@@ -11,6 +11,14 @@ async function openSheet()
 	const data = await promisify(doc.getInfo)();
 	const sheet = data.worksheets[0];
 	console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
+
+	const rows = await promisify(sheet.getRows)();
+
+	/* Code for printing a certain column out of each row
+	rows.forEach(row => {
+		console.log(`Code: ${row.passcode}`);
+	});
+	*/
 }
 
 openSheet();
