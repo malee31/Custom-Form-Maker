@@ -1,3 +1,3 @@
 # Testing Reading and Writing to a Google Sheet through Node.js
-To run this, you need a SpreadSheetCredentials.json which is just a Google Drive API Service account key from Google Developers Console as an editor as well as a SpreadsheetID.json with nothing but an "id" key with the sheet ID.
-The email given by the json file must have access to the sheet in question as an editor as well.
+To run this, you'll need SpreadSheetCredentials.json (just a renamed Google Drive API Service account key json file from Google Developers Console) and a SpreadsheetID.json with nothing but an "id" key with the sheet ID.
+The email given in the credentials json file must have edit access to the sheet being used for data too.
