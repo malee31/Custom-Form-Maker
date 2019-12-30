@@ -17,16 +17,36 @@ async function testSheet()
 
 	const cells = await promisify(sheet.getCells)({
 		'min-row' : 1,
-		'max-row' : 3,
+		'max-row' : 1,
 		'min-col' : 1,
-		'max-col' : 2,
+		'max-col' : 1,
 		'return-empty' : true,
 	});
 
-	for(const cell of cells)
-	{
-		console.log(cell.value);
-	}
+	// for(const cell of cells)
+	// {
+	// 	console.log(cell.value);
+	// }
+	getCell(1, 1).then(
+		(val) => {val[0].value = "FirstOrNot"; val[0].save();},
+		(err) => {console.log(err);}
+	);
+}
+
+async function getCell(x, y)
+{
+	const doc = new GoogleSpreadsheet(sheetID.id);
+	await promisify(doc.useServiceAccountAuth)(credentials);
+	const data = await promisify(doc.getInfo)();
+	//change index number to access different sheet
+	const sheet = data.worksheets[0];
+	return await promisify(sheet.getCells)({
+		'min-row' : y,
+		'max-row' : y,
+		'min-col' : x,
+		'max-col' : x,
+		'return-empty' : true,
+	});
 }
 
 async function testRows()
@@ -59,12 +79,12 @@ testRows().then((rows) => {
 		rows.forEach(row => {
 			/* This is for sheet 1 testing
             console.log(row.score);*/
-			if(row.first === "Marvin")
-			{
-				console.log(`${row.first} ${row.lastname} is now ${row.first} ${row.lastname + row.lastname}`);
-				row.lastname += row.lastname;
-				row.save();
-			}
+			// if(row.first === "Marvin")
+			// {
+			// 	console.log(`${row.first} ${row.lastname} is now ${row.first} ${row.lastname + row.lastname}`);
+			// 	row.lastname += row.lastname;
+			// 	row.save();
+			// }
 		});
 	},
 	(err) => {
