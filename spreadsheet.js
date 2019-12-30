@@ -18,11 +18,13 @@ async function openSheet()
 	//Code for printing a certain column out of each row
 	rows.forEach(row => {
 		console.log(row.score);
-		// if(row.first !== "Marvin")
-		// {
-		// 	console.log(row.lastname)
-		// 	row.save();
-		// }
+		/* For sheet 1 testing
+		if(row.first !== "Marvin")
+		{
+			console.log(row.lastname)
+			row.save();
+		}
+		*/
 	});
 }
 
