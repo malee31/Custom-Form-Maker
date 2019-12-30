@@ -10,22 +10,32 @@ async function openSheet()
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 	//change index number to access different sheet
-	const sheet = data.worksheets[1];
+	const sheet = data.worksheets[0];
 	console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
+}
+
+async function testRows()
+{
+	const doc = new GoogleSpreadsheet(sheetID.id);
+	await promisify(doc.useServiceAccountAuth)(credentials);
+	const data = await promisify(doc.getInfo)();
+	//change index number to access different sheet
+	const sheet = data.worksheets[0];
 
 	const rows = await promisify(sheet.getRows)();
 
-	//Code for printing a certain column out of each row
+	/*Code for printing a certain column out of each row*/
 	rows.forEach(row => {
-		console.log(row.score);
-		/* For sheet 1 testing
-		if(row.first !== "Marvin")
+		/* This is for sheet 1 testing
+		console.log(row.score);*/
+		if(row.first === "Marvin")
 		{
-			console.log(row.lastname)
+			console.log(`${row.first} ${row.lastname} is now ${row.first} ${row.lastname + row.lastname}`);
+			row.lastname += row.lastname;
 			row.save();
 		}
-		*/
 	});
 }
 
 openSheet();
+testRows();
