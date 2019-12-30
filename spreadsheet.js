@@ -15,17 +15,18 @@ async function testSheet()
 
 	console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
 
-	// const cells = doc.getCells(1, {
-	// 	'min-row' : 1,
-	// 	'min-col' : 1,
-	// 	'max-row' : 2,
-	// 	'max-col' : 2,
-	// });
-	//
-	// for(const cell in cells)
-	// {
-	// 	console.log(cell.value);
-	// }
+	const cells = await promisify(sheet.getCells)({
+		'min-row' : 1,
+		'max-row' : 3,
+		'min-col' : 1,
+		'max-col' : 2,
+		'return-empty' : true,
+	});
+
+	for(const cell of cells)
+	{
+		console.log(cell.value);
+	}
 }
 
 async function testRows()
