@@ -9,6 +9,7 @@ async function openSheet()
 	const doc = new GoogleSpreadsheet(sheetID.id);
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
+	//change index number to access different sheet
 	const sheet = data.worksheets[1];
 	console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
 
