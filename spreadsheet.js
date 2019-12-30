@@ -15,18 +15,6 @@ async function testSheet()
 
 	console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
 
-	const cells = await promisify(sheet.getCells)({
-		'min-row' : 1,
-		'max-row' : 1,
-		'min-col' : 1,
-		'max-col' : 1,
-		'return-empty' : true,
-	});
-
-	// for(const cell of cells)
-	// {
-	// 	console.log(cell.value);
-	// }
 	getCell(1, 1).then(
 		(val) => {val[0].value = "FirstOrNot"; val[0].save();},
 		(err) => {console.log(err);}
