@@ -6,12 +6,26 @@ const sheetID = require('./SpreadsheetID.json');
 
 async function testSheet()
 {
+	//Testing things here then splitting them off into functions
 	const doc = new GoogleSpreadsheet(sheetID.id);
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 	//change index number to access different sheet
 	const sheet = data.worksheets[0];
+
 	console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
+
+	// const cells = doc.getCells(1, {
+	// 	'min-row' : 1,
+	// 	'min-col' : 1,
+	// 	'max-row' : 2,
+	// 	'max-col' : 2,
+	// });
+	//
+	// for(const cell in cells)
+	// {
+	// 	console.log(cell.value);
+	// }
 }
 
 async function testRows()
@@ -27,11 +41,15 @@ async function testRows()
 	return rows;
 }
 
+// async function testCells()
+
+
+//Actual testing
 testSheet().then(() => {
 		console.log("testSheet() complete")
 	},
 	(err) => {
-		console.log(`Error: ${err}`)
+		console.log(`Error: ${err}`);
 	}
 );
 
@@ -49,6 +67,6 @@ testRows().then((rows) => {
 		});
 	},
 	(err) => {
-		console.log(`Error: ${err}`)
+		console.log(`Error: ${err}`);
 	}
 );
