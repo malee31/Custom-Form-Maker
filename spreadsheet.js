@@ -4,7 +4,7 @@ const { promisify } = require('util');
 const credentials = require('./SpreadsheetPlaygroundCredentials.json');
 const sheetID = require('./SpreadsheetID.json');
 
-async function openSheet()
+async function testSheet()
 {
 	const doc = new GoogleSpreadsheet(sheetID.id);
 	await promisify(doc.useServiceAccountAuth)(credentials);
@@ -16,6 +16,7 @@ async function openSheet()
 
 async function testRows()
 {
+	//returns rows for resolved Promise
 	const doc = new GoogleSpreadsheet(sheetID.id);
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
@@ -23,19 +24,31 @@ async function testRows()
 	const sheet = data.worksheets[0];
 
 	const rows = await promisify(sheet.getRows)();
-
-	/*Code for printing a certain column out of each row*/
-	rows.forEach(row => {
-		/* This is for sheet 1 testing
-		console.log(row.score);*/
-		if(row.first === "Marvin")
-		{
-			console.log(`${row.first} ${row.lastname} is now ${row.first} ${row.lastname + row.lastname}`);
-			row.lastname += row.lastname;
-			row.save();
-		}
-	});
+	return rows;
 }
 
-openSheet();
-testRows();
+testSheet().then(() => {
+		console.log("testSheet() complete")
+	},
+	(err) => {
+		console.log(`Error: ${err}`)
+	}
+);
+
+testRows().then((rows) => {
+		/*Code for printing a certain column out of each row*/
+		rows.forEach(row => {
+			/* This is for sheet 1 testing
+            console.log(row.score);*/
+			if(row.first === "Marvin")
+			{
+				console.log(`${row.first} ${row.lastname} is now ${row.first} ${row.lastname + row.lastname}`);
+				row.lastname += row.lastname;
+				row.save();
+			}
+		});
+	},
+	(err) => {
+		console.log(`Error: ${err}`)
+	}
+);
