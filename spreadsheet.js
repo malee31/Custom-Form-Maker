@@ -4,6 +4,15 @@ const { promisify } = require('util');
 const credentials = require('./SpreadsheetPlaygroundCredentials.json');
 const sheetID = require('./SpreadsheetID.json');
 
+module.exports = {
+	testPost: function () {
+		console.log("yay");
+	},
+	pasteName: function () {
+		testSheet();
+	}
+}
+
 async function testSheet()
 {
 	//Testing things here then splitting them off into functions
@@ -54,13 +63,13 @@ async function testRows()
 
 
 //Actual testing
-testSheet().then(() => {
-		console.log("testSheet() complete")
-	},
-	(err) => {
-		console.log(`Error: ${err}`);
-	}
-);
+//testSheet().then(() => {
+//		console.log("testSheet() complete")
+//	},
+//	(err) => {
+//		console.log(`Error: ${err}`);
+//	}
+//);
 
 testRows().then((rows) => {
 		/*Code for printing a certain column out of each row*/
