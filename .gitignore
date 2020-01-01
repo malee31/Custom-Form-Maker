@@ -3,6 +3,10 @@
 # npm install files
 node_modules/
 
+# vim files
+*.swp
+*.swo
+
 #dev files
 output.txt
 
