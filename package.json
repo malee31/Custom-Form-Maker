@@ -4,6 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "run": "node app.js",
+    "dev": "node app.js &> output.txt",
     "test": "node spreadsheet.js"
   },
   "keywords": [],
