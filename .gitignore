@@ -1,6 +1,10 @@
+# Intellij files
 .idea/
-
+# npm install files
 node_modules/
+
+#dev files
+output.txt
 
 # Private Stuff needed to run script
 SpreadsheetPlaygroundCredentials.json
