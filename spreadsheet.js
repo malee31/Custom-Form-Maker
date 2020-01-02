@@ -1,8 +1,8 @@
 const GoogleSpreadsheet = require('google-spreadsheet');
 const { promisify } = require('util');
 
-const credentials = require('./SpreadsheetPlaygroundCredentials.json');
-const sheetID = require('./SpreadsheetID.json');
+const credentials = require('./private/SpreadsheetPlaygroundCredentials.json');
+const sheetID = require('./private/SpreadsheetID.json');
 
 module.exports = {
 	testPost: function () {

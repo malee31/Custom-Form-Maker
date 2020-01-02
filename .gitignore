@@ -11,5 +11,6 @@ node_modules/
 output.txt
 
 # Private Stuff needed to run script
+private/
 SpreadsheetPlaygroundCredentials.json
 SpreadsheetID.json
