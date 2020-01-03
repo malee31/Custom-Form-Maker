@@ -5,10 +5,14 @@ const path = require("path");
 const test = require("./spreadsheet.js");
 
 app.use(express.urlencoded({extended: true}));
-app.use(express.static(path.join(__dirname, "public")));
+
+app.use('*/css',express.static('public/css'));
+app.use('*/js',express.static('public/js'));
+
+app.use("/static", express.static(path.resolve(__dirname, "public")));
 
 app.get("/", (req, res) => {
-	res.sendFile(path.resolve(__dirname + "/public/html/index.html"));
+	res.sendFile(path.resolve(__dirname, "views/index.html"));
 });
 
 app.post('/', function (req, res) {
