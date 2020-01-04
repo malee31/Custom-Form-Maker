@@ -88,3 +88,27 @@ testRows().then((rows) => {
 		console.log(`Error: ${err}`);
 	}
 );
+
+async function testNewRow()
+{
+	const doc = new GoogleSpreadsheet(sheetID.id);
+	await promisify(doc.useServiceAccountAuth)(credentials);
+	const data = await promisify(doc.getInfo)();
+	//change index number to access different sheet
+	const sheet = data.worksheets[0];
+
+	sheet.addRow({
+		"first": "John",
+		"last": "Doe",
+		"buildseasonhours": 99,
+		"teamhours": 98,
+		"probation": true
+	}, (err, row) => {
+		return (err) ? err : JSON.stringify(row);
+	})
+}
+
+testNewRow().then((returnee) => {
+	console.log(returnee);
+	}
+)
