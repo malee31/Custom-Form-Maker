@@ -11,6 +11,10 @@ app.use('*/js',express.static('public/js'));
 
 app.use("/static", express.static(path.resolve(__dirname, "public")));
 
+app.get("/css/styles.css", () => {
+	res.sendFile(path.resolve(__dirname, "public/css/styles.css"));
+});
+
 app.get("/", (req, res) => {
 	res.sendFile(path.resolve(__dirname, "views/index.html"));
 });
