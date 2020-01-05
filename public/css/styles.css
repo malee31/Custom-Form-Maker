@@ -1,3 +1,11 @@
+body
+{
+	background-color: #D6C0C2;
+	background-image: url("https://www.nps.gov/subjects/culturallandscapes/images/29704127485_d92369476c_k.jpg?maxwidth=1200&maxheight=1200&autorotate=false");
+	background-size: cover;
+	background-repeat: no-repeat; 
+}
+
 main
 {
 	padding: 0;
