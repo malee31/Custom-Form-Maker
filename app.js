@@ -23,6 +23,8 @@ app.post('/', function (req, res) {
 	test.testPost();
 	test.pasteName();
 	console.log(req.body);
+	const info = req.body;
+	test.newRow(info.first, info.last, info.buildHours, info.hours, (info.probation.toUpperCase() === "YES" || info.probation.toUpperCase() === "TRUE"));
 	res.send("Success\n" + JSON.stringify(req.body));
 })
 

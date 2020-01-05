@@ -8,9 +8,8 @@ module.exports = {
 	testPost: function () {
 		console.log("yay");
 	},
-	pasteName: function () {
-		testSheet();
-	}
+	pasteName: testSheet,
+	newRow: testNewRow
 }
 
 async function testSheet()
@@ -89,7 +88,7 @@ testRows().then((rows) => {
 	}
 );
 
-async function testNewRow()
+async function testNewRow(first, last, buildhrs, hrs, prob)
 {
 	const doc = new GoogleSpreadsheet(sheetID.id);
 	await promisify(doc.useServiceAccountAuth)(credentials);
@@ -98,17 +97,12 @@ async function testNewRow()
 	const sheet = data.worksheets[0];
 
 	sheet.addRow({
-		"first": "John",
-		"last": "Doe",
-		"buildseasonhours": 99,
-		"teamhours": 98,
-		"probation": true
+		"first": first,
+		"lastname": last,
+		"buildseasonhours": buildhrs,
+		"teamhours": hrs,
+		"probation": prob
 	}, (err, row) => {
 		return (err) ? err : JSON.stringify(row);
 	})
 }
-
-testNewRow().then((returnee) => {
-	console.log(returnee);
-	}
-)
