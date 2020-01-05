@@ -5,9 +5,6 @@ const credentials = require('./private/SpreadsheetPlaygroundCredentials.json');
 const sheetID = require('./private/SpreadsheetID.json');
 
 module.exports = {
-	testPost: function () {
-		console.log("yay");
-	},
 	pasteName: testSheet,
 	newRow: testNewRow
 }
@@ -22,11 +19,6 @@ async function testSheet()
 	const sheet = data.worksheets[0];
 
 	console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
-
-	getCell(1, 1).then(
-		(val) => {val[0].value = "FirstOrNot"; val[0].save();},
-		(err) => {console.log(err);}
-	);
 }
 
 async function getCell(x, y)

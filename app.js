@@ -5,6 +5,7 @@ const path = require("path");
 const test = require("./spreadsheet.js");
 
 app.use(express.urlencoded({extended: true}));
+app.use(express.json());
 
 app.use('*/css',express.static('public/css'));
 app.use('*/js',express.static('public/js'));
@@ -20,11 +21,9 @@ app.get("/", (req, res) => {
 });
 
 app.post('/', function (req, res) {
-	test.testPost();
 	test.pasteName();
-	console.log(req.body);
 	const info = req.body;
-	test.newRow(info.first, info.last, info.buildHours, info.hours, (info.probation.toUpperCase() === "YES" || info.probation.toUpperCase() === "TRUE"));
+	test.newRow(info.first, info.last, info.buildHours, info.hours, (info.probation && (info.probation.toUpperCase() === "YES" || info.probation.toUpperCase() === "TRUE")));
 	res.send("Success\n" + JSON.stringify(req.body));
 })
 
