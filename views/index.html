@@ -7,14 +7,15 @@
 	</head>
 	<body>
 		<main>
-			<form action="/" method="POST">
-				<input type="text" name="first" autocomplete=""off" placeholder="First Name"></input>
-				<input type="text" name="last" autocomplete=""off" placeholder="Last Name"></input>
-				<input type="text" name="buildHours" autocomplete=""off" placeholder="Build Hours"></input>
-				<input type="text" name="hours" autocomplete=""off" placeholder="Hours"></inputHours>
-				<input type="text" name="probation" autocomplete=""off" placeholder="On Probation"></inputHours>
+			<form enctype="application/json" action="/" method="POST" name="mainForm">
+				<input type="text" name="first" autocomplete="off" placeholder="First Name"></input>
+				<input type="text" name="last" autocomplete="off" placeholder="Last Name"></input>
+				<input type="text" name="buildHours" autocomplete="off" placeholder="Build Hours"></input>
+				<input type="text" name="hours" autocomplete="off" placeholder="Hours"></input>
+				<input type="text" name="probation" autocomplete="off" placeholder="On Probation"></input>
 				<input type="submit" name="mainSubmit" value="Submit and Test"/>
 			</form>
 		</main>
+		<script src="/js/formSender.js"></script>
 	</body>
 </html>
