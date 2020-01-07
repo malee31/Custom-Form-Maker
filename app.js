@@ -23,7 +23,6 @@ app.get("/", (req, res) => {
 app.post('/', function (req, res) {
 	test.pasteName();
 	const info = req.body;
-	console.log(req);
 	if(Object.entries(info).length === 0 && info.constructor === Object)
 	{
 		res.sendStatus(422);

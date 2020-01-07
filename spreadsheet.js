@@ -62,24 +62,6 @@ async function testRows()
 //	}
 //);
 
-testRows().then((rows) => {
-		/*Code for printing a certain column out of each row*/
-		rows.forEach(row => {
-			/* This is for sheet 1 testing
-            console.log(row.score);*/
-			// if(row.first === "Marvin")
-			// {
-			// 	console.log(`${row.first} ${row.lastname} is now ${row.first} ${row.lastname + row.lastname}`);
-			// 	row.lastname += row.lastname;
-			// 	row.save();
-			// }
-		});
-	},
-	(err) => {
-		console.log(`Error: ${err}`);
-	}
-);
-
 async function testNewRow(first, last, buildhrs, hrs, prob)
 {
 	const doc = new GoogleSpreadsheet(sheetID.id);
