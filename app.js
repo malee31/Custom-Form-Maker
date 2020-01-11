@@ -10,17 +10,18 @@ app.use(express.json());
 app.use('*/css',express.static('public/css'));
 app.use('*/js',express.static('public/js'));
 
+//Not used... I used the one above which probably isn't right. Will fix later.
 app.use("/static", express.static(path.resolve(__dirname, "public")));
-
-app.get("/css/styles.css", () => {
-	res.sendFile(path.resolve(__dirname, "public/css/styles.css"));
-});
 
 app.get("/", (req, res) => {
 	res.sendFile(path.resolve(__dirname, "views/index.html"));
 });
 
-app.post('/', function (req, res) {
+app.get("/form", (req, res) => {
+	res.sendFile(path.resolve(__dirname, "views/form.html"));
+});
+
+app.post('/form', (req, res) => {
 	test.pasteName();
 	const info = req.body;
 	if(Object.entries(info).length === 0 && info.constructor === Object)
@@ -32,6 +33,6 @@ app.post('/', function (req, res) {
 		test.newRow(info.first, info.last, info.buildHours, info.hours, (info.probation && (info.probation.toUpperCase() === "YES" || info.probation.toUpperCase() === "TRUE")));
 		res.send("Success\n" + JSON.stringify(req.body));
 	}
-})
+});
 
 app.listen(8080);

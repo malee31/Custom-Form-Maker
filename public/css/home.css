@@ -14,18 +14,18 @@ main
 	align-items: center;
 	justify-content: center;
 	text-align: center;
-	flex-direction: column;
+   flex-direction: column;
 }
 
-form
+#inputContainer
 {
-	padding: 5%;
+	padding: 2%;
 	display: flex;
 	align-content: center;
 	align-items: center;
 	justify-content: center;
 	text-align: center;
-	flex-direction: column;
+   flex-direction: column;
 }
 
 input
