@@ -1,15 +1,27 @@
 <!DOCTYPE html>
 	<head>
 		<title>
-			Form Selection
+			Custom Spreadsheet Form
 		</title>
-		<link rel="stylesheet" type="text/css" href="/css/home.css">
+		<link rel="stylesheet" type="text/css" href="/css/styles.css">
 	</head>
 	<body>
+		<section id="getId">
+			<form enctype="application/json" action="/" method="POST" name="idGetter">
+				<input type="text" name="sheetId"></input>
+				<input type="submit" name="submit"></input>
+			</form>
+		</section>
 		<main>
-			<div id="inputContainer">
-				<input type="text" placeholder="Spreadsheet ID">
-			</div>
+			<form enctype="application/json" action="/" method="POST" name="mainForm">
+				<input type="text" name="first" autocomplete="off" placeholder="First Name"></input>
+				<input type="text" name="last" autocomplete="off" placeholder="Last Name"></input>
+				<input type="text" name="buildHours" autocomplete="off" placeholder="Build Hours"></input>
+				<input type="text" name="hours" autocomplete="off" placeholder="Hours"></input>
+				<input type="text" name="probation" autocomplete="off" placeholder="On Probation"></input>
+				<input type="submit" name="mainSubmit" value="Submit and Test"/>
+			</form>
 		</main>
+		<script src="/js/formSender.js"></script>
 	</body>
 </html>

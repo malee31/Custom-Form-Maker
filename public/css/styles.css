@@ -6,6 +6,25 @@ body
 	background-repeat: no-repeat; 
 }
 
+#getId
+{
+	background-color: #EEE;
+	position: fixed;
+	z-index: 2;
+	width: 60vw;
+	height: 50vh;
+	top: 50%;
+	left: 50%;
+	margin-left: -30vw;
+	margin-top: -25vh;
+	display: flex;
+	align-content: center;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	flex-direction: column;
+}
+
 main
 {
 	padding: 0;

@@ -17,21 +17,27 @@ app.get("/", (req, res) => {
 	res.sendFile(path.resolve(__dirname, "views/index.html"));
 });
 
-app.get("/form", (req, res) => {
-	res.sendFile(path.resolve(__dirname, "views/form.html"));
-});
-
-app.post('/form', (req, res) => {
+app.post("/", (req, res) => {
 	test.pasteName();
 	const info = req.body;
 	if(Object.entries(info).length === 0 && info.constructor === Object)
 	{
 		res.sendStatus(422);
 	}
+	else if(info.id)
+	{
+		test.getHeaders(info.id).then(headers => {
+			console.log(headers);
+			res.json(headers);
+		},
+		err => {
+			console.log(`Error: ${err}`);
+		});
+	}
 	else
 	{
 		test.newRow(info.first, info.last, info.buildHours, info.hours, (info.probation && (info.probation.toUpperCase() === "YES" || info.probation.toUpperCase() === "TRUE")));
-		res.send("Success\n" + JSON.stringify(req.body));
+		res.send("Success\n" + JSON.stringify(info));
 	}
 });
 

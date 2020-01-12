@@ -6,7 +6,33 @@ const sheetID = require('./private/SpreadsheetID.json');
 
 module.exports = {
 	pasteName: testSheet,
-	newRow: testNewRow
+	newRow: testNewRow,
+	getHeaders: getHeaders
+}
+
+async function getHeaders(id)
+{
+	const doc = new GoogleSpreadsheet(id);
+	await promisify(doc.useServiceAccountAuth)(credentials);
+	const data = await promisify(doc.getInfo)();
+	//change index number to access different sheet
+	const sheet = data.worksheets[0];
+	const topCells = await promisify(sheet.getCells)({
+		'min-row' : 1,
+		'max-row' : 1,
+		'min-col' : 1,
+		'max-col' : sheet.colCount,
+		'return-empty' : false,
+	});
+	var headers = {};
+	var counter = 1;
+	for(const cell of topCells)
+	{
+		headers[counter] = cell.value;
+		counter++;
+	}
+	//Might want to reprocess them to sanitize their values
+	return JSON.stringify(headers);
 }
 
 async function testSheet()
