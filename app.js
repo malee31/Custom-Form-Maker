@@ -27,7 +27,7 @@ app.post("/", (req, res) => {
 	else if(info.id)
 	{
 		test.getHeaders(info.id).then(headers => {
-			console.log(headers);
+			//console.log(headers);
 			res.json(headers);
 		},
 		err => {
@@ -36,7 +36,8 @@ app.post("/", (req, res) => {
 	}
 	else
 	{
-		test.newRow(info.first, info.last, info.buildHours, info.hours, (info.probation && (info.probation.toUpperCase() === "YES" || info.probation.toUpperCase() === "TRUE")));
+		console.log(info);
+		test.newRow(info);
 		res.send("Success\n" + JSON.stringify(info));
 	}
 });

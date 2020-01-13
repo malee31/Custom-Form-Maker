@@ -31,7 +31,7 @@ async function getHeaders(id)
 		headers[counter] = cell.value;
 		counter++;
 	}
-	//Might want to reprocess them to sanitize their values
+	//Reprocessed client-side to sanitize their values to the actual properties
 	return JSON.stringify(headers);
 }
 
