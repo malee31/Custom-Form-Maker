@@ -88,21 +88,19 @@ async function testRows()
 //	}
 //);
 
-async function testNewRow(first, last, buildhrs, hrs, prob)
+async function testNewRow(userInput)
 {
 	const doc = new GoogleSpreadsheet(sheetID.id);
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 	//change index number to access different sheet
 	const sheet = data.worksheets[0];
+	
+	console.log(userInput);
 
-	sheet.addRow({
-		"first": first,
-		"lastname": last,
-		"buildseasonhours": buildhrs,
-		"teamhours": hrs,
-		"probation": prob
-	}, (err, row) => {
+	sheet.addRow(
+		userInput
+	, (err, row) => {
 		return (err) ? err : JSON.stringify(row);
 	})
 }
