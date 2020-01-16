@@ -37,7 +37,12 @@ app.post("/", (req, res) => {
 	else
 	{
 		console.log(info);
-		test.newRow(info);
+		test.newRow(info).then(output => {
+			console.log(output);
+		},
+		err => {
+			console.log(`Error while adding rows: ${err}`);
+		});
 		res.send("Success\n" + JSON.stringify(info));
 	}
 });
