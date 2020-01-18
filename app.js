@@ -32,6 +32,7 @@ app.post("/", (req, res) => {
 		},
 		err => {
 			console.log(`Error: ${err}`);
+			res.sendStatus(422);
 		});
 	}
 	else

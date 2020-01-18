@@ -1,3 +1,5 @@
+var canPost = true;
+
 function loadInputs(ids)
 {
 	//Don't ask, I don't know either because the first parse gives typeof string while the second is object
@@ -50,26 +52,37 @@ window.addEventListener("load", () => {
 	idGet.addEventListener("submit", event => {
 		event.preventDefault();
 		
-		const req = new XMLHttpRequest();
+		if(canPost)
+		{
+			canPost = false;
 
-		req.addEventListener("load", event => {
-			loadInputs(event.target.responseText);
-		});
+			const req = new XMLHttpRequest();
 
-		req.addEventListener("error", event => {
-			console.log("There's been an error");
-			console.log(event);
-		});
+			req.addEventListener("load", event => {
+				loadInputs(event.target.responseText);
+			});
+
+			req.addEventListener("onerror", event => {
+				console.log("There's been an error");
+				console.log(event);
+				canPost = true;
+			});
 		
-		req.open("POST", window.location, true);
+			/*req.onerror = (err) => {
+				console.log(err);
+				canPost = true;
+			}*/
 
-		req.setRequestHeader("Content-Type", "application/json");
+			req.open("POST", window.location, true);
 
-		const data = {"id": document.getElementsByName("sheetId")[0].value};
+			req.setRequestHeader("Content-Type", "application/json");
 
-		console.log("Sending for Inputs " + JSON.stringify(data));
+			const data = {"id": document.getElementsByName("sheetId")[0].value};
 
-		req.send(JSON.stringify(data));
+			console.log("Sending for Inputs " + JSON.stringify(data));
+
+			req.send(JSON.stringify(data));
+		}
 	});
 
 
