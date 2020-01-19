@@ -44,7 +44,7 @@ async function testSheet()
 	//change index number to access different sheet
 	const sheet = data.worksheets[0];
 
-	console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
+	//console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
 }
 
 async function getCell(x, y)
@@ -96,7 +96,7 @@ async function testNewRow(userInput)
 	//change index number to access different sheet
 	const sheet = data.worksheets[0];
 	
-	console.log(userInput);
+	//console.log(userInput);
 
 	sheet.addRow(
 		userInput

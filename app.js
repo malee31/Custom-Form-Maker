@@ -37,7 +37,7 @@ app.post("/", (req, res) => {
 	}
 	else
 	{
-		console.log(info);
+		//console.log(info);
 		test.newRow(info).then(output => {
 			console.log(output);
 		},
