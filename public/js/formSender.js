@@ -3,7 +3,10 @@ var canPost = true;
 function loadInputs(ids)
 {
 	//Don't ask, I don't know either because the first parse gives typeof string while the second is object
-	const inputIds = JSON.parse(JSON.parse(ids));
+	//Welp, with responseType="json", no need to parse twice anymore
+	//const inputIds = JSON.parse(JSON.parse(ids));
+
+	const inputIds = JSON.parse(ids);
 
 	const mainForm = document.getElementsByName("mainForm")[0];
 
@@ -59,7 +62,14 @@ window.addEventListener("load", () => {
 			const req = new XMLHttpRequest();
 
 			req.addEventListener("load", event => {
-				loadInputs(event.target.responseText);
+				if(event.target.status != 200)
+				{
+					canPost = true;
+				}
+				else
+				{
+					loadInputs(event.target.response);
+				}
 			});
 
 			req.addEventListener("onerror", event => {
@@ -68,18 +78,20 @@ window.addEventListener("load", () => {
 				canPost = true;
 			});
 		
-			/*req.onerror = (err) => {
+			req.onerror = (err) => {
 				console.log(err);
 				canPost = true;
-			}*/
+			}
 
 			req.open("POST", window.location, true);
+
+			req.responseType = "json";
 
 			req.setRequestHeader("Content-Type", "application/json");
 
 			const data = {"id": document.getElementsByName("sheetId")[0].value};
 
-			console.log("Sending for Inputs " + JSON.stringify(data));
+			console.log("Sending for Inputs from Id: " + JSON.stringify(data));
 
 			req.send(JSON.stringify(data));
 		}
