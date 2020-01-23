@@ -91,6 +91,8 @@ window.addEventListener("load", () => {
 
 			const data = {"id": document.getElementsByName("sheetId")[0].value};
 
+			document.cookie = "id=" + data.id;
+
 			console.log("Sending for Inputs from Id: " + JSON.stringify(data));
 
 			req.send(JSON.stringify(data));
@@ -104,7 +106,9 @@ window.addEventListener("load", () => {
 		event.preventDefault();
 
 		var data = {};
-
+		
+		//var cookie = document.cookie;
+		
 		for(const input of form.elements)
 		{
 			if(input.nodeName === "INPUT")
