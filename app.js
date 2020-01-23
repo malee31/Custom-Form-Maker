@@ -4,17 +4,13 @@ const app = express();
 const path = require("path");
 
 //Imports module imports from spreadsheet.js
-const test = require("./spreadsheet.js");
+const sheet = require("./spreadsheet.js");
 
 //Allows parsing of data in requests
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
-//Serving static css and js files in index.html
-app.use('*/css', express.static('public/css'));
-app.use('*/js', express.static('public/js'));
-
-//Not used... I used the one above which probably isn't right. Will fix later.
+//Serves static file like local js and css
 app.use("/static", express.static(path.resolve(__dirname, "public")));
 
 //Sends html file when the page is accessed
@@ -23,7 +19,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/", (req, res) => {
-	//test.pasteName();
+	//sheet.pasteName();
 	const info = req.body;
 
 	//Invalid Request error on empty POST request
@@ -35,7 +31,7 @@ app.post("/", (req, res) => {
 	else if(info.id)
 	{
 		//Runs if we are retrieving spreadsheet form
-		test.getHeaders(info.id).then(headers => {
+		sheet.getHeaders(info.id).then(headers => {
 			//console.log(headers);
 			//returns the headers to site as a json file to be parsed
 			res.json(headers);
@@ -50,7 +46,7 @@ app.post("/", (req, res) => {
 	{
 		//Submitting data
 		//console.log(info);
-		test.newRow(info).then(output => {
+		sheet.newRow(info).then(output => {
 			console.log(output);
 		},
 		err => {
