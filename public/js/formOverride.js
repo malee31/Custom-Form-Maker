@@ -1,55 +1,6 @@
 var canPost = true;
 
-function loadInputs(ids)
-{
-	//Don't ask, I don't know either because the first parse gives typeof string while the second is object
-	//Welp, with responseType="json", no need to parse twice anymore
-	//const inputIds = JSON.parse(JSON.parse(ids));
-
-	const inputIds = JSON.parse(ids);
-
-	const mainForm = document.getElementsByName("mainForm")[0];
-
-	const submitButton = document.getElementsByName("mainSubmit")[0];
-	submitButton.removeAttribute("hidden");
-	for(const index in inputIds)
-	{
-		var newInput = document.createElement("INPUT");
-		var text = inputIds[index];
-		newInput.setAttribute("name", sheetFormatHeaders(text));
-		newInput.setAttribute("placeholder", text);
-		newInput.setAttribute("type", "text");
-		mainForm.insertBefore(newInput, submitButton);
-	}
-	console.log(inputIds);
-	deleteIdGetter();
-}
-
-function sheetFormatHeaders(header)
-{
-	var formatted = header.toLowerCase().replace(/\s/g, "").replace(/\W/g, "").replace(/_/g, "");
-	for(var i= 0; i < header.length; i++)
-	{
-		if(!isNaN(parseInt(formatted.substring(0, 1))))
-		{
-			formatted = formatted.substring(1);
-		}
-		else
-		{
-			break;
-		}
-	}
-	return formatted;
-}
-
-function deleteIdGetter()
-{
-	const idGetter = document.getElementById("getId");
-	idGetter.parentNode.removeChild(idGetter);
-}
-
 window.addEventListener("load", () => {
-
 	let idGet = document.forms["idGetter"];
 
 	idGet.addEventListener("submit", event => {
