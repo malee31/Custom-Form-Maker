@@ -58,6 +58,8 @@ window.addEventListener("load", () => {
 
 		var data = {};
 		
+		data["formId"] = cookieValue("id");
+
 		for(const input of form.elements)
 		{
 			if(input.nodeName === "INPUT")

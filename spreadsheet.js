@@ -90,7 +90,8 @@ async function testRows()
 
 async function testNewRow(userInput)
 {
-	const doc = new GoogleSpreadsheet(sheetID.id);
+	const doc = new GoogleSpreadsheet(userInput["formId"]);
+	delete userInput["formId"];
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 	//change index number to access different sheet
