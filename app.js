@@ -47,7 +47,7 @@ app.post("/", (req, res) => {
 		//Submitting data
 		//console.log(info);
 		sheet.newRow(info).then(output => {
-			console.log(output);
+			console.log(output ? output : "");
 		},
 		err => {
 			console.log(`Error while adding rows: ${err}`);

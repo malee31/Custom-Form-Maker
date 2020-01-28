@@ -5,8 +5,8 @@ const credentials = require('./private/SpreadsheetPlaygroundCredentials.json');
 const sheetID = require('./private/SpreadsheetID.json');
 
 module.exports = {
-	pasteName: testSheet,
-	newRow: testNewRow,
+	pasteName: basicData,
+	newRow: newRow,
 	getHeaders: getHeaders
 }
 
@@ -16,7 +16,7 @@ async function getHeaders(id)
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 	//change index number to access different sheet
-	const sheet = data.worksheets[0];
+	const sheet = data.worksheets[getMain()];
 	const topCells = await promisify(sheet.getCells)({
 		'min-row' : 1,
 		'max-row' : 1,
@@ -35,14 +35,14 @@ async function getHeaders(id)
 	return JSON.stringify(headers);
 }
 
-async function testSheet()
+async function basicData()
 {
 	//Testing things here then splitting them off into functions
 	const doc = new GoogleSpreadsheet(sheetID.id);
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 	//change index number to access different sheet
-	const sheet = data.worksheets[0];
+	const sheet = data.worksheets[getMain()];
 
 	//console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
 }
@@ -53,7 +53,7 @@ async function getCell(x, y)
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 	//change index number to access different sheet
-	const sheet = data.worksheets[0];
+	const sheet = data.worksheets[getMain()];
 	return await promisify(sheet.getCells)({
 		'min-row' : y,
 		'max-row' : y,
@@ -70,7 +70,7 @@ async function testRows()
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 	//change index number to access different sheet
-	const sheet = data.worksheets[0];
+	const sheet = data.worksheets[getMain()];
 
 	const rows = await promisify(sheet.getRows)();
 	return rows;
@@ -88,15 +88,16 @@ async function testRows()
 //	}
 //);
 
-async function testNewRow(userInput)
+async function newRow(userInput)
 {
 	const doc = new GoogleSpreadsheet(userInput["formId"]);
 	delete userInput["formId"];
+
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
+
 	//change index number to access different sheet
-	const sheet = data.worksheets[0];
-	
+	const sheet = data.worksheets[getMain()];
 	//console.log(userInput);
 
 	sheet.addRow(
@@ -104,4 +105,14 @@ async function testNewRow(userInput)
 	, (err, row) => {
 		return (err) ? err : JSON.stringify(row);
 	})
+}
+
+async function getConfig()
+{
+	
+}
+
+/*async*/ function getMain()
+{
+	return 0;
 }
