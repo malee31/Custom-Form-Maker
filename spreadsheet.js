@@ -4,6 +4,8 @@ const { promisify } = require('util');
 const credentials = require('./private/SpreadsheetPlaygroundCredentials.json');
 const sheetID = require('./private/SpreadsheetID.json');
 
+const configSheetName = ".config";
+
 module.exports = {
 	pasteName: basicData,
 	newRow: newRow,
@@ -15,6 +17,9 @@ async function getHeaders(id)
 	const doc = new GoogleSpreadsheet(id);
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
+
+	getConfig(data.worksheets);
+
 	//change index number to access different sheet
 	const sheet = data.worksheets[getMain()];
 	const topCells = await promisify(sheet.getCells)({
@@ -107,9 +112,17 @@ async function newRow(userInput)
 	})
 }
 
-async function getConfig()
+async function getConfig(spreadsheets)
 {
-	
+	for(var i = 0; i < spreadsheets.length; i++)
+	{
+		if(spreadsheets[i].title === configSheetName)
+		{
+			console.log(spreadsheets[i].title);
+			return spreadsheets[i];
+		}
+	}
+	return;
 }
 
 /*async*/ function getMain()
