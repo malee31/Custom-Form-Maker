@@ -18,10 +18,8 @@ async function getHeaders(id)
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 
-	getConfig(data.worksheets);
-
 	//change index number to access different sheet
-	const sheet = data.worksheets[getMain()];
+	const sheet = getMain(data.worksheets);
 	const topCells = await promisify(sheet.getCells)({
 		'min-row' : 1,
 		'max-row' : 1,
@@ -47,7 +45,7 @@ async function basicData()
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 	//change index number to access different sheet
-	const sheet = data.worksheets[getMain()];
+	const sheet = getMain(data.worksheets);
 
 	//console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
 }
@@ -58,7 +56,7 @@ async function getCell(x, y)
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 	//change index number to access different sheet
-	const sheet = data.worksheets[getMain()];
+	const sheet = getMain(data.worksheets);
 	return await promisify(sheet.getCells)({
 		'min-row' : y,
 		'max-row' : y,
@@ -75,7 +73,7 @@ async function testRows()
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 	//change index number to access different sheet
-	const sheet = data.worksheets[getMain()];
+	const sheet = getMain(data.worksheets);
 
 	const rows = await promisify(sheet.getRows)();
 	return rows;
@@ -95,15 +93,15 @@ async function testRows()
 
 async function newRow(userInput)
 {
-	const doc = new GoogleSpreadsheet(userInput["formId"]);
-	delete userInput["formId"];
-
-	await promisify(doc.useServiceAccountAuth)(credentials);
-	const data = await promisify(doc.getInfo)();
-
 	//change index number to access different sheet
-	const sheet = data.worksheets[getMain()];
+	const sheet = await getWorksheets(userInput["formId"]).then(worksheets => {
+		return getMain(worksheets);
+	}, err => {
+		console.log("Worksheets not found: " + err);
+	});
 	//console.log(userInput);
+
+	delete userInput["formId"];
 
 	sheet.addRow(
 		userInput
@@ -112,20 +110,36 @@ async function newRow(userInput)
 	})
 }
 
-async function getConfig(spreadsheets)
+async function getWorksheets(formId)
 {
+	const doc = new GoogleSpreadsheet(formId);
+	await promisify(doc.useServiceAccountAuth)(credentials);
+	const data = await promisify(doc.getInfo)();
+	return data.worksheets;
+}
+
+function getConfig(spreadsheets)
+{
+	return getSheetByName(spreadsheets, configSheetName);
+}
+
+function getMain(spreadsheets)
+{
+	//TODO search for the MAIN column and take its value
+	return getSheetByName(spreadsheets, "Main");
+}
+
+function getSheetByName(spreadsheets, name)
+{
+	console.log("Now in getSheets");
 	for(var i = 0; i < spreadsheets.length; i++)
 	{
-		if(spreadsheets[i].title === configSheetName)
+		if(spreadsheets[i].title === name)
 		{
 			console.log(spreadsheets[i].title);
 			return spreadsheets[i];
 		}
 	}
-	return;
-}
-
-/*async*/ function getMain()
-{
-	return 0;
+	console.log("Sheet not found by name. Defaulting to first sheet.");
+	return spreadSheets[0];
 }
