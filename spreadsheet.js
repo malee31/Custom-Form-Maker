@@ -7,19 +7,21 @@ const sheetID = require('./private/SpreadsheetID.json');
 const configSheetName = ".config";
 
 module.exports = {
-	pasteName: basicData,
-	newRow: newRow,
-	getHeaders: getHeaders
+	newRow: fillRow,
+	getHeaders: getSheetHeaders
 }
 
-async function getHeaders(id)
+async function getSheetHeaders(id)
 {
-	const doc = new GoogleSpreadsheet(id);
-	await promisify(doc.useServiceAccountAuth)(credentials);
-	const data = await promisify(doc.getInfo)();
-
 	//change index number to access different sheet
-	const sheet = getMain(data.worksheets);
+	const sheet = await getWorksheets(id).then(sheets => {
+		return getMain(sheets);
+	}, err => {
+		console.log(err);
+	});
+
+	//console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
+
 	const topCells = await promisify(sheet.getCells)({
 		'min-row' : 1,
 		'max-row' : 1,
@@ -36,18 +38,6 @@ async function getHeaders(id)
 	}
 	//Reprocessed client-side to sanitize their values to the actual properties
 	return JSON.stringify(headers);
-}
-
-async function basicData()
-{
-	//Testing things here then splitting them off into functions
-	const doc = new GoogleSpreadsheet(sheetID.id);
-	await promisify(doc.useServiceAccountAuth)(credentials);
-	const data = await promisify(doc.getInfo)();
-	//change index number to access different sheet
-	const sheet = getMain(data.worksheets);
-
-	//console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
 }
 
 async function getCell(x, y)
@@ -91,7 +81,7 @@ async function testRows()
 //	}
 //);
 
-async function newRow(userInput)
+async function fillRow(userInput)
 {
 	//change index number to access different sheet
 	const sheet = await getWorksheets(userInput["formId"]).then(worksheets => {
@@ -126,6 +116,7 @@ function getConfig(spreadsheets)
 function getMain(spreadsheets)
 {
 	//TODO search for the MAIN column and take its value
+	console.log("Searching for main");
 	return getSheetByName(spreadsheets, "Main");
 }
 
