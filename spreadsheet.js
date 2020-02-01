@@ -14,11 +14,13 @@ module.exports = {
 async function getSheetHeaders(id)
 {
 	//change index number to access different sheet
-	const sheet = await getWorksheets(id).then(sheets => {
-		return getMain(sheets);
+	var sheet = await getWorksheets(id).then(async(sheets) => {
+		return sheets;
 	}, err => {
 		console.log(err);
 	});
+
+	sheet = await getMain(sheet);
 
 	//console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
 
@@ -46,7 +48,7 @@ async function getCell(x, y)
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 	//change index number to access different sheet
-	const sheet = getMain(data.worksheets);
+	const sheet = await getMain(data.worksheets);
 	return await promisify(sheet.getCells)({
 		'min-row' : y,
 		'max-row' : y,
@@ -63,16 +65,13 @@ async function testRows()
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 	//change index number to access different sheet
-	const sheet = getMain(data.worksheets);
+	const sheet = await getMain(data.worksheets);
 
 	const rows = await promisify(sheet.getRows)();
 	return rows;
 }
 
 // async function testCells()
-
-
-//Actual testing
 //testSheet().then(() => {
 //		console.log("testSheet() complete")
 //	},
@@ -84,12 +83,14 @@ async function testRows()
 async function fillRow(userInput)
 {
 	//change index number to access different sheet
-	const sheet = await getWorksheets(userInput["formId"]).then(worksheets => {
-		return getMain(worksheets);
+	var sheet = await getWorksheets(userInput["formId"]).then(worksheets => {
+		return worksheets;
 	}, err => {
 		console.log("Worksheets not found: " + err);
 	});
 	//console.log(userInput);
+
+	sheet = await getMain(sheet);
 
 	delete userInput["formId"];
 
@@ -113,10 +114,23 @@ function getConfig(spreadsheets)
 	return getSheetByName(spreadsheets, configSheetName);
 }
 
-function getMain(spreadsheets)
+async function getMain(spreadsheets)
 {
-	//TODO search for the MAIN column and take its value
 	console.log("Searching for main");
+	const config = getConfig(spreadsheets);
+	const main = await promisify(config.getCells)({
+		'min-row' : 1,
+		'max-row' : 1,
+		'min-col' : 2,
+		'max-col' : 2,
+		'return-empty' : true,
+	}).then(cell => {
+		return cell.value;
+	}, err => {
+		console.log("There is no Main at .config!B1. Error: "+ err);
+		return "Main";
+	});
+
 	return getSheetByName(spreadsheets, "Main");
 }
 
