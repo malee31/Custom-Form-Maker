@@ -14,11 +14,10 @@ module.exports = {
 async function getSheetHeaders(id)
 {
 	//change index number to access different sheet
+	//UNKNOWN async USAGE. Untested and probably unnecessary
 	var sheet = await getWorksheets(id).then(async(sheets) => {
 		return sheets;
-	}, err => {
-		console.log(err);
-	});
+	}, genericError);
 
 	sheet = await getMain(sheet);
 
@@ -33,6 +32,7 @@ async function getSheetHeaders(id)
 	});
 	var headers = {};
 	var counter = 1;
+	console.log("The type of CELLS is " + typeof topCells);
 	for(const cell of topCells)
 	{
 		headers[counter] = cell.value;
@@ -49,6 +49,7 @@ async function getCell(x, y)
 	const data = await promisify(doc.getInfo)();
 	//change index number to access different sheet
 	const sheet = await getMain(data.worksheets);
+	
 	return await promisify(sheet.getCells)({
 		'min-row' : y,
 		'max-row' : y,
@@ -147,4 +148,9 @@ function getSheetByName(spreadsheets, name)
 	}
 	console.log("Sheet not found by name. Defaulting to first sheet.");
 	return spreadSheets[0];
+}
+
+function genericError(err)
+{
+	console.log(error);
 }
