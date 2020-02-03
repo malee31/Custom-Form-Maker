@@ -122,7 +122,10 @@ async function getAllCells(sheet, returnEmpty)
 
 async function getLastRow(sheet)
 {
+	//Note: Considers empty checkboxes or validation as nonempty so those aren't considered the last rows.
 	return await getAllCells(sheet, false).then(allCells => {
+		console.log(allCells);
+		console.log(allCells[Object.keys(allCells).length - 1]);
 		return allCells[Object.keys(allCells).length - 1].row;
 	}, genericError);
 }
