@@ -15,7 +15,7 @@ async function getSheetHeaders(id)
 {
 	//change index number to access different sheet
 	//UNKNOWN async USAGE. Untested and probably unnecessary
-	var sheet = await getWorksheets(id).then(async(sheets) => {
+	var sheet = await getWorksheets(id).then(sheets => {
 		return sheets;
 	}, genericError);
 
@@ -32,7 +32,6 @@ async function getSheetHeaders(id)
 	});
 	var headers = {};
 	var counter = 1;
-	console.log("The type of CELLS is " + typeof topCells);
 	for(const cell of topCells)
 	{
 		headers[counter] = cell.value;
@@ -42,7 +41,7 @@ async function getSheetHeaders(id)
 	return JSON.stringify(headers);
 }
 
-async function getCell(x, y)
+/*async function getCell(x, y)
 {
 	const doc = new GoogleSpreadsheet(sheetID.id);
 	await promisify(doc.useServiceAccountAuth)(credentials);
@@ -57,7 +56,7 @@ async function getCell(x, y)
 		'max-col' : x,
 		'return-empty' : true,
 	});
-}
+}*/
 
 async function testRows()
 {
@@ -108,6 +107,24 @@ async function getWorksheets(formId)
 	await promisify(doc.useServiceAccountAuth)(credentials);
 	const data = await promisify(doc.getInfo)();
 	return data.worksheets;
+}
+
+async function getAllCells(sheet, returnEmpty)
+{
+	return await promisify(sheet.getCells)({
+		'min-row' : 1,
+		'max-row' : sheet.rowCount,
+		'min-col' : 1,
+		'max-col' : sheet.colCount,
+		'return-empty' : returnEmpty,
+	});
+}
+
+async function getLastRow(sheet)
+{
+	return await getAllCells(sheet, false).then(allCells => {
+		return allCells[Object.keys(allCells).length - 1].row;
+	}, genericError);
 }
 
 function getConfig(spreadsheets)
