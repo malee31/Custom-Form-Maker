@@ -41,13 +41,15 @@ async function getSheetHeaders(id)
 	return JSON.stringify(headers);
 }
 
-/*async function getCell(x, y)
+async function getCell(formId, x, y, sheetName)
 {
-	const doc = new GoogleSpreadsheet(sheetID.id);
-	await promisify(doc.useServiceAccountAuth)(credentials);
-	const data = await promisify(doc.getInfo)();
+	//TODO Test function
 	//change index number to access different sheet
-	const sheet = await getMain(data.worksheets);
+	var sheet = await getWorksheets(formId).then(worksheets => {
+		return worksheets;
+	}, genericError);
+
+	sheet = (sheetName ? await getSheetByName(sheet, sheetName) : await getMain(sheet));
 	
 	return await promisify(sheet.getCells)({
 		'min-row' : y,
@@ -56,29 +58,7 @@ async function getSheetHeaders(id)
 		'max-col' : x,
 		'return-empty' : true,
 	});
-}*/
-
-async function testRows()
-{
-	//returns rows for resolved Promise
-	const doc = new GoogleSpreadsheet(sheetID.id);
-	await promisify(doc.useServiceAccountAuth)(credentials);
-	const data = await promisify(doc.getInfo)();
-	//change index number to access different sheet
-	const sheet = await getMain(data.worksheets);
-
-	const rows = await promisify(sheet.getRows)();
-	return rows;
 }
-
-// async function testCells()
-//testSheet().then(() => {
-//		console.log("testSheet() complete")
-//	},
-//	(err) => {
-//		console.log(`Error: ${err}`);
-//	}
-//);
 
 async function fillRow(userInput)
 {
