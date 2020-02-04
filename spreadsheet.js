@@ -48,7 +48,7 @@ async function getCell(formId, x, y, sheetName)
 		return worksheets;
 	}, genericError);
 
-	sheet = (sheetName ? await getSheetByName(sheet, sheetName) : await getMain(sheet));
+	sheet = await (sheetName ? getSheetByName(sheet, sheetName) : getMain(sheet));
 	
 	return await promisify(sheet.getCells)({
 		'min-row' : y,
