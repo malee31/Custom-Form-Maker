@@ -2,7 +2,6 @@ const GoogleSpreadsheet = require('google-spreadsheet');
 const { promisify } = require('util');
 
 const credentials = require('./private/SpreadsheetPlaygroundCredentials.json');
-const sheetID = require('./private/SpreadsheetID.json');
 
 const configSheetName = ".config";
 
