@@ -37,12 +37,12 @@ async function getSheetHeaders(id)
 		counter++;
 	}
 	//Reprocessed client-side to sanitize their values to the actual properties
+	await test();
 	return JSON.stringify(headers);
 }
 
 async function getCell(formId, x, y, sheetName)
 {
-	//TODO Test function
 	//change index number to access different sheet
 	var sheet = await getWorksheets(formId).then(worksheets => {
 		return worksheets;
@@ -103,8 +103,6 @@ async function getLastRow(sheet)
 {
 	//Note: Considers empty checkboxes or validation as nonempty so those aren't considered the last rows.
 	return await getAllCells(sheet, false).then(allCells => {
-		console.log(allCells);
-		console.log(allCells[Object.keys(allCells).length - 1]);
 		return allCells[Object.keys(allCells).length - 1].row;
 	}, genericError);
 }
@@ -130,7 +128,6 @@ async function getMain(spreadsheets)
 		console.log("There is no Main at .config!B1. Error: "+ err);
 		return "Main";
 	});
-
 	return getSheetByName(spreadsheets, "Main");
 }
 
@@ -152,4 +149,12 @@ function getSheetByName(spreadsheets, name)
 function genericError(err)
 {
 	console.log(error);
+}
+
+async function test()
+{
+	console.log("With naming");
+	console.log(await getCell("1n-hg18uCMywzbPlJ7KV1kXPkH3frWr7Hx8RAnTQP4UQ", 1, 1).then(cell => cell));
+	console.log("Without naming");
+	console.log(await getCell("1n-hg18uCMywzbPlJ7KV1kXPkH3frWr7Hx8RAnTQP4UQ", 1, 1, ".config").then(cell => cell));
 }
