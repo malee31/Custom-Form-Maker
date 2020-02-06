@@ -69,3 +69,20 @@ input[type="submit"]:hover
 	background-color: #2B83E2;
 	color: #DDD;
 }
+
+.loadWheel
+{
+	position: absolute;
+	border-radius: 50%;
+	border: 16px solid #F3F3F3;
+	border-top: 16px solid #3498DB;
+	width: min(60vw, 50vh);
+	height: min(60vw, 50vh);
+	animation: load 2s linear infinite;
+}
+
+@keyframes load
+{
+	0% {transform: rotate(0deg);}
+	100% {transform: rotate(360deg);}
+}
