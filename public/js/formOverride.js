@@ -4,13 +4,19 @@ toggleLoader(false);
 function toggleLoader(show)
 {
 	var loader = document.getElementsByClassName("loadWheel")[0];
+	var idSubmit = document.getElementsByName("submit")[0];
+
+	canPost = !show;
+
 	if(show)
 	{
 		loader.style.visibility = "visible";
+		idSubmit.value = "Loading...";
 	}
 	else
 	{
 		loader.style.visibility = "hidden";
+		idSubmit.value = "Submit";
 	}
 }
 
@@ -24,7 +30,6 @@ window.addEventListener("load", () => {
 
 		if(canPost && idInput.value !== "")
 		{
-			canPost = false;
 			toggleLoader(true);
 
 			const req = new XMLHttpRequest();
@@ -32,7 +37,6 @@ window.addEventListener("load", () => {
 			req.addEventListener("load", event => {
 				if(event.target.status != 200)
 				{
-					canPost = true;
 					toggleLoader(false);
 				}
 				else
@@ -44,13 +48,11 @@ window.addEventListener("load", () => {
 			req.addEventListener("onerror", event => {
 				console.log("There's been an error");
 				console.log(event);
-				canPost = true;
 				toggleLoader(false);
 			});
 		
 			req.onerror = (err) => {
 				console.log(err);
-				canPost = true;
 				toggleLoader(false);
 			}
 
