@@ -39,7 +39,7 @@ app.post("/", (req, res) => {
 		},
 		err => {
 			//Unprocessable Entity - caused usually by invalid spreadsheet ids
-			console.log(`Error: ${err}`);
+			console.log(`Sheet ID Error: ${err} -- SheetID may be incorrect`);
 			res.sendStatus(422);
 		});
 	}
