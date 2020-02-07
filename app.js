@@ -12,6 +12,7 @@ app.use(express.json());
 
 //Serves static file like local js and css
 app.use("/static", express.static(path.resolve(__dirname, "public")));
+app.use("/favicon.ico", express.static(path.resolve(__dirname, "public/img/favicon.ico")));
 
 //Sends html file when the page is accessed
 app.get("/", (req, res) => {
