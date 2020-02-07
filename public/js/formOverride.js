@@ -1,14 +1,31 @@
 var canPost = true;
+toggleLoader(false);
+
+function toggleLoader(show)
+{
+	var loader = document.getElementsByClassName("loadWheel")[0];
+	if(show)
+	{
+		loader.style.visibility = "visible";
+	}
+	else
+	{
+		loader.style.visibility = "hidden";
+	}
+}
 
 window.addEventListener("load", () => {
 	let idGet = document.forms["idGetter"];
 
 	idGet.addEventListener("submit", event => {
 		event.preventDefault();
-		
-		if(canPost)
+
+		const idInput = document.getElementsByName("sheetId")[0];
+
+		if(canPost && idInput.value !== "")
 		{
 			canPost = false;
+			toggleLoader(true);
 
 			const req = new XMLHttpRequest();
 
@@ -16,6 +33,7 @@ window.addEventListener("load", () => {
 				if(event.target.status != 200)
 				{
 					canPost = true;
+					toggleLoader(false);
 				}
 				else
 				{
@@ -27,11 +45,13 @@ window.addEventListener("load", () => {
 				console.log("There's been an error");
 				console.log(event);
 				canPost = true;
+				toggleLoader(false);
 			});
 		
 			req.onerror = (err) => {
 				console.log(err);
 				canPost = true;
+				toggleLoader(false);
 			}
 
 			req.open("POST", window.location, true);
@@ -40,7 +60,7 @@ window.addEventListener("load", () => {
 
 			req.setRequestHeader("Content-Type", "application/json");
 
-			const data = {"id": document.getElementsByName("sheetId")[0].value};
+			const data = {"id": idInput.value};
 
 			setCookie("id", data.id);
 
