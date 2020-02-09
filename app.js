@@ -5,6 +5,7 @@ const path = require("path");
 
 //Imports module imports from spreadsheet.js
 const sheet = require("./spreadsheet.js");
+const sheetError = require("./sheetError.js");
 
 //Allows parsing of data in requests
 app.use(express.urlencoded({extended: true}));
@@ -39,7 +40,7 @@ app.post("/", (req, res) => {
 		},
 		err => {
 			//Unprocessable Entity - caused usually by invalid spreadsheet ids
-			console.log(`Sheet ID Error: ${err} -- SheetID may be incorrect`);
+			sheetError.sheetIdErr(err, "SheetID input may be invalid");
 			res.sendStatus(422);
 		});
 	}
@@ -51,7 +52,7 @@ app.post("/", (req, res) => {
 			console.log(output ? output : "");
 		},
 		err => {
-			console.log(`Error while adding rows: ${err}`);
+			sheetError.specificErr(err, "Adding Rows")
 		});
 		res.send("Success\n" + JSON.stringify(info));
 	}

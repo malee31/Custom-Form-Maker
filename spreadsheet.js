@@ -1,5 +1,6 @@
 const GoogleSpreadsheet = require('google-spreadsheet');
 const { promisify } = require('util');
+const sheetError = require('./sheetError.js');
 
 const credentials = require('./private/SpreadsheetPlaygroundCredentials.json');
 
@@ -16,7 +17,7 @@ async function getSheetHeaders(id)
 	//UNKNOWN async USAGE. Untested and probably unnecessary
 	var sheet = await getWorksheets(id).then(sheets => {
 		return sheets;
-	}, genericError);
+	}, sheetError.genericErr);
 
 	sheet = await getMain(sheet);
 
@@ -46,7 +47,7 @@ async function getCell(formId, x, y, sheetName)
 	//change index number to access different sheet
 	var sheet = await getWorksheets(formId).then(worksheets => {
 		return worksheets;
-	}, genericError);
+	}, sheetError.genericErr);
 
 	sheet = await (sheetName ? getSheetByName(sheet, sheetName) : getMain(sheet));
 	
@@ -104,7 +105,7 @@ async function getLastRow(sheet)
 	//Note: Considers empty checkboxes or validation as nonempty so those aren't considered the last rows.
 	return await getAllCells(sheet, false).then(allCells => {
 		return allCells[Object.keys(allCells).length - 1].row;
-	}, genericError);
+	}, sheetError.genericErr);
 }
 
 function getConfig(spreadsheets)
@@ -144,11 +145,6 @@ function getSheetByName(spreadsheets, name)
 	}
 	console.log("Sheet not found by name. Defaulting to first sheet.");
 	return spreadSheets[0];
-}
-
-function genericError(err)
-{
-	console.log(error);
 }
 
 async function test()
