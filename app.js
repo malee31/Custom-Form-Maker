@@ -15,16 +15,6 @@ app.use(express.json());
 app.use("/static", express.static(path.resolve(__dirname, "public")));
 app.use("/favicon.ico", express.static(path.resolve(__dirname, "public/img/favicon.ico")));
 
-/*// Error 404
-app.use((req, res) => {
-	res.status(404).send('Error 404: Page not Found');
-});
-
-// Error 500
-app.use((error, req, res, next) => {
-	res.status(500).send('Error 500: Our problem, not yours');
-});*/
-
 //Sends html file when the page is accessed
 app.get("/", (req, res) => {
 	res.sendFile(path.resolve(__dirname, "views/index.html"));
@@ -70,6 +60,16 @@ app.post("/", (req, res) => {
 
 app.get("/form/:sheetId", (req, res) => {
 	console.log(req.params);
+});
+
+// Error 404
+app.use((req, res) => {
+	res.status(404).send('Error 404: Page not Found');
+});
+
+// Error 500
+app.use((error, req, res, next) => {
+	res.status(500).send('Error 500: Our problem, not yours');
 });
 
 app.listen(8080);
