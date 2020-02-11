@@ -64,7 +64,7 @@ app.get("/form/:sheetId", (req, res) => {
 
 // Error 404
 app.use((req, res) => {
-	res.status(404).send('Error 404: Page not Found');
+	res.status(404).sendFile(path.resolve(__dirname, "views/404.html"));
 });
 
 // Error 500
