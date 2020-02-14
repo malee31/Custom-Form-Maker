@@ -23,12 +23,12 @@ function genericError(err, optionalText)
 
 function specificError(err, errorMessage)
 {
-	console.log(`Definite <${optionalErrDetail(errorMessage)}>: ${error}`);
+	console.log(`Definite <${optionalErrDetail(errorMessage)}>: ${err}`);
 }
 
 function unexpectedError(err, optionalText)
 {
-	console.log(`Unexpected Error in Bagging Area${optionalErrDetail(optionalText)}: ${error}`);
+	console.log(`Unexpected Error in Bagging Area${optionalErrDetail(optionalText)}: ${err}`);
 }
 
 function optionalErrDetail(detail)
