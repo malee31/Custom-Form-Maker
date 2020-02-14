@@ -81,6 +81,31 @@ async function fillRow(userInput)
 	})
 }
 
+//TODO Test and make this work
+async function fillLastRow(userInput)
+{
+	//change index number to access different sheet
+	var sheet = await getWorksheets(userInput["formId"]).then(worksheets => {
+		return worksheets;
+	}, err => {
+		console.log("Worksheets not found: " + err);
+	});
+	//console.log(userInput);
+
+	sheet = await getMain(sheet);
+
+	delete userInput["formId"];
+
+	const finalRow = await sheet.getRows()[getLastRow(sheet)];
+
+	for(let label in userInput)
+	{
+		finalRow[label] = userInput[label];
+	}
+
+	finalRow.save();
+}
+
 async function getWorksheets(formId)
 {
 	const doc = new GoogleSpreadsheet(formId);
