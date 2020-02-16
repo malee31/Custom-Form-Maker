@@ -69,7 +69,7 @@ app.use((req, res) => {
 
 // Error 500
 app.use((error, req, res, next) => {
-	res.status(500).send('Error 500: Our problem, not yours');
+	res.status(500).sendFile(path.resolve(__dirname, "views/500.html"));
 });
 
 app.listen(8080);
