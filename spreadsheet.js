@@ -8,20 +8,12 @@ const configSheetName = ".config";
 
 module.exports = {
 	newRow: fillRow,
-	getHeaders: getSheetHeaders
+	getHeaders: getSheetHeaders,
+	debug: test
 }
 
-async function getSheetHeaders(id)
-{
-	//change index number to access different sheet
-	//UNKNOWN async USAGE. Untested and probably unnecessary
-	var sheet = await getWorksheets(id).then(sheets => {
-		return sheets;
-	}, sheetError.genericErr);
-
-	sheet = await getMain(sheet);
-
-	//console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
+/*Example codes
+	console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
 
 	const topCells = await promisify(sheet.getCells)({
 		'min-row' : 1,
@@ -30,6 +22,17 @@ async function getSheetHeaders(id)
 		'max-col' : sheet.colCount,
 		'return-empty' : false,
 	});
+*/
+
+async function getSheetHeaders(id)
+{
+	var sheet = await getWorksheets(id).then(sheets => {
+		return sheets;
+	}, sheetError.genericErr);
+
+	sheet = await getMain(sheet);
+
+	//Headers are reprocessed client-side to format their values to the actual column name properties
 	var headers = {};
 	var counter = 1;
 	for(const cell of topCells)
@@ -37,14 +40,12 @@ async function getSheetHeaders(id)
 		headers[counter] = cell.value;
 		counter++;
 	}
-	//Reprocessed client-side to sanitize their values to the actual properties
-	await test();
+	
 	return JSON.stringify(headers);
 }
 
 async function getCell(formId, x, y, sheetName)
 {
-	//change index number to access different sheet
 	var sheet = await getWorksheets(formId).then(worksheets => {
 		return worksheets;
 	}, sheetError.genericErr);
@@ -68,7 +69,6 @@ async function fillRow(userInput)
 	}, err => {
 		console.log("Worksheets not found: " + err);
 	});
-	//console.log(userInput);
 
 	sheet = await getMain(sheet);
 
