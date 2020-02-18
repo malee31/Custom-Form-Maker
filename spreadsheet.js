@@ -120,12 +120,31 @@ async function valueLookup(sheet, value, returnMultiple)
 
 	for(var matchedCell = 0; matchedCell < result.length; matchedCell++)
 	{
-		result[matchedCell] = [result[matchedCell].row, result[matchedCell].col];
+		result[matchedCell] = [result[matchedCell].col, result[matchedCell].row];
 	}
 
 	console.log(result);
 
 	return result;
+}
+
+async function offsetLookup(sheet, value, offsetCol, offsetRow, returnMultiple)
+{
+	returnMultiple = returnMultiple ? true : false;
+	
+	var matches = await valueLookup(sheet, value, returnMultiple);
+	
+	for(var matchPair = 0; matchPair < matches.length; matchPair++)
+	{
+		matches[matchPair][0] = matches[matchPair][0] + offsetCol;
+		matches[matchPair][1] = matches[matchPair][1] + offsetRow;
+		if(matches[matchPair][0] < 1 || matches[matchPair][1] < 1)
+		{
+			console.log("Potential Error: This Offset Pair is invalid - " + matches[matchPair]);
+		}
+	}
+
+	return matches;
 }
 
 //With the updates, this is now useless but will be kept as a relic lol
@@ -181,6 +200,9 @@ async function test()
 	console.log("Testing: ");
 	const sheets = await getWorksheets("1n-hg18uCMywzbPlJ7KV1kXPkH3frWr7Hx8RAnTQP4UQ");
 
-	await valueLookup(sheets[0], "1", true);
+	var val = await offsetLookup(sheets[0], "1", 1, 0, true);
+
+	console.log("Test val evaluates to " + val);
+
 	console.log("End of Test.");
 }
