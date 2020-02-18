@@ -15,17 +15,13 @@ module.exports = {
 /*Example codes
 	console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
 
-	const topCells = await promisify(sheet.getCells)({
-		'min-row' : 1,
-		'max-row' : 1,
-		'min-col' : 1,
-		'max-col' : sheet.colCount,
-		'return-empty' : false,
-	});
+
 */
 
 async function getSheetHeaders(id)
 {
+	test();
+
 	var sheet = await getWorksheets(id).then(sheets => {
 		return sheets;
 	}, sheetError.genericErr);
@@ -35,6 +31,15 @@ async function getSheetHeaders(id)
 	//Headers are reprocessed client-side to format their values to the actual column name properties
 	var headers = {};
 	var counter = 1;
+
+	const topCells = await promisify(sheet.getCells)({
+		'min-row' : 1,
+		'max-row' : 1,
+		'min-col' : 1,
+		'max-col' : sheet.colCount,
+		'return-empty' : false,
+	});
+
 	for(const cell of topCells)
 	{
 		headers[counter] = cell.value;
@@ -96,10 +101,34 @@ async function getAllCells(sheet, returnEmpty)
 		'max-row' : sheet.rowCount,
 		'min-col' : 1,
 		'max-col' : sheet.colCount,
-		'return-empty' : returnEmpty,
+		'return-empty' : (returnEmpty ? true : false),
 	});
 }
 
+async function valueLookup(sheet, value, returnMultiple)
+{
+	returnMultiple = returnMultiple ? true : false;
+
+	const cells = await getAllCells(sheet, false);
+
+	var result = cells.filter(cell => {/*console.log(cell.value);*/ return cell.value == value;});
+
+	if(!returnMultiple && result.length >= 2)
+	{
+		result = result.slice(0, 2);
+	}
+
+	for(var matchedCell = 0; matchedCell < result.length; matchedCell++)
+	{
+		result[matchedCell] = [result[matchedCell].row, result[matchedCell].col];
+	}
+
+	console.log(result);
+
+	return result;
+}
+
+//With the updates, this is now useless but will be kept as a relic lol
 async function getLastRow(sheet)
 {
 	//Note: Considers empty checkboxes or validation as nonempty so those aren't considered the last rows.
@@ -149,8 +178,9 @@ function getSheetByName(spreadsheets, name)
 
 async function test()
 {
-	console.log("With naming");
-	console.log(await getCell("1n-hg18uCMywzbPlJ7KV1kXPkH3frWr7Hx8RAnTQP4UQ", 1, 1).then(cell => cell));
-	console.log("Without naming");
-	console.log(await getCell("1n-hg18uCMywzbPlJ7KV1kXPkH3frWr7Hx8RAnTQP4UQ", 1, 1, ".config").then(cell => cell));
+	console.log("Testing: ");
+	const sheets = await getWorksheets("1n-hg18uCMywzbPlJ7KV1kXPkH3frWr7Hx8RAnTQP4UQ");
+
+	await valueLookup(sheets[0], "1", true);
+	console.log("End of Test.");
 }
