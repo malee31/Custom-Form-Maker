@@ -58,10 +58,10 @@ async function getCell(formId, x, y, sheetName)
 	sheet = await (sheetName ? getSheetByName(sheet, sheetName) : getMain(sheet));
 	
 	return await promisify(sheet.getCells)({
-		'min-row' : y,
-		'max-row' : y,
 		'min-col' : x,
 		'max-col' : x,
+		'min-row' : y,
+		'max-row' : y,
 		'return-empty' : true,
 	});
 }
@@ -111,7 +111,7 @@ async function valueLookup(sheet, value, returnMultiple)
 
 	const cells = await getAllCells(sheet, false);
 
-	var result = cells.filter(cell => {/*console.log(cell.value);*/ return cell.value == value;});
+	var result = cells.filter(cell => {return cell.value == value;});
 
 	if(!returnMultiple && result.length >= 2)
 	{
@@ -145,6 +145,22 @@ async function offsetLookup(sheet, value, offsetCol, offsetRow, returnMultiple)
 	}
 
 	return matches;
+}
+
+async function parseValue(sheet, col, row)
+{
+	return await promisify(sheet.getCells)({
+		'min-col' : col,
+		'max-col' : col,
+		'min-row' : row,
+		'max-row' : row,
+		'return-empty' : true,
+	}).then(cell => {
+		console.log(Object.keys(cell[0]));
+		return cell.value;
+	}, err => {
+		console.log("Cell parseValue error: "+ err);
+	});
 }
 
 //With the updates, this is now useless but will be kept as a relic lol
@@ -203,6 +219,11 @@ async function test()
 	var val = await offsetLookup(sheets[0], "1", 1, 0, true);
 
 	console.log("Test val evaluates to " + val);
+
+
+	var cont = await parseValue(sheets[0], 1, 2);
+
+	console.log("Test cont evaluates to " + cont);
 
 	console.log("End of Test.");
 }
