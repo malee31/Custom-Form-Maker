@@ -149,15 +149,14 @@ async function offsetLookup(sheet, value, offsetCol, offsetRow, returnMultiple)
 
 async function parseValue(sheet, col, row)
 {
-	return await promisify(sheet.getCells)({
+	return cell = await promisify(sheet.getCells)({
 		'min-col' : col,
 		'max-col' : col,
 		'min-row' : row,
 		'max-row' : row,
 		'return-empty' : true,
 	}).then(cell => {
-		console.log(Object.keys(cell[0]));
-		return cell.value;
+		return cell[0].value;
 	}, err => {
 		console.log("Cell parseValue error: "+ err);
 	});
@@ -188,12 +187,12 @@ async function getMain(spreadsheets)
 		'max-col' : 2,
 		'return-empty' : true,
 	}).then(cell => {
-		return cell.value;
+		return cell[0].value;
 	}, err => {
 		console.log("There is no Main at .config!B1. Error: "+ err);
 		return "Main";
 	});
-	return getSheetByName(spreadsheets, "Main");
+	return getSheetByName(spreadsheets, main);
 }
 
 function getSheetByName(spreadsheets, name)
