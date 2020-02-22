@@ -14,19 +14,15 @@ module.exports = {
 
 /*Example codes
 	console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
-
-
 */
 
 async function getSheetHeaders(id)
 {
 	test();
 
-	var sheet = await getWorksheets(id).then(sheets => {
-		return sheets;
+	var sheet = await getWorksheets(id).then(async sheets => {
+		return await getMain(sheets);
 	}, sheetError.genericErr);
-
-	sheet = await getMain(sheet);
 
 	//Headers are reprocessed client-side to format their values to the actual column name properties
 	var headers = {};
