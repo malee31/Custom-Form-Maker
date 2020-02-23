@@ -19,6 +19,7 @@ module.exports = {
 async function getSheetHeaders(id)
 {
 	test();
+	return;
 
 	var sheet = await getWorksheets(id).then(async sheets => {
 		return await getMain(sheets);
@@ -28,20 +29,25 @@ async function getSheetHeaders(id)
 	var headers = {};
 	var counter = 1;
 
-	//Array of objects containing the name of a column and what kind of field it is
-	const requirements = await getRequirements(id);
+	const topCells = await promisify(sheet.getCells)({
+		'min-row' : 1,
+		'max-row' : 1,
+		'min-col' : 1,
+		'max-col' : sheet.colCount,
+		'return-empty' : false,
+	});
 
-	for(var headerCol = 0; headerCol < requirements.length; headerCol++)
+	//const requirements = await getRequirements(id);
+
+	for(const cell of topCells)
 	{
-		//Excludes fields marked with "EXCLUDE" code here and on the site will have to change radically for "REQUIRED"
-		if(requirements[headerCol].required != "EXCLUDE")
+		if(true)
 		{
-			headers[counter] = requirements[headerCol].name;
+			headers[counter] = cell.value;
 			counter++;
 		}
 	}
-
-	console.log(headers);
+	
 	return JSON.stringify(headers);
 }
 
@@ -75,19 +81,18 @@ async function getRequirements(id)
 		combineData[i] = {};
 		combineData[i].name = topCells[i].value;
 		combineData[i].required = "";
-		for(var ii = 0; ii < requirementCells.length; ii++)
+		/*for(var ii = 0; ii < requirementCells.length; i++)
 		{
 			if(requirementCells[ii].col == topCells[i].col)
 			{
 				combineData[i].required = requirementCells[ii].value;
 				break;
 			}
-		}
+		}*/
 	}
 
-	combineData.shift();
 	console.log(combineData);
-	return combineData;
+
 }
 
 async function getCell(formId, x, y, sheetName)
@@ -157,6 +162,7 @@ async function valueLookup(sheet, value, returnMultiple)
 	for(var matchedCell = 0; matchedCell < result.length; matchedCell++)
 	{
 		result[matchedCell] = [result[matchedCell].col, result[matchedCell].row];
+		console.log("rip");
 	}
 
 	if(!returnMultiple && result.length >= 1)
@@ -255,9 +261,9 @@ async function test()
 	const testId = "1n-hg18uCMywzbPlJ7KV1kXPkH3frWr7Hx8RAnTQP4UQ";
 	const sheets = await getWorksheets(testId);
 
-	/*console.log("Testing getRequirements");
+	console.log("Testing getRequirements");
 
-	await getRequirements(testId);*/
+	await getRequirements(testId);
 
 	console.log("End of Test.");
 }
