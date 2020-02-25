@@ -26,7 +26,6 @@ async function getSheetHeaders(id)
 
 	//Headers are reprocessed client-side to format their values to the actual column name properties
 	var headers = {};
-	var counter = 1;
 
 	//Array of objects containing the name of a column and what kind of field it is
 	const requirements = await getRequirements(id);
@@ -36,8 +35,7 @@ async function getSheetHeaders(id)
 		//Excludes fields marked with "EXCLUDE" code here and on the site will have to change radically for "REQUIRED"
 		if(requirements[headerCol].required != "EXCLUDE")
 		{
-			headers[counter] = requirements[headerCol].name;
-			counter++;
+			headers[requirements[headerCol].name] = requirements[headerCol].required;
 		}
 	}
 

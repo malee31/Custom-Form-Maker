@@ -37,9 +37,9 @@ function loadInputs(ids)
 	const submitButton = document.getElementsByName("mainSubmit")[0]
 	submitButton.removeAttribute("hidden");
 
-	for(const index in inputIds)
+	for(const name in inputIds)
 	{
-		mainForm.insertBefore(generateInput(inputIds[index]), submitButton);
+		mainForm.insertBefore(generateInput(name, inputIds[name]), submitButton);
 	}
 
 	//console.log(inputIds);
@@ -55,11 +55,12 @@ function loadInputs(ids)
  * @params {string} columnName Name of a column in the requested sheet.
  * @returns {object} formInput Contains an html input tag with proper attributes
  */
-function generateInput(columnName)
+function generateInput(columnName, required)
 {
 	const formInput = document.createElement("INPUT");
 	formInput.setAttribute("name", sheetFormatHeaders(columnName));
 	formInput.setAttribute("placeholder", columnName);
 	formInput.setAttribute("type", "text");
+	if(required) formInput.setAttribute("required", "");
 	return formInput;
 }
