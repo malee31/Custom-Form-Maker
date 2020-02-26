@@ -18,7 +18,7 @@ module.exports = {
 
 async function getSheetHeaders(id)
 {
-	test();
+	//test();
 
 	var sheet = await getWorksheets(id).then(async sheets => {
 		return await getMain(sheets);
@@ -170,11 +170,16 @@ async function offsetLookup(sheet, value, offsetCol, offsetRow, returnMultiple)
 	returnMultiple = returnMultiple ? true : false;
 	
 	var matches = await valueLookup(sheet, value, returnMultiple);
+
+	if(!returnMultiple)
+	{
+		return [matches[0] + offsetCol, matches[1] + offsetRow];
+	}
 	
 	for(var matchPair = 0; matchPair < matches.length; matchPair++)
 	{
-		matches[matchPair][0] = matches[matchPair][0] + offsetCol;
-		matches[matchPair][1] = matches[matchPair][1] + offsetRow;
+		matches[matchPair][0] += offsetCol;
+		matches[matchPair][1] += offsetRow;
 		if(matches[matchPair][0] < 1 || matches[matchPair][1] < 1)
 		{
 			console.log("Potential Error: This Offset Pair is invalid - " + matches[matchPair]);
@@ -217,17 +222,14 @@ async function getMain(spreadsheets)
 {
 	console.log("Searching for main");
 	const config = getConfig(spreadsheets);
-	const main = await promisify(config.getCells)({
-		'min-row' : 1,
-		'max-row' : 1,
-		'min-col' : 2,
-		'max-col' : 2,
-		'return-empty' : true,
-	}).then(cell => {
-		return cell[0].value;
-	}, err => {
-		console.log("There is no Main at .config!B1. Error: "+ err);
-		return "Main";
+	const main = await offsetLookup(config, "DATA", 1, 0, false).then(async pos => {
+		return await parseValue(config, pos[0], pos[1]).then(value => {
+			console.log("Main sheet is called: " + value);
+			return value;
+		}, err => {
+			console.log("Error looking for name of Main sheet. Defaulting to 'Main': " + err);
+			return "Main";
+		});
 	});
 	return getSheetByName(spreadsheets, main);
 }
@@ -237,6 +239,8 @@ function getSheetByName(spreadsheets, name)
 	console.log("Now in getSheets");
 	for(var i = 0; i < spreadsheets.length; i++)
 	{
+		/*console.log(spreadsheets[i].title);
+		console.log(spreadsheets[i].title + "," + name + ",");*/
 		if(spreadsheets[i].title === name)
 		{
 			console.log(spreadsheets[i].title);
@@ -244,7 +248,7 @@ function getSheetByName(spreadsheets, name)
 		}
 	}
 	console.log("Sheet not found by name. Defaulting to first sheet.");
-	return spreadSheets[0];
+	return spreadsheets[0];
 }
 
 async function test()
@@ -252,10 +256,6 @@ async function test()
 	console.log("Testing: ");
 	const testId = "1n-hg18uCMywzbPlJ7KV1kXPkH3frWr7Hx8RAnTQP4UQ";
 	const sheets = await getWorksheets(testId);
-
-	/*console.log("Testing getRequirements");
-
-	await getRequirements(testId);*/
 
 	console.log("End of Test.");
 }
