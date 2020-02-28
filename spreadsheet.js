@@ -204,6 +204,21 @@ async function parseValue(sheet, col, row)
 	});
 }
 
+async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal)
+{
+	defaultVal = defaultVal || "";
+
+	return await offsetLookup(sheet, searchKey, colOffset, rowOffset, false).then(async pos => {
+		console.log("Position at :" + pos);
+		return await parseValue(sheet, pos[0], pos[1], false).then(value => {
+			return value;
+		}, err => {
+			console.log("Failed to offset and parse. Returning empty String or default value.");
+			return defaultVal;
+		});
+	});
+}
+
 //With the updates, this is now useless but will be kept as a relic lol
 async function getLastRow(sheet)
 {
@@ -222,15 +237,16 @@ async function getMain(spreadsheets)
 {
 	console.log("Searching for main");
 	const config = getConfig(spreadsheets);
-	const main = await offsetLookup(config, "DATA", 1, 0, false).then(async pos => {
+	const main = await offsetParse(config, "DATA", 1, 0, "Main");
+	console.log("Main sheet is called: " + main);
+	/*const main = await offsetLookup(config, "DATA", 1, 0, false).then(async pos => {
 		return await parseValue(config, pos[0], pos[1]).then(value => {
-			console.log("Main sheet is called: " + value);
 			return value;
 		}, err => {
 			console.log("Error looking for name of Main sheet. Defaulting to 'Main': " + err);
 			return "Main";
 		});
-	});
+	});*/
 	return getSheetByName(spreadsheets, main);
 }
 
@@ -239,8 +255,8 @@ function getSheetByName(spreadsheets, name)
 	console.log("Now in getSheets");
 	for(var i = 0; i < spreadsheets.length; i++)
 	{
-		/*console.log(spreadsheets[i].title);
-		console.log(spreadsheets[i].title + "," + name + ",");*/
+		console.log(spreadsheets[i].title);
+		console.log("Comparing " + name + " to " + spreadsheets[i].title);
 		if(spreadsheets[i].title === name)
 		{
 			console.log(spreadsheets[i].title);
