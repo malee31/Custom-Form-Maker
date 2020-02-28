@@ -32,7 +32,6 @@ async function getSheetHeaders(id)
 
 	for(var headerCol = 0; headerCol < requirements.length; headerCol++)
 	{
-		//Excludes fields marked with "EXCLUDE" code here and on the site will have to change radically for "REQUIRED"
 		if(requirements[headerCol].required != "EXCLUDE")
 		{
 			headers[requirements[headerCol].name] = requirements[headerCol].required;
@@ -110,9 +109,7 @@ async function fillRow(userInput)
 	//change index number to access different sheet
 	var sheet = await getWorksheets(userInput["formId"]).then(worksheets => {
 		return worksheets;
-	}, err => {
-		console.log("Worksheets not found: " + err);
-	});
+	}, sheetError.worksheetErr);
 
 	sheet = await getMain(sheet);
 
@@ -199,9 +196,7 @@ async function parseValue(sheet, col, row)
 		'return-empty' : true,
 	}).then(cell => {
 		return cell[0].value;
-	}, err => {
-		console.log("Cell parseValue error: "+ err);
-	});
+	}, err => sheetError.specificErr(err, "Cell parseValue error"));
 }
 
 async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal)
@@ -239,14 +234,6 @@ async function getMain(spreadsheets)
 	const config = getConfig(spreadsheets);
 	const main = await offsetParse(config, "DATA", 1, 0, "Main");
 	console.log("Main sheet is called: " + main);
-	/*const main = await offsetLookup(config, "DATA", 1, 0, false).then(async pos => {
-		return await parseValue(config, pos[0], pos[1]).then(value => {
-			return value;
-		}, err => {
-			console.log("Error looking for name of Main sheet. Defaulting to 'Main': " + err);
-			return "Main";
-		});
-	});*/
 	return getSheetByName(spreadsheets, main);
 }
 
@@ -255,8 +242,8 @@ function getSheetByName(spreadsheets, name)
 	console.log("Now in getSheets");
 	for(var i = 0; i < spreadsheets.length; i++)
 	{
-		console.log(spreadsheets[i].title);
-		console.log("Comparing " + name + " to " + spreadsheets[i].title);
+		/*console.log(spreadsheets[i].title);
+		console.log("Comparing " + name + " to " + spreadsheets[i].title);*/
 		if(spreadsheets[i].title === name)
 		{
 			console.log(spreadsheets[i].title);
