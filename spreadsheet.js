@@ -107,13 +107,24 @@ async function getCell(formId, x, y, sheetName)
 async function fillRow(userInput)
 {
 	//change index number to access different sheet
-	var sheet = await getWorksheets(userInput["formId"]).then(worksheets => {
-		return worksheets;
+	var sheet = await getWorksheets(userInput["formId"]).then(async worksheets => {
+		return await getMain(worksheets);
 	}, sheetError.worksheetErr);
 
-	sheet = await getMain(sheet);
+	const requirements = await getRequirements(userInput["formId"]);
 
 	delete userInput["formId"];
+
+	/*for(var dataProp in userInput)
+	{
+		if(!requirements.hasOwnProperty(dataProp) || requirements[dataProp] == "EXCLUDE")
+		{
+			delete userInput[dataProp];
+		}
+	}
+
+	console.log("USERINPUT FILTERED");	
+	console.log(userInput);*/
 
 	sheet.addRow(
 		userInput
