@@ -24,22 +24,37 @@ async function getSheetHeaders(id)
 		return await getMain(sheets);
 	}, sheetError.genericErr);
 
-	//Headers are reprocessed client-side to format their values to the actual column name properties
-	var headers = {};
-
 	//Array of objects containing the name of a column and what kind of field it is
-	const requirements = await getRequirements(id);
+	const headers = processRequirements(await getRequirements(id));
 
+	console.log(headers);
+	return JSON.stringify(headers);
+}
+
+function processRequirements(requirements)
+{
+	var headers = {};
 	for(var headerCol = 0; headerCol < requirements.length; headerCol++)
 	{
 		if(requirements[headerCol].required != "EXCLUDE")
 		{
-			headers[requirements[headerCol].name] = requirements[headerCol].required;
+			var formatted = requirements[headerCol].name.toLowerCase().replace(/\s/g, "").replace(/\W/g, "").replace(/_/g, "");
+			//removes all leading numbers in the header
+			for(var i = 0; i < formatted.length; i++)
+			{
+				if(!isNaN(parseInt(formatted.substring(0, 1))))
+				{
+					formatted = formatted.substring(1);
+				}
+				else
+				{
+					break;
+				}
+			}
+			headers[formatted] = requirements[headerCol].required;
 		}
 	}
-
-	console.log(headers);
-	return JSON.stringify(headers);
+	return headers;
 }
 
 async function getRequirements(id)
