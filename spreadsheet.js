@@ -142,11 +142,11 @@ async function fillRow(userInput)
 		return await getMain(worksheets);
 	}, sheetError.worksheetErr);
 
-	const requirements = await getRequirements(userInput["formId"]);
+	const requirements = processRequirements(await getRequirements(userInput["formId"]));
 
 	delete userInput["formId"];
 
-	/*for(var dataProp in userInput)
+	for(var dataProp in userInput)
 	{
 		if(!requirements.hasOwnProperty(dataProp) || requirements[dataProp] == "EXCLUDE")
 		{
@@ -155,7 +155,7 @@ async function fillRow(userInput)
 	}
 
 	console.log("USERINPUT FILTERED");	
-	console.log(userInput);*/
+	console.log(userInput);
 
 	sheet.addRow(
 		userInput
