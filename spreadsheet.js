@@ -31,6 +31,15 @@ async function getSheetHeaders(id)
 	return JSON.stringify(headers);
 }
 
+/**
+ * Formats the name of the requirement headers into object keys used by the google-sheets api
+ * along with whether they are required in the form to continue.
+ *
+ * @params {{name: string, required: string}[]} requirements Array of Objects with a name key
+ * 	corresponding to a column header and required key for whether it is required to submit the form.
+ * @returns {Object.<string: string>} Returns singular object containing sanitized column names in order
+ * 	as keys and their required status as its value.
+ */
 function processRequirements(requirements)
 {
 	var headers = {};
