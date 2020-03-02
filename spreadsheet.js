@@ -25,7 +25,7 @@ async function getSheetHeaders(id)
 	}, sheetError.genericErr);
 
 	//Array of objects containing the name of a column and what kind of field it is
-	const headers = processRequirements(await getRequirements(id));
+	const headers = await getRequirements(id, false);
 
 	console.log(headers);
 	return JSON.stringify(headers);
@@ -66,7 +66,7 @@ function processRequirements(requirements)
 	return headers;
 }
 
-async function getRequirements(id)
+async function getRequirements(id, keepExcluded)
 {
 	const config = await getWorksheets(id).then(async sheets => {
 		return await getConfig(sheets);
@@ -91,16 +91,23 @@ async function getRequirements(id)
 	});
 
 	var combineData = [];
+	var adjustment = 0;
 	for(var i = 0; i < topCells.length; i++)
 	{
-		combineData[i] = {};
-		combineData[i].name = topCells[i].value;
-		combineData[i].required = "";
+		combineData[i - adjustment] = {};
+		combineData[i - adjustment].name = topCells[i].value;
+		combineData[i - adjustment].required = "";
 		for(var ii = 0; ii < requirementCells.length; ii++)
 		{
 			if(requirementCells[ii].col == topCells[i].col)
 			{
-				combineData[i].required = requirementCells[ii].value;
+				if(!keepExcluded && requirementCells[ii].value == "EXCLUDE")
+				{
+					combineData.pop();
+					adjustment++;
+					break;
+				}
+				combineData[i - adjustment].required = requirementCells[ii].value;
 				break;
 			}
 		}

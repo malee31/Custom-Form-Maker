@@ -30,6 +30,7 @@ function sheetFormatHeaders(header)
  */
 function loadInputs(ids)
 {
+	console.log(ids);
 	const inputIds = JSON.parse(ids);
 
 	const mainForm = document.getElementsByName("mainForm")[0];
@@ -37,9 +38,10 @@ function loadInputs(ids)
 	const submitButton = document.getElementsByName("mainSubmit")[0]
 	submitButton.removeAttribute("hidden");
 
-	for(const name in inputIds)
+	for(const inputField of inputIds)
 	{
-		mainForm.insertBefore(generateInput(name, inputIds[name]), submitButton);
+	console.log(inputField);
+		mainForm.insertBefore(generateInput(inputField.name, inputField.required), submitButton);
 	}
 
 	//console.log(inputIds);
@@ -61,6 +63,6 @@ function generateInput(columnName, required)
 	formInput.setAttribute("name", sheetFormatHeaders(columnName));
 	formInput.setAttribute("placeholder", columnName);
 	formInput.setAttribute("type", "text");
-	if(required) formInput.setAttribute("required", "");
+	if(required == "REQUIRE") formInput.setAttribute("required", "");
 	return formInput;
 }
