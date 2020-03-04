@@ -50,11 +50,11 @@ app.post("/", (req, res) => {
 		//console.log(info);
 		sheet.newRow(info).then(output => {
 			console.log(output ? output : "");
-		},
-		err => {
+			res.send("Success\n" + JSON.stringify(info));
+		}).catch(err => {
 			sheetError.specificErr(err, "Adding Rows")
+			res.sendStatus(422);
 		});
-		res.send("Success\n" + JSON.stringify(info));
 	}
 });
 

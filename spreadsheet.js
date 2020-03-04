@@ -154,6 +154,16 @@ async function fillRow(userInput)
 		}
 	}
 
+	for(var mayRequire in requirements)
+	{
+		if(!userInput[mayRequire] != "" && requirements[mayRequire] == "REQUIRE")
+		{
+			console.log("Required Input Missing");
+			throw "REQUIRED INPUT NONEXISTANT"
+			return;
+		}
+	}
+
 	console.log("USERINPUT FILTERED");	
 	console.log(userInput);
 
