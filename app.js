@@ -48,9 +48,9 @@ app.post("/", (req, res) => {
 	{
 		//Submitting data
 		//console.log(info);
-		sheet.newRow(info).then(output => {
-			console.log(output ? output : "");
-			res.send("Success\n" + JSON.stringify(info));
+		sheet.newRow(info).then(() => {
+			console.log("A form was successfully completed.");
+			res.send("Thank you for filling out the form!");
 		}).catch(err => {
 			sheetError.specificErr(err, "Adding Rows")
 			res.sendStatus(422);

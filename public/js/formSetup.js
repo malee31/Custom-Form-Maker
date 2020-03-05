@@ -30,7 +30,7 @@ function sheetFormatHeaders(header)
  */
 function loadInputs(ids)
 {
-	console.log(ids);
+	//console.log(ids);
 	const inputIds = JSON.parse(ids);
 
 	const mainForm = document.getElementsByName("mainForm")[0];
@@ -40,7 +40,7 @@ function loadInputs(ids)
 
 	for(const inputField of inputIds)
 	{
-	console.log(inputField);
+		//console.log(inputField);
 		mainForm.insertBefore(generateInput(inputField.name, inputField.required), submitButton);
 	}
 

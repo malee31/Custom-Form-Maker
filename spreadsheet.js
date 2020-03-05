@@ -27,7 +27,7 @@ async function getSheetHeaders(id)
 	//Array of objects containing the name of a column and what kind of field it is
 	const headers = await getRequirements(id, false);
 
-	console.log(headers);
+	//console.log(headers);
 	return JSON.stringify(headers);
 }
 
@@ -114,7 +114,7 @@ async function getRequirements(id, keepExcluded)
 	}
 
 	combineData.shift();
-	console.log(combineData);
+	//console.log(combineData);
 	return combineData;
 }
 
@@ -164,8 +164,8 @@ async function fillRow(userInput)
 		}
 	}
 
-	console.log("USERINPUT FILTERED");	
-	console.log(userInput);
+	//console.log("USERINPUT FILTERED");	
+	//console.log(userInput);
 
 	sheet.addRow(
 		userInput
@@ -256,7 +256,7 @@ async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal)
 	defaultVal = defaultVal || "";
 
 	return await offsetLookup(sheet, searchKey, colOffset, rowOffset, false).then(async pos => {
-		console.log("Position at :" + pos);
+		//console.log("Position at :" + pos);
 		return await parseValue(sheet, pos[0], pos[1], false).then(value => {
 			return value;
 		}, err => {
@@ -282,23 +282,23 @@ function getConfig(spreadsheets)
 
 async function getMain(spreadsheets)
 {
-	console.log("Searching for main");
+	//console.log("Searching for main");
 	const config = getConfig(spreadsheets);
 	const main = await offsetParse(config, "DATA", 1, 0, "Main");
-	console.log("Main sheet is called: " + main);
+	//console.log("Main sheet is called: " + main);
 	return getSheetByName(spreadsheets, main);
 }
 
 function getSheetByName(spreadsheets, name)
 {
-	console.log("Now in getSheets");
+	//console.log("Now in getSheets");
 	for(var i = 0; i < spreadsheets.length; i++)
 	{
 		/*console.log(spreadsheets[i].title);
 		console.log("Comparing " + name + " to " + spreadsheets[i].title);*/
 		if(spreadsheets[i].title === name)
 		{
-			console.log(spreadsheets[i].title);
+			//console.log(spreadsheets[i].title);
 			return spreadsheets[i];
 		}
 	}

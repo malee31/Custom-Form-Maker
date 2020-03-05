@@ -66,7 +66,7 @@ window.addEventListener("load", () => {
 
 			setCookie("id", data.id);
 
-			console.log("Sending for Inputs from Id: " + JSON.stringify(data));
+			//console.log("Sending for Inputs from Id: " + JSON.stringify(data));
 
 			req.send(JSON.stringify(data));
 		}
@@ -105,7 +105,7 @@ window.addEventListener("load", () => {
 
 		req.setRequestHeader("Content-Type", "application/json");
 
-		console.log("Sending " + data);
+		//console.log("Sending " + data);
 
 		req.send(JSON.stringify(data));
 
