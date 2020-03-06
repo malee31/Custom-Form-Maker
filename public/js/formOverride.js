@@ -1,4 +1,5 @@
 var canPost = true;
+var disableSubmit = false;
 toggleLoader(false);
 
 function toggleLoader(show)
@@ -77,6 +78,7 @@ window.addEventListener("load", () => {
 	
 	form.addEventListener("submit", event => {
 		event.preventDefault();
+		 if(disableSubmit) return;
 
 		var data = {};
 		
@@ -93,6 +95,14 @@ window.addEventListener("load", () => {
 		const req = new XMLHttpRequest();
 
 		req.addEventListener("load", event => {
+			if(event.target.status != 422)
+			{
+				form.parentNode.removeChild(form);
+			}
+
+			//toggleLoader(false);
+			disableSubmit = false;
+
 			alert(event.target.responseText);
 		});
 
@@ -109,6 +119,7 @@ window.addEventListener("load", () => {
 
 		req.send(JSON.stringify(data));
 
-		form.parentNode.removeChild(form);
+		//toggleLoader(true);
+		disableSubmit = true;
 	});
 });
