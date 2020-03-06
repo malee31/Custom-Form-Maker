@@ -72,13 +72,16 @@ input[type="submit"]:hover
 
 .loadWheel
 {
-	position: absolute;
+	position: fixed;
+	top: calc(50% - min(30vw, 25vh) - 16px);
+	left: calc(50% - min(30vw, 25vh) - 16px);
 	border-radius: 50%;
 	border: 16px solid #F3F3F3;
 	border-top: 16px solid #3498DB;
 	width: min(60vw, 50vh);
 	height: min(60vw, 50vh);
 	animation: load 2s linear infinite;
+	z-index: 99;
 }
 
 @keyframes load

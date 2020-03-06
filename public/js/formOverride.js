@@ -12,12 +12,12 @@ function toggleLoader(show)
 	if(show)
 	{
 		loader.style.visibility = "visible";
-		idSubmit.value = "Loading...";
+		if(idSubmit) idSubmit.value = "Loading...";
 	}
 	else
 	{
 		loader.style.visibility = "hidden";
-		idSubmit.value = "Submit";
+		if(idSubmit) idSubmit.value = "Submit";
 	}
 }
 
@@ -36,11 +36,8 @@ window.addEventListener("load", () => {
 			const req = new XMLHttpRequest();
 
 			req.addEventListener("load", event => {
-				if(event.target.status != 200)
-				{
-					toggleLoader(false);
-				}
-				else
+				toggleLoader(false);
+				if(event.target.status == 200)
 				{
 					loadInputs(event.target.response);
 				}
@@ -100,7 +97,7 @@ window.addEventListener("load", () => {
 				form.parentNode.removeChild(form);
 			}
 
-			//toggleLoader(false);
+			toggleLoader(false);
 			disableSubmit = false;
 
 			alert(event.target.responseText);
@@ -119,7 +116,7 @@ window.addEventListener("load", () => {
 
 		req.send(JSON.stringify(data));
 
-		//toggleLoader(true);
+		toggleLoader(true);
 		disableSubmit = true;
 	});
 });
