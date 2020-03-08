@@ -16,6 +16,13 @@ module.exports = {
 	console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
 */
 
+/**
+ * Retrieves the labels/headers at the top row of the main sheet.
+ *
+ * @params {string} id String that is the id of the spreadsheet on Google Spreadsheets
+ * @returns {string} Returns stringified JSON object containing the key value pairs of
+ * 	header name and whether it is a required input.
+ */
 async function getSheetHeaders(id)
 {
 	//test();
@@ -66,6 +73,13 @@ function processRequirements(requirements)
 	return headers;
 }
 
+/**
+ * Retrieves the labels/headers at the top row of the main sheet along with their requirement status.
+ *
+ * @params {string} id String that is the id of the spreadsheet on Google Spreadsheets
+ * @params {boolean} [keepExcluded = false] Determines whether or not the returned object will include excluded headers.
+ * @returns {Object} Returns JSON object with key value pairs of header name and whether it is a required input.
+ */
 async function getRequirements(id, keepExcluded)
 {
 	const config = await getWorksheets(id).then(async sheets => {
@@ -118,6 +132,15 @@ async function getRequirements(id, keepExcluded)
 	return combineData;
 }
 
+/**
+ * Retrieves a specific cell from a sheet based on sheet id, position, and sheet name.
+ *
+ * @params {string} formId String that is the id of the spreadsheet on Google Spreadsheets
+ * @params {number} x The x position of the cell (Not zero indexed).
+ * @params {number} y The y position of the cell (Not zero indexed).
+ * @params {string} [sheetName] The name of the worksheet. Defaults to the main sheet.
+ * @returns {Object} Returns JSON object with key value pairs of header name and whether it is a required input.
+ */
 async function getCell(formId, x, y, sheetName)
 {
 	var sheet = await getWorksheets(formId).then(worksheets => {
@@ -135,6 +158,12 @@ async function getCell(formId, x, y, sheetName)
 	});
 }
 
+/**
+ * Fills a new row in the main sheet with form input after checking input. Returns 422 on failure.
+ *
+ * @params {Object} userInput JSON object containing user form input in key value pairs of sanitized header
+ * 	names and inputted data.
+ */
 async function fillRow(userInput)
 {
 	//change index number to access different sheet
@@ -174,6 +203,13 @@ async function fillRow(userInput)
 	})
 }
 
+/**
+ * Retrieves all worksheets from a specified form id.
+ *
+ * @params {string} formId String that is the id of the spreadsheet on Google Spreadsheets
+ * 	names and inputted data.
+ * @returns {Object[]} Array of all the Google Sheets worksheets for the specified id. 
+ */
 async function getWorksheets(formId)
 {
 	const doc = new GoogleSpreadsheet(formId);
@@ -182,6 +218,13 @@ async function getWorksheets(formId)
 	return data.worksheets;
 }
 
+/**
+ * Retrieves all worksheets from a specified form id.
+ *
+ * @params {Object} sheet A singular worksheet from any Google Sheet
+ * @params {boolean} [returnEmpty = false] Determines whether to return cells containing no value.
+ * @returns {Object[]} Array of all the cells in the given worksheet. 
+ */
 async function getAllCells(sheet, returnEmpty)
 {
 	return await promisify(sheet.getCells)({
@@ -193,6 +236,16 @@ async function getAllCells(sheet, returnEmpty)
 	});
 }
 
+/**
+ * Retrieves all worksheets from a specified form id.
+ *
+ * @params {Object} sheet A singular worksheet from any Google Sheet
+ * @params {string} value The value to look for the position of.
+ * @params {boolean} [returnMultiple = false] Determines whether to return array of multiple position
+ * 	pair arrays or only one position pair array.
+ * @returns {number[] | number[][]} Position of first match in column, row format (Not zero indexed) in an array.
+ * 	If returnMultiple is true, multiple arrays are placed into one.
+ */
 async function valueLookup(sheet, value, returnMultiple)
 {
 	returnMultiple = returnMultiple ? true : false;
