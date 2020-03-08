@@ -44,7 +44,7 @@ async function getSheetHeaders(id)
  *
  * @params {{name: string, required: string}[]} requirements Array of Objects with a name key
  * 	corresponding to a column header and required key for whether it is required to submit the form.
- * @returns {Object.<string: string>} Returns singular object containing sanitized column names in order
+ * @returns {Object} Returns singular object containing sanitized column names in order
  * 	as keys and their required status as its value.
  */
 function processRequirements(requirements)

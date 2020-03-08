@@ -1,18 +1,22 @@
 {
-  "name": "custom-google-forms",
-  "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
-  "scripts": {
-    "run": "node app.js",
-    "dev": "node app.js &> output.txt",
-    "test": "node spreadsheet.js"
-  },
-  "keywords": [],
-  "author": "Marvin Lee",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.17.1",
-    "google-spreadsheet": "^2.0.9"
-  }
+	"name": "custom-google-forms",
+	"version": "1.0.0",
+	"description": "",
+	"main": "app.js",
+	"scripts": {
+		"run": "node app.js",
+		"dev": "node app.js &> output.txt",
+		"docs": "./node_modules/.bin/jsdoc -c jsdoc.json",
+		"test": "node spreadsheet.js"
+	},
+	"keywords": [],
+	"author": "Marvin Lee",
+	"license": "ISC",
+	"dependencies": {
+		"express": "^4.17.1",
+		"google-spreadsheet": "^2.0.9"
+	},
+	"devDependencies": {
+		"jsdoc": "^3.6.3"
+	}
 }

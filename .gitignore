@@ -7,6 +7,9 @@ node_modules/
 *.swp
 *.swo
 
+#JSDoc
+jsdocs/
+
 #dev files
 output.txt
 
