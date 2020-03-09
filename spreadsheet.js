@@ -237,7 +237,7 @@ async function getAllCells(sheet, returnEmpty)
 }
 
 /**
- * Retrieves all worksheets from a specified form id.
+ * Returns the position of cells in a given sheet that match a given value. Not zero indexed.
  *
  * @params {Object} sheet A singular worksheet from any Google Sheet
  * @params {string} value The value to look for the position of.
@@ -267,6 +267,18 @@ async function valueLookup(sheet, value, returnMultiple)
 	return result;
 }
 
+/**
+ * Returns the position of cells in a given sheet that match a given value, offset by given offsets. Not zero indexed.
+ *
+ * @params {Object} sheet A singular worksheet from any Google Sheet
+ * @params {string} value The value to look for the position of.
+ * @params {number} offsetCol Value to offset returned position columns by.
+ * @params {number} offsetRow Value to offset returned postion rows by.
+ * @params {boolean} [returnMultiple = false] Determines whether to return array of multiple position
+ * 	pair arrays or only one position pair array.
+ * @returns {number[] | number[][]} Position of first match in column, row format (Not zero indexed) in an array.
+ * 	If returnMultiple is true, multiple arrays are placed into one.
+ */
 async function offsetLookup(sheet, value, offsetCol, offsetRow, returnMultiple)
 {
 	returnMultiple = returnMultiple ? true : false;
@@ -291,6 +303,14 @@ async function offsetLookup(sheet, value, offsetCol, offsetRow, returnMultiple)
 	return matches;
 }
 
+/**
+ * Returns the value of a cell position in a given sheet.
+ *
+ * @params {Object} sheet A singular worksheet from any Google Sheet
+ * @params {number} col Column position of the cell to retrieve the value from.
+ * @params {number} row Row position of the cell to retrieve the value from.
+ * @returns {string} Value of the given cell.
+ */
 async function parseValue(sheet, col, row)
 {
 	return cell = await promisify(sheet.getCells)({
@@ -304,6 +324,16 @@ async function parseValue(sheet, col, row)
 	}, err => sheetError.specificErr(err, "Cell parseValue error"));
 }
 
+/**
+ * Returns the value of a cell position in a given sheet.
+ *
+ * @params {Object} sheet A singular worksheet from any Google Sheet
+ * @params {string} searchKey The value to look for the position of before offsetting.
+ * @params {number} colOffset Value to offset returned position columns by.
+ * @params {string} defaultVal Value to return in case the search key is not found.
+ * @params {number} rowOffset Value to offset returned postion rows by.
+ * @returns {string} Value of the given cell.
+ */
 async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal)
 {
 	defaultVal = defaultVal || "";
@@ -319,20 +349,38 @@ async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal)
 	});
 }
 
-//With the updates, this is now useless but will be kept as a relic lol
+/**
+ * Returns the row position of the lowest cell with a value in it.
+ * With the API updates, this is now useless but will be kept as a relic lol
+ * Note: Empty checkboxes or validation are counted as nonempty and can affect the value this returns.
+ *
+ * @params {Object} sheet A singular worksheet from any Google Sheet
+ * @returns {number} Row position of the last cell with a value in it. Not zero indexed.
+ */
 async function getLastRow(sheet)
 {
-	//Note: Considers empty checkboxes or validation as nonempty so those aren't considered the last rows.
 	return await getAllCells(sheet, false).then(allCells => {
 		return allCells[Object.keys(allCells).length - 1].row;
 	}, sheetError.genericErr);
 }
 
+/**
+ * Returns the sheet labeled as the config from an array of worksheets.
+ *
+ * @params {Object[]} spreadsheets An array of worksheets from Google Sheets.
+ * @returns {number} Row position of the last cell with a value in it. Not zero indexed.
+ */
 function getConfig(spreadsheets)
 {
 	return getSheetByName(spreadsheets, configSheetName);
 }
 
+/**
+ * Returns the sheet labeled as the main sheet from an array of worksheets based on the config sheet.
+ *
+ * @params {Object[]} spreadsheets An array of worksheets from Google Sheets.
+ * @returns {number} Row position of the last cell with a value in it. Not zero indexed.
+ */
 async function getMain(spreadsheets)
 {
 	//console.log("Searching for main");
@@ -342,6 +390,14 @@ async function getMain(spreadsheets)
 	return getSheetByName(spreadsheets, main);
 }
 
+/**
+ * Returns the sheet that matches a given name from an array of worksheets.
+ * Defaults to the first sheet if nothing is found by that name.
+ *
+ * @params {Object[]} spreadsheets An array of worksheets from Google Sheets.
+ * @params {string} name The name of the worksheet to search for
+ * @returns {number} Row position of the last cell with a value in it. Not zero indexed.
+ */
 function getSheetByName(spreadsheets, name)
 {
 	//console.log("Now in getSheets");
@@ -359,6 +415,9 @@ function getSheetByName(spreadsheets, name)
 	return spreadsheets[0];
 }
 
+/**
+ * Function used for debugging and function testing during development.
+ */
 async function test()
 {
 	console.log("Testing: ");
