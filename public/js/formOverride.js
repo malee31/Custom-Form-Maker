@@ -70,6 +70,11 @@ window.addEventListener("load", () => {
 		}
 	});
 
+	if(window.location.search != "")
+	{
+		document.getElementsByName("sheetId")[0].value = window.location.search.substring(window.location.search.indexOf("id=")+3).split("&")[0];
+		document.getElementsByName("submit")[0].click();
+	}
 
 	let form = document.forms["mainForm"];
 	

@@ -2,6 +2,7 @@
 const express = require('express');
 const app = express();
 const path = require("path");
+const url = require('url');
 
 //Imports module imports from spreadsheet.js
 const sheet = require("./spreadsheet.js");
@@ -60,6 +61,12 @@ app.post("/", (req, res) => {
 
 app.get("/form/:sheetId", (req, res) => {
 	console.log(req.params);
+	res.redirect(url.format({
+		pathname: "/",
+		query: {
+			"id": req.params.sheetId
+		}
+	}));
 });
 
 // Error 404
