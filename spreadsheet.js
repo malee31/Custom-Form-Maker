@@ -104,6 +104,15 @@ async function getRequirements(id, keepExcluded)
 		'return-empty' : false,
 	});
 
+	const defaultStart = await valueLookup(config, "DEFAULT", false);
+	const defaultCells = await promisify(config.getCells)({
+		'min-col' : 1,
+		'max-col' : config.colCount,
+		'min-row' : defaultStart[1],
+		'max-row' : defaultStart[1],
+		'return-empty' : false,
+	});
+
 	var combineData = [];
 	var adjustment = 0;
 	for(var i = 0; i < topCells.length; i++)
@@ -111,6 +120,7 @@ async function getRequirements(id, keepExcluded)
 		combineData[i - adjustment] = {};
 		combineData[i - adjustment].name = topCells[i].value;
 		combineData[i - adjustment].required = "";
+		combineData[i - adjustment].defaultValue = "";
 		for(var ii = 0; ii < requirementCells.length; ii++)
 		{
 			if(requirementCells[ii].col == topCells[i].col)
@@ -122,13 +132,31 @@ async function getRequirements(id, keepExcluded)
 					break;
 				}
 				combineData[i - adjustment].required = requirementCells[ii].value;
+
+				for(var iii = 0; iii < defaultCells.length; iii++)
+				{
+					if(defaultCells[iii].col == topCells[i].col)
+					{
+						combineData[i - adjustment].defaultValue = defaultCells[iii].value;
+						break;
+					}
+				}
+				break;
+			}
+		}
+
+		for(var iii = 0; iii < defaultCells.length; iii++)
+		{
+			if(defaultCells[iii].col == topCells[i].col)
+			{
+				combineData[i - adjustment].defaultValue = defaultCells[iii].value;
 				break;
 			}
 		}
 	}
 
 	combineData.shift();
-	//console.log(combineData);
+	console.log(combineData);
 	return combineData;
 }
 
