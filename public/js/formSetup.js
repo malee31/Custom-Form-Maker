@@ -31,20 +31,19 @@ function sheetFormatHeaders(header)
 function loadInputs(ids)
 {
 	//console.log(ids);
-	const inputIds = JSON.parse(ids);
 
 	const mainForm = document.getElementsByName("mainForm")[0];
 
 	const submitButton = document.getElementsByName("mainSubmit")[0]
 	submitButton.removeAttribute("hidden");
 
-	for(const inputField of inputIds)
+	for(const inputField of ids)
 	{
 		//console.log(inputField);
 		mainForm.insertBefore(generateInput(inputField.name, inputField.required, inputField.defaultValue), submitButton);
 	}
 
-	//console.log(inputIds);
+	//console.log(ids);
 
 	idPrompt = document.getElementById("getId");
 	idPrompt.parentNode.removeChild(idPrompt);

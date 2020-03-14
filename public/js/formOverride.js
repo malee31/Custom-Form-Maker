@@ -22,9 +22,8 @@ function toggleLoader(show)
 }
 
 window.addEventListener("load", () => {
-	let idGet = document.forms["idGetter"];
 
-	idGet.addEventListener("submit", event => {
+	document.forms["idGetter"].addEventListener("submit", event => {
 		event.preventDefault();
 
 		const idInput = document.getElementsByName("sheetId")[0];
@@ -39,7 +38,18 @@ window.addEventListener("load", () => {
 				toggleLoader(false);
 				if(event.target.status == 200)
 				{
-					loadInputs(event.target.response);
+					var resp = JSON.parse(event.target.response);
+					const defaultCookie = cookieValue("defaultVals").split(",");
+
+					for(var inputIndex = 0; inputIndex < Math.min(resp.length, defaultCookie.length); inputIndex++)
+					{
+						if(defaultCookie[inputIndex] != "")
+						{
+							resp[inputIndex].defaultValue = defaultCookie[inputIndex];
+						}
+					}
+
+					loadInputs(resp);
 				}
 			});
 
@@ -67,6 +77,12 @@ window.addEventListener("load", () => {
 			//console.log("Sending for Inputs from Id: " + JSON.stringify(data));
 
 			req.send(JSON.stringify(data));
+		
+
+			var defaultInput = document.getElementsByName("defaultVals")[0].value;
+
+			if(defaultInput == "clear") setCookie("defaultVals", "");
+			else if(defaultInput != "") setCookie("defaultVals", defaultInput);
 		}
 	});
 
@@ -76,6 +92,9 @@ window.addEventListener("load", () => {
 		document.getElementsByName("submit")[0].click();
 	}
 
+	/*
+		Moving onto main form override
+	*/
 	let form = document.forms["mainForm"];
 	
 	form.addEventListener("submit", event => {
