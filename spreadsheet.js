@@ -29,7 +29,7 @@ async function getSheetHeaders(id)
 
 	var sheet = await getWorksheets(id).then(async sheets => {
 		return await getMain(sheets);
-	}, sheetError.genericErr);
+	}, err => sheetError.specificErr(err, "Invalid SheetID"));
 
 	//Array of objects containing the name of a column and what kind of field it is
 	const headers = await getRequirements(id, false);
@@ -156,7 +156,7 @@ async function getRequirements(id, keepExcluded)
 	}
 
 	combineData.shift();
-	console.log(combineData);
+	//console.log(combineData);
 	return combineData;
 }
 
@@ -215,8 +215,7 @@ async function fillRow(userInput)
 	{
 		if(!userInput[mayRequire] != "" && requirements[mayRequire] == "REQUIRE")
 		{
-			console.log("Required Input Missing");
-			throw "REQUIRED INPUT NONEXISTANT"
+			sheetError.throwErr("REQUIRED INPUT NONEXISTANT", "Required Input Missing");
 			return;
 		}
 	}
@@ -324,7 +323,7 @@ async function offsetLookup(sheet, value, offsetCol, offsetRow, returnMultiple)
 		matches[matchPair][1] += offsetRow;
 		if(matches[matchPair][0] < 1 || matches[matchPair][1] < 1)
 		{
-			console.log("Potential Error: This Offset Pair is invalid - " + matches[matchPair]);
+			sheetError.nonErr("Potential Error: This Offset Pair is invalid - " + matches[matchPair]);
 		}
 	}
 
@@ -371,7 +370,7 @@ async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal)
 		return await parseValue(sheet, pos[0], pos[1], false).then(value => {
 			return value;
 		}, err => {
-			console.log("Failed to offset and parse. Returning empty String or default value.");
+			sheetError.handledErr("Failed to offset and parse. Returning empty String or default value.");
 			return defaultVal;
 		});
 	});
@@ -439,7 +438,7 @@ function getSheetByName(spreadsheets, name)
 			return spreadsheets[i];
 		}
 	}
-	console.log("Sheet not found by name. Defaulting to first sheet.");
+	sheetError.handledErr("Sheet not found by name. Defaulting to first sheet.");
 	return spreadsheets[0];
 }
 

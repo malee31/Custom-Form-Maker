@@ -3,35 +3,59 @@ module.exports = {
 	worksheetErr: worksheetError,
 	genericErr: genericError,
 	specificErr: specificError,
-	unexpectedErr: unexpectedError
+	unexpectedErr: unexpectedError,
+	handledErr: handledError,
+	nonErr: nonErrorError,
+	throwErr: throwError
 }
 
 function sheetIdError(err, optionalText)
 {
-	console.log(`Invalid Sheet ID${optionalErrDetail(optionalText)}: ${err}`);
+	errorLog(`Invalid Sheet ID${optionalErrDetail(optionalText)}:`, err);
 }
 
 function worksheetError(err, optionalText)
 {
-	console.log(`Invalid Worksheet${optionalErrDetail(optionalText)}: ${err}`);
+	errorLog(`Invalid Worksheet${optionalErrDetail(optionalText)}`, err);
 }
 
 function genericError(err, optionalText)
 {
-	console.log(`Generic Error${optionalErrDetail(optionalText)}: ${err}\nGet more specific with error handling to debug.`);
+	errorLog(`Generic Error${optionalErrDetail(optionalText)}`, err, "\nGet more specific with error handling to debug.");
 }
 
 function specificError(err, errorMessage)
 {
-	console.log(`Definite <${optionalErrDetail(errorMessage)}>: ${err}`);
+	errorLog(`Definite <${optionalErrDetail(errorMessage)}>`, err);
 }
 
 function unexpectedError(err, optionalText)
 {
-	console.log(`Unexpected Error in Bagging Area${optionalErrDetail(optionalText)}: ${err}`);
+	errorLog(`Unexpected Error in Bagging Area${optionalErrDetail(optionalText)}`, err);
 }
 
 function optionalErrDetail(detail)
 {
-	return (detail ? ` (${detail})` : "");
+	return (detail ? detail : "");
+}
+
+function handledError(handledText)
+{
+	console.log(handledText);
+}
+
+function nonErrorError(errText)
+{
+	console.log(errText);
+}
+
+function throwError(errText, optionalText)
+{
+	if(optionalText) console.log(optionalText);
+	throw errText;
+}
+
+function errorLog(name, text, detail)
+{
+	console.log("\x1b[31m%s:\x1b[0m %s \x1b[32m%s\x1b[0m", name, text, optionalErrDetail(detail))
 }
