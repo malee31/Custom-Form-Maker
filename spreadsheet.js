@@ -2,7 +2,6 @@ const GoogleSpreadsheet = require('google-spreadsheet');
 const { promisify } = require('util');
 const sheetError = require('./sheetError.js');
 
-//const credentials = require("./private/SpreadsheetPlaygroundCredentials.json");
 const credentials = {
   "type": process.env.type,
   "project_id": process.env.project_id,
