@@ -2,6 +2,7 @@ const GoogleSpreadsheet = require('google-spreadsheet');
 const { promisify } = require('util');
 const sheetError = require('./sheetError.js');
 
+//const credentials = require("./private/SpreadsheetPlaygroundCredentials.json");
 const credentials = {
   "type": process.env.type,
   "project_id": process.env.project_id,
@@ -20,7 +21,6 @@ const configSheetName = ".config";
 module.exports = {
 	newRow: fillRow,
 	getHeaders: getSheetHeaders,
-	debug: test
 }
 
 /*Example codes
@@ -36,8 +36,6 @@ module.exports = {
  */
 async function getSheetHeaders(id)
 {
-	//test();
-
 	var sheet = await getWorksheets(id).then(async sheets => {
 		return await getMain(sheets);
 	}, err => sheetError.specificErr(err, "Invalid SheetID"));
@@ -466,16 +464,4 @@ function getSheetByName(spreadsheets, name)
 	}
 	sheetError.handledErr("Sheet not found by name. Defaulting to first sheet.");
 	return spreadsheets[0];
-}
-
-/**
- * Function used for debugging and function testing during development.
- */
-async function test()
-{
-	console.log("Testing: ");
-	const testId = "1n-hg18uCMywzbPlJ7KV1kXPkH3frWr7Hx8RAnTQP4UQ";
-	const title = await getFileTitle(testId);
-	console.log(title);
-	console.log("End of Test.");
 }
