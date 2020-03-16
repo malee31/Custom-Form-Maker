@@ -246,6 +246,21 @@ async function getWorksheets(formId)
 }
 
 /**
+ * Retrieves the name of the entire Google Spreadsheet file.
+ *
+ * @params {string} formId String that is the id of the spreadsheet on Google Spreadsheets
+ * 	names and inputted data.
+ * @returns {string} The title of the entire Google Spreadsheet file.
+ */
+async function getFileTitle(formId)
+{
+	const doc = new GoogleSpreadsheet(formId);
+	await promisify(doc.useServiceAccountAuth)(credentials);
+	const data = await promisify(doc.getInfo)();
+	return data.title;
+}
+
+/**
  * Retrieves all worksheets from a specified form id.
  *
  * @params {Object} sheet A singular worksheet from any Google Sheet
@@ -449,7 +464,7 @@ async function test()
 {
 	console.log("Testing: ");
 	const testId = "1n-hg18uCMywzbPlJ7KV1kXPkH3frWr7Hx8RAnTQP4UQ";
-	const sheets = await getWorksheets(testId);
-
+	const title = await getFileTitle(testId);
+	console.log(title);
 	console.log("End of Test.");
 }
