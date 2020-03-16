@@ -78,4 +78,4 @@ app.use((error, req, res, next) => {
 	res.status(500).sendFile(path.resolve(__dirname, "views/500.html"));
 });
 
-app.listen(8080);
+app.listen(process.env.PORT || 8080);
