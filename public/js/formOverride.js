@@ -81,7 +81,7 @@ window.addEventListener("load", () => {
 
 			var defaultInput = document.getElementsByName("defaultVals")[0].value;
 
-			if(defaultInput == "clear") setCookie("defaultVals", "");
+			if(defaultInput == "clear" || cookieValue("defaultVals") == "Error 404") setCookie("defaultVals", "");
 			else if(defaultInput != "") setCookie("defaultVals", defaultInput);
 		}
 	});

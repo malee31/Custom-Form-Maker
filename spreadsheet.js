@@ -164,7 +164,8 @@ async function getRequirements(id, keepExcluded)
 		}
 	}
 
-	combineData.shift();
+	//This just overwrites the COLUMN label with the title of the Google Sheets
+	combineData[0] = {"name": await getFileTitle(id)};
 	//console.log(combineData);
 	return combineData;
 }

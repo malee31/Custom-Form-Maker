@@ -33,9 +33,11 @@ function loadInputs(ids)
 	//console.log(ids);
 
 	const mainForm = document.getElementsByName("mainForm")[0];
+	mainForm.style.display = "flex";
 
-	const submitButton = document.getElementsByName("mainSubmit")[0]
-	submitButton.removeAttribute("hidden");
+	const submitButton = mainForm.lastChild;
+
+	document.getElementById("fileTitle").innerText = ids.shift().name;
 
 	for(const inputField of ids)
 	{
