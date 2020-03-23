@@ -2,6 +2,13 @@ var canPost = true;
 var disableSubmit = false;
 toggleLoader(false);
 
+
+/**
+ *
+ * Toggles the loading wheel by hiding or showing it
+ *
+ * @params {boolean} show Determines whether to show the loader or hide it.
+ */
 function toggleLoader(show)
 {
 	var loader = document.getElementsByClassName("loadWheel")[0];
@@ -21,6 +28,13 @@ function toggleLoader(show)
 	}
 }
 
+
+/**
+ *
+ * Handles all the overriding of the id getter form
+ *
+ * @params {Event} event Event object passed in from addEventListerner.
+ */
 function idGetOverride(event)
 {
 	event.preventDefault();
@@ -44,7 +58,7 @@ function idGetOverride(event)
 				{
 					if(defaultCookie[inputIndex] != "")
 					{
-						resp[inputIndex].defaultValue = defaultCookie[inputIndex];
+						resp[inputIndex + 1].defaultValue = defaultCookie[inputIndex];
 					}
 				}
 
@@ -85,6 +99,12 @@ function idGetOverride(event)
 	}
 }
 
+
+/**
+ *
+ * When redirected from /forms/:id, this handles the sending of the POST request by simulating manual input.
+ *
+ */
 function redirectedHandler()
 {
 	if(window.location.search != "")
@@ -94,6 +114,12 @@ function redirectedHandler()
 	}
 }
 
+
+/**
+ *
+ * Handles all the overriding of the mainForm.
+ *
+ */
 function mainFormOverride()
 {
 	let form = document.forms["mainForm"];
@@ -147,6 +173,7 @@ function mainFormOverride()
 	});
 }
 
+// Overrides all the forms and handles redirects once the window loads.
 window.addEventListener("load", () => {
 
 	document.forms["idGetter"].addEventListener("submit", idGetOverride);
