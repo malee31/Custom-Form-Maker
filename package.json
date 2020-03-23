@@ -15,7 +15,8 @@
 	"license": "ISC",
 	"dependencies": {
 		"express": "^4.17.1",
-		"google-spreadsheet": "^2.0.9"
+		"google-spreadsheet": "^2.0.9",
+		"minimist": ">=1.2.2"
 	},
 	"devDependencies": {
 		"jsdoc": "^3.6.3"
