@@ -7,9 +7,14 @@
 	</head>
 	<body>
 		<div class="loadWheel"></div>
+		<section id="errorBox" style="display: none;">
+				<h1 id="errorName">Error</h1>
+				<p id="errorDesc">Something has gone wrong! Try again in a moment.</p>
+				<button onclick="toggleErrorBox(false)">Ok</button>
+		</section>
 		<section id="getId">
 			<form enctype="application/json" action="/" method="POST" name="idGetter">
-				<h1>Welcome</h1>
+				<h1>Enter the ID</h1>
 				<input type="text" name="sheetId" placeholder="Google Sheet ID"></input>
 				<input type="text" name="defaultVals" placeholder="OPTIONAL: Default Values"></input>
 				<input type="submit" name="submit"></input>
@@ -17,7 +22,7 @@
 		</section>
 		<main>
 			<form enctype="application/json" action="/" method="POST" name="mainForm" style="display: none;">
-				<i><h1 id = "fileTitle">Welcome<h1></i>
+				<i><h1 id = "fileTitle">Form<h1></i>
 				<input type="submit" name="mainSubmit" value="Submit and Test"/>
 			</form>
 		</main>

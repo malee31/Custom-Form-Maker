@@ -1,7 +1,7 @@
 /**
  * Formats the name of the headers into object keys used by the google-sheets api.
  *
- * @params {string} header Singular unformatted string which is the name of a column in the default data sheet.
+ * @param {string} header Singular unformatted string which is the name of a column in the default data sheet.
  * @returns {string} Formatted string without whitespace, capitalization, leading numbers, or underscores.
  */
 function sheetFormatHeaders(header)
@@ -26,7 +26,7 @@ function sheetFormatHeaders(header)
  *
  * Uses JSON received from a request to find the sheet with sheet id to load inputs in the main form.
  *
- * @params {string} ids Stringified JSON containing the unformatted column names for the sheet requested as their values in order.
+ * @param {string} ids Stringified JSON containing the unformatted column names for the sheet requested as their values in order.
  */
 function loadInputs(ids)
 {
@@ -55,7 +55,7 @@ function loadInputs(ids)
  *
  * Given a column name, a new input is created with a formatted key and label using the column name the input corresponds to.
  *
- * @params {string} columnName Name of a column in the requested sheet.
+ * @param {string} columnName Name of a column in the requested sheet.
  * @returns {object} formInput Contains an html input tag with proper attributes
  */
 function generateInput(columnName, required, defaultValue)

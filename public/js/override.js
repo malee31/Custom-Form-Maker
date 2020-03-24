@@ -7,7 +7,7 @@ toggleLoader(false);
  *
  * Toggles the loading wheel by hiding or showing it
  *
- * @params {boolean} show Determines whether to show the loader or hide it.
+ * @param {boolean} show Determines whether to show the loader or hide it.
  */
 function toggleLoader(show)
 {
@@ -28,12 +28,36 @@ function toggleLoader(show)
 	}
 }
 
+/**
+ *
+ * Toggles the error window by hiding or showing it. Also sets the text if provided.
+ *
+ * @param {boolean} show Determines whether to show the loader or hide it.
+ * @param {string} [title] The name of the error used as the title.
+ * @param {string} [desc] Additional description about the error.
+ */
+function toggleErrorBox(show, title, desc)
+{
+	var errBox = document.getElementById("errorBox");
+
+	if(show)
+	{
+		errBox.style.display = "flex";
+	}
+	else
+	{
+		errBox.style.display = "none";
+	}
+	
+	if(title) document.getElementById("errorName").innerHTML = title;
+	if(desc) document.getElementById("errorDesc").innerHTML = desc;
+}
 
 /**
  *
  * Handles all the overriding of the id getter form
  *
- * @params {Event} event Event object passed in from addEventListerner.
+ * @param {Event} event Event object passed in from addEventListerner.
  */
 function idGetOverride(event)
 {

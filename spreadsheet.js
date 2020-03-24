@@ -30,7 +30,7 @@ module.exports = {
 /**
  * Retrieves the labels/headers at the top row of the main sheet.
  *
- * @params {string} id String that is the id of the spreadsheet on Google Spreadsheets
+ * @param {string} id String that is the id of the spreadsheet on Google Spreadsheets
  * @returns {string} Returns stringified JSON object containing the key value pairs of
  * 	header name and whether it is a required input.
  */
@@ -51,7 +51,7 @@ async function getSheetHeaders(id)
  * Formats the name of the requirement headers into object keys used by the google-sheets api
  * along with whether they are required in the form to continue.
  *
- * @params {{name: string, required: string}[]} requirements Array of Objects with a name key
+ * @param {Object[]} requirements Array of Objects with a string name key and string required key.
  * 	corresponding to a column header and required key for whether it is required to submit the form.
  * @returns {Object} Returns singular object containing sanitized column names in order
  * 	as keys and their required status as its value.
@@ -85,8 +85,8 @@ function processRequirements(requirements)
 /**
  * Retrieves the labels/headers at the top row of the main sheet along with their requirement status.
  *
- * @params {string} id String that is the id of the spreadsheet on Google Spreadsheets
- * @params {boolean} [keepExcluded = false] Determines whether or not the returned object will include excluded headers.
+ * @param {string} id String that is the id of the spreadsheet on Google Spreadsheets
+ * @param {boolean} [keepExcluded = false] Determines whether or not the returned object will include excluded headers.
  * @returns {Object} Returns JSON object with key value pairs of header name and whether it is a required input.
  */
 async function getRequirements(id, keepExcluded)
@@ -173,10 +173,10 @@ async function getRequirements(id, keepExcluded)
 /**
  * Retrieves a specific cell from a sheet based on sheet id, position, and sheet name.
  *
- * @params {string} formId String that is the id of the spreadsheet on Google Spreadsheets
- * @params {number} x The x position of the cell (Not zero indexed).
- * @params {number} y The y position of the cell (Not zero indexed).
- * @params {string} [sheetName] The name of the worksheet. Defaults to the main sheet.
+ * @param {string} formId String that is the id of the spreadsheet on Google Spreadsheets
+ * @param {number} x The x position of the cell (Not zero indexed).
+ * @param {number} y The y position of the cell (Not zero indexed).
+ * @param {string} [sheetName] The name of the worksheet. Defaults to the main sheet.
  * @returns {Object} Returns JSON object with key value pairs of header name and whether it is a required input.
  */
 async function getCell(formId, x, y, sheetName)
@@ -199,7 +199,7 @@ async function getCell(formId, x, y, sheetName)
 /**
  * Fills a new row in the main sheet with form input after checking input. Returns 422 on failure.
  *
- * @params {Object} userInput JSON object containing user form input in key value pairs of sanitized header
+ * @param {Object} userInput JSON object containing user form input in key value pairs of sanitized header
  * 	names and inputted data.
  */
 async function fillRow(userInput)
@@ -243,7 +243,7 @@ async function fillRow(userInput)
 /**
  * Retrieves all worksheets from a specified form id.
  *
- * @params {string} formId String that is the id of the spreadsheet on Google Spreadsheets
+ * @param {string} formId String that is the id of the spreadsheet on Google Spreadsheets
  * 	names and inputted data.
  * @returns {Object[]} Array of all the Google Sheets worksheets for the specified id. 
  */
@@ -258,7 +258,7 @@ async function getWorksheets(formId)
 /**
  * Retrieves the name of the entire Google Spreadsheet file.
  *
- * @params {string} formId String that is the id of the spreadsheet on Google Spreadsheets
+ * @param {string} formId String that is the id of the spreadsheet on Google Spreadsheets
  * 	names and inputted data.
  * @returns {string} The title of the entire Google Spreadsheet file.
  */
@@ -273,8 +273,8 @@ async function getFileTitle(formId)
 /**
  * Retrieves all worksheets from a specified form id.
  *
- * @params {Object} sheet A singular worksheet from any Google Sheet
- * @params {boolean} [returnEmpty = false] Determines whether to return cells containing no value.
+ * @param {Object} sheet A singular worksheet from any Google Sheet
+ * @param {boolean} [returnEmpty = false] Determines whether to return cells containing no value.
  * @returns {Object[]} Array of all the cells in the given worksheet. 
  */
 async function getAllCells(sheet, returnEmpty)
@@ -291,9 +291,9 @@ async function getAllCells(sheet, returnEmpty)
 /**
  * Returns the position of cells in a given sheet that match a given value. Not zero indexed.
  *
- * @params {Object} sheet A singular worksheet from any Google Sheet
- * @params {string} value The value to look for the position of.
- * @params {boolean} [returnMultiple = false] Determines whether to return array of multiple position
+ * @param {Object} sheet A singular worksheet from any Google Sheet
+ * @param {string} value The value to look for the position of.
+ * @param {boolean} [returnMultiple = false] Determines whether to return array of multiple position
  * 	pair arrays or only one position pair array.
  * @returns {number[] | number[][]} Position of first match in column, row format (Not zero indexed) in an array.
  * 	If returnMultiple is true, multiple arrays are placed into one.
@@ -322,11 +322,11 @@ async function valueLookup(sheet, value, returnMultiple)
 /**
  * Returns the position of cells in a given sheet that match a given value, offset by given offsets. Not zero indexed.
  *
- * @params {Object} sheet A singular worksheet from any Google Sheet
- * @params {string} value The value to look for the position of.
- * @params {number} offsetCol Value to offset returned position columns by.
- * @params {number} offsetRow Value to offset returned postion rows by.
- * @params {boolean} [returnMultiple = false] Determines whether to return array of multiple position
+ * @param {Object} sheet A singular worksheet from any Google Sheet
+ * @param {string} value The value to look for the position of.
+ * @param {number} offsetCol Value to offset returned position columns by.
+ * @param {number} offsetRow Value to offset returned postion rows by.
+ * @param {boolean} [returnMultiple = false] Determines whether to return array of multiple position
  * 	pair arrays or only one position pair array.
  * @returns {number[] | number[][]} Position of first match in column, row format (Not zero indexed) in an array.
  * 	If returnMultiple is true, multiple arrays are placed into one.
@@ -358,9 +358,9 @@ async function offsetLookup(sheet, value, offsetCol, offsetRow, returnMultiple)
 /**
  * Returns the value of a cell position in a given sheet.
  *
- * @params {Object} sheet A singular worksheet from any Google Sheet
- * @params {number} col Column position of the cell to retrieve the value from.
- * @params {number} row Row position of the cell to retrieve the value from.
+ * @param {Object} sheet A singular worksheet from any Google Sheet
+ * @param {number} col Column position of the cell to retrieve the value from.
+ * @param {number} row Row position of the cell to retrieve the value from.
  * @returns {string} Value of the given cell.
  */
 async function parseValue(sheet, col, row)
@@ -379,11 +379,11 @@ async function parseValue(sheet, col, row)
 /**
  * Returns the value of a cell position in a given sheet.
  *
- * @params {Object} sheet A singular worksheet from any Google Sheet
- * @params {string} searchKey The value to look for the position of before offsetting.
- * @params {number} colOffset Value to offset returned position columns by.
- * @params {string} defaultVal Value to return in case the search key is not found.
- * @params {number} rowOffset Value to offset returned postion rows by.
+ * @param {Object} sheet A singular worksheet from any Google Sheet
+ * @param {string} searchKey The value to look for the position of before offsetting.
+ * @param {number} colOffset Value to offset returned position columns by.
+ * @param {string} defaultVal Value to return in case the search key is not found.
+ * @param {number} rowOffset Value to offset returned postion rows by.
  * @returns {string} Value of the given cell.
  */
 async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal)
@@ -406,7 +406,7 @@ async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal)
  * With the API updates, this is now useless but will be kept as a relic lol
  * Note: Empty checkboxes or validation are counted as nonempty and can affect the value this returns.
  *
- * @params {Object} sheet A singular worksheet from any Google Sheet
+ * @param {Object} sheet A singular worksheet from any Google Sheet
  * @returns {number} Row position of the last cell with a value in it. Not zero indexed.
  */
 async function getLastRow(sheet)
@@ -419,7 +419,7 @@ async function getLastRow(sheet)
 /**
  * Returns the sheet labeled as the config from an array of worksheets.
  *
- * @params {Object[]} spreadsheets An array of worksheets from Google Sheets.
+ * @param {Object[]} spreadsheets An array of worksheets from Google Sheets.
  * @returns {number} Row position of the last cell with a value in it. Not zero indexed.
  */
 function getConfig(spreadsheets)
@@ -430,7 +430,7 @@ function getConfig(spreadsheets)
 /**
  * Returns the sheet labeled as the main sheet from an array of worksheets based on the config sheet.
  *
- * @params {Object[]} spreadsheets An array of worksheets from Google Sheets.
+ * @param {Object[]} spreadsheets An array of worksheets from Google Sheets.
  * @returns {number} Row position of the last cell with a value in it. Not zero indexed.
  */
 async function getMain(spreadsheets)
@@ -446,8 +446,8 @@ async function getMain(spreadsheets)
  * Returns the sheet that matches a given name from an array of worksheets.
  * Defaults to the first sheet if nothing is found by that name.
  *
- * @params {Object[]} spreadsheets An array of worksheets from Google Sheets.
- * @params {string} name The name of the worksheet to search for
+ * @param {Object[]} spreadsheets An array of worksheets from Google Sheets.
+ * @param {string} name The name of the worksheet to search for
  * @returns {number} Row position of the last cell with a value in it. Not zero indexed.
  */
 function getSheetByName(spreadsheets, name)

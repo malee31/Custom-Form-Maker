@@ -12,6 +12,26 @@ body
 	background-repeat: no-repeat; 
 }
 
+#errorBox
+{
+	background-color: #EEE;
+	position: fixed;
+	z-index: 3;
+	width: 60vw;
+	height: 50vh;
+	top: 50%;
+	left: 50%;
+	margin-left: -30vw;
+	margin-top: -25vh;
+	border-radius: .75em;
+	display: flex;
+	align-content: center;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	flex-direction: column;
+}
+
 #getId
 {
 	background-color: #EEE;

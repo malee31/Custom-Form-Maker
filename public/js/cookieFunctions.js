@@ -2,8 +2,8 @@
  *
  * Sets a cookie with a value.
  *
- * @params {string} name The name of the cookie to be set.
- * @params {string} value The value to assign to a cookie.
+ * @param {string} name The name of the cookie to be set.
+ * @param {string} value The value to assign to a cookie.
  */
 function setCookie(name, value)
 {
@@ -30,7 +30,7 @@ function getCookies()
  *
  * Given a case-sensitive key value, this function returns the value of a cookie with the name of key.
  *
- * @params {(string|number)} key case-sensitive string containing the exact name of a cookie.
+ * @param {(string|number)} key case-sensitive string containing the exact name of a cookie.
  * @returns {string} returns the value of the cookie with the name stored in the parameter key. If not found, logs a problem and returns "Error 404".
  */
 function cookieValue(key)
