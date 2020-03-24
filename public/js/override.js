@@ -43,10 +43,12 @@ function toggleErrorBox(show, title, desc)
 	if(show)
 	{
 		errBox.style.display = "flex";
+		errBox.style.opacity = 1;
 	}
 	else
 	{
-		errBox.style.display = "none";
+		errBox.style.opacity = 0;
+		setTimeout(() => {errBox.style.display = "none";}, 500);
 	}
 	
 	if(title) document.getElementById("errorName").innerHTML = title;
@@ -88,6 +90,12 @@ function idGetOverride(event)
 
 				loadInputs(resp);
 			}
+			else
+			{
+				console.log(event);
+				toggleErrorBox(true, `Status Code ${req.status}: ${req.statusText}`, (req.status == 422) ? "The ID is invalid." : "An error has occurred. Try again later.");
+				toggleLoader(false);
+			}
 		});
 
 		req.addEventListener("onerror", event => {
@@ -97,6 +105,7 @@ function idGetOverride(event)
 		});
 	
 		req.onerror = (err) => {
+			toggleErrorBox(true, "An Error Occurred", "Try again later.");
 			console.log(err);
 			toggleLoader(false);
 		}
@@ -111,10 +120,7 @@ function idGetOverride(event)
 
 		setCookie("id", data.id);
 
-		//console.log("Sending for Inputs from Id: " + JSON.stringify(data));
-
 		req.send(JSON.stringify(data));
-	
 
 		var defaultInput = document.getElementsByName("defaultVals")[0].value;
 
@@ -176,7 +182,7 @@ function mainFormOverride()
 			toggleLoader(false);
 			disableSubmit = false;
 
-			alert(event.target.responseText);
+			toggleErrorBox(true, event.target.status == 200 ? "Thank You!" : ("Status code " + event.target.status), event.target.responseText);
 		});
 
 		req.addEventListener("error", event => {
