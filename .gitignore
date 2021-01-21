@@ -8,7 +8,7 @@ node_modules/
 *.swo
 
 #JSDoc
-jsdocs/
+docs/
 
 #dev files
 output.txt

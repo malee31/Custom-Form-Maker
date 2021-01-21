@@ -9,20 +9,16 @@ toggleLoader(false);
  *
  * @param {boolean} show Determines whether to show the loader or hide it.
  */
-function toggleLoader(show)
-{
+function toggleLoader(show) {
 	var loader = document.getElementsByClassName("loadWheel")[0];
 	var idSubmit = document.getElementsByName("submit")[0];
 
 	canPost = !show;
 
-	if(show)
-	{
+	if(show) {
 		loader.style.visibility = "visible";
 		if(idSubmit) idSubmit.value = "Loading...";
-	}
-	else
-	{
+	} else {
 		loader.style.visibility = "hidden";
 		if(idSubmit) idSubmit.value = "Submit";
 	}
@@ -36,21 +32,19 @@ function toggleLoader(show)
  * @param {string} [title] The name of the error used as the title.
  * @param {string} [desc] Additional description about the error.
  */
-function toggleErrorBox(show, title, desc)
-{
+function toggleErrorBox(show, title, desc) {
 	var errBox = document.getElementById("errorBox");
 
-	if(show)
-	{
+	if(show) {
 		errBox.style.display = "flex";
 		errBox.style.opacity = 1;
-	}
-	else
-	{
+	} else {
 		errBox.style.opacity = 0;
-		setTimeout(() => {errBox.style.display = "none";}, 500);
+		setTimeout(() => {
+			errBox.style.display = "none";
+		}, 500);
 	}
-	
+
 	if(title) document.getElementById("errorName").innerHTML = title;
 	if(desc) document.getElementById("errorDesc").innerHTML = desc;
 }
@@ -61,37 +55,30 @@ function toggleErrorBox(show, title, desc)
  *
  * @param {Event} event Event object passed in from addEventListerner.
  */
-function idGetOverride(event)
-{
+function idGetOverride(event) {
 	event.preventDefault();
 
 	const idInput = document.getElementsByName("sheetId")[0];
 
-	if(canPost && idInput.value !== "")
-	{
+	if(canPost && idInput.value !== "") {
 		toggleLoader(true);
 
 		const req = new XMLHttpRequest();
 
 		req.addEventListener("load", event => {
 			toggleLoader(false);
-			if(event.target.status == 200)
-			{
+			if(event.target.status == 200) {
 				var resp = JSON.parse(event.target.response);
 				const defaultCookie = cookieValue("defaultVals").split(",");
 
-				for(var inputIndex = 0; inputIndex < Math.min(resp.length, defaultCookie.length); inputIndex++)
-				{
-					if(defaultCookie[inputIndex] != "")
-					{
+				for(var inputIndex = 0; inputIndex < Math.min(resp.length, defaultCookie.length); inputIndex++) {
+					if(defaultCookie[inputIndex] != "") {
 						resp[inputIndex + 1].defaultValue = defaultCookie[inputIndex];
 					}
 				}
 
 				loadInputs(resp);
-			}
-			else
-			{
+			} else {
 				console.log(event);
 				toggleErrorBox(true, `Status Code ${req.status}: ${req.statusText}`, (req.status == 422) ? "The ID is invalid." : "An error has occurred. Try again later.");
 				toggleLoader(false);
@@ -103,7 +90,7 @@ function idGetOverride(event)
 			console.log(event);
 			toggleLoader(false);
 		});
-	
+
 		req.onerror = (err) => {
 			toggleErrorBox(true, "An Error Occurred", "Try again later.");
 			console.log(err);
@@ -135,11 +122,9 @@ function idGetOverride(event)
  * When redirected from /forms/:id, this handles the sending of the POST request by simulating manual input.
  *
  */
-function redirectedHandler()
-{
-	if(window.location.search != "")
-	{
-		document.getElementsByName("sheetId")[0].value = window.location.search.substring(window.location.search.indexOf("id=")+3).split("&")[0];
+function redirectedHandler() {
+	if(window.location.search != "") {
+		document.getElementsByName("sheetId")[0].value = window.location.search.substring(window.location.search.indexOf("id=") + 3).split("&")[0];
 		document.getElementsByName("submit")[0].click();
 	}
 }
@@ -150,23 +135,20 @@ function redirectedHandler()
  * Handles all the overriding of the mainForm.
  *
  */
-function mainFormOverride()
-{
+function mainFormOverride() {
 	let form = document.forms["mainForm"];
-	
+
 	form.addEventListener("submit", event => {
 		event.preventDefault();
 
 		if(disableSubmit) return;
 
 		var data = {};
-		
+
 		data["formId"] = cookieValue("id");
 
-		for(const input of form.elements)
-		{
-			if(input.nodeName === "INPUT")
-			{
+		for(const input of form.elements) {
+			if(input.nodeName === "INPUT") {
 				data[input.name] = input.value;
 			}
 		}
@@ -174,8 +156,7 @@ function mainFormOverride()
 		const req = new XMLHttpRequest();
 
 		req.addEventListener("load", event => {
-			if(event.target.status != 422)
-			{
+			if(event.target.status != 422) {
 				form.parentNode.removeChild(form);
 			}
 
@@ -189,7 +170,7 @@ function mainFormOverride()
 			console.log("There's been an error");
 			console.log(event);
 		});
-		
+
 		req.open("POST", window.location, true);
 
 		req.setRequestHeader("Content-Type", "application/json");

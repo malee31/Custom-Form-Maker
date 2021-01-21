@@ -4,18 +4,13 @@
  * @param {string} header Singular unformatted string which is the name of a column in the default data sheet.
  * @returns {string} Formatted string without whitespace, capitalization, leading numbers, or underscores.
  */
-function sheetFormatHeaders(header)
-{
+function sheetFormatHeaders(header) {
 	var formatted = header.toLowerCase().replace(/\s/g, "").replace(/\W/g, "").replace(/_/g, "");
 	//removes all leading numbers in the header
-	for(var i= 0; i < header.length; i++)
-	{
-		if(!isNaN(parseInt(formatted.substring(0, 1))))
-		{
+	for(var i = 0; i < header.length; i++) {
+		if(!isNaN(parseInt(formatted.substring(0, 1)))) {
 			formatted = formatted.substring(1);
-		}
-		else
-		{
+		} else {
 			break;
 		}
 	}
@@ -28,8 +23,7 @@ function sheetFormatHeaders(header)
  *
  * @param {string} ids Stringified JSON containing the unformatted column names for the sheet requested as their values in order.
  */
-function loadInputs(ids)
-{
+function loadInputs(ids) {
 	//console.log(ids);
 
 	const mainForm = document.getElementsByName("mainForm")[0];
@@ -39,8 +33,7 @@ function loadInputs(ids)
 
 	document.getElementById("fileTitle").innerText = ids.shift().name;
 
-	for(const inputField of ids)
-	{
+	for(const inputField of ids) {
 		//console.log(inputField);
 		mainForm.insertBefore(generateInput(inputField.name, inputField.required, inputField.defaultValue), submitButton);
 	}
@@ -58,8 +51,7 @@ function loadInputs(ids)
  * @param {string} columnName Name of a column in the requested sheet.
  * @returns {object} formInput Contains an html input tag with proper attributes
  */
-function generateInput(columnName, required, defaultValue)
-{
+function generateInput(columnName, required, defaultValue) {
 	const formInput = document.createElement("INPUT");
 	formInput.setAttribute("name", sheetFormatHeaders(columnName));
 	formInput.setAttribute("placeholder", columnName);

@@ -26,26 +26,21 @@ app.post("/", (req, res) => {
 	const info = req.body;
 
 	//Invalid Request error on empty POST request
-	if(Object.entries(info).length === 0 && info.constructor === Object)
-	{
+	if(Object.entries(info).length === 0 && info.constructor === Object) {
 		//Unprocessable Entity
 		res.sendStatus(422);
-	}
-	else if(info.id)
-	{
+	} else if(info.id) {
 		//Runs if we are retrieving spreadsheet form
 		sheet.getHeaders(info.id).then(headers => {
-			//console.log(headers);
-			//returns the headers to site as a json file to be parsed
-			res.json(headers);
-		},
-		err => {
-			//Unprocessable Entity - caused usually by invalid spreadsheet ids
-			res.sendStatus(422);
-		});
-	}
-	else
-	{
+				//console.log(headers);
+				//returns the headers to site as a json file to be parsed
+				res.json(headers);
+			},
+			err => {
+				//Unprocessable Entity - caused usually by invalid spreadsheet ids
+				res.sendStatus(422);
+			});
+	} else {
 		//Submitting data
 		//console.log(info);
 		sheet.newRow(info).then(() => {

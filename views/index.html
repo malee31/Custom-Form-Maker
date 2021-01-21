@@ -1,33 +1,35 @@
 <!DOCTYPE html>
-	<head>
-		<title>
-			Custom Spreadsheet Form
-		</title>
-		<link rel="stylesheet" type="text/css" href="/static/css/styles.css">
-	</head>
-	<body>
-		<div class="loadWheel"></div>
-		<section id="errorBox" style="display: none; opacity: 0;">
-				<h1 id="errorName">Error</h1>
-				<p id="errorDesc">Something has gone wrong! Try again in a moment.</p>
-				<button onclick="toggleErrorBox(false)">Ok</button>
-		</section>
-		<section id="getId">
-			<form enctype="application/json" action="/" method="POST" name="idGetter">
-				<h1>Enter the ID</h1>
-				<input type="text" name="sheetId" placeholder="Google Sheet ID"></input>
-				<input type="text" name="defaultVals" placeholder="OPTIONAL: Default Values"></input>
-				<input type="submit" name="submit"></input>
-			</form>
-		</section>
-		<main>
-			<form enctype="application/json" action="/" method="POST" name="mainForm" style="display: none;">
-				<i><h1 id = "fileTitle">Form<h1></i>
-				<input type="submit" name="mainSubmit" value="Submit and Test"/>
-			</form>
-		</main>
-		<script src="static/js/cookieFunctions.js"></script>
-		<script src="static/js/override.js"></script>
-		<script src="static/js/formSetup.js"></script>
-	</body>
+<head>
+	<title>
+		Custom Spreadsheet Form
+	</title>
+	<link href="/static/css/styles.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+	<div class="loadWheel"></div>
+	<section id="errorBox" style="display: none; opacity: 0;">
+		<h1 id="errorName">Error</h1>
+		<p id="errorDesc">Something has gone wrong! Try again in a moment.</p>
+		<button onclick="toggleErrorBox(false)">Ok</button>
+	</section>
+	<section id="getId">
+		<form action="/" enctype="application/json" method="POST" name="idGetter">
+			<h1>Enter the ID</h1>
+			<input name="sheetId" placeholder="Google Sheet ID" type="text"></input>
+			<input name="defaultVals" placeholder="OPTIONAL: Default Values" type="text"></input>
+			<input name="submit" type="submit"></input>
+		</form>
+	</section>
+	<main>
+		<form action="/" enctype="application/json" method="POST" name="mainForm" style="display: none;">
+			<i>
+				<h1 id="fileTitle">Form<h1>
+			</i>
+			<input name="mainSubmit" type="submit" value="Submit and Test"/>
+		</form>
+	</main>
+	<script src="static/js/cookieFunctions.js"></script>
+	<script src="static/js/override.js"></script>
+	<script src="static/js/formSetup.js"></script>
+</body>
 </html>
