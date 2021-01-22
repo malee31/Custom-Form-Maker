@@ -2,19 +2,19 @@ const GoogleSpreadsheet = require('google-spreadsheet');
 const {promisify} = require('util');
 const sheetError = require('./sheetError.js');
 
-//const credentials = require("./private/SpreadsheetPlaygroundCredentials.json");
-const credentials = {
-	"type": process.env.type,
-	"project_id": process.env.project_id,
-	"private_key_id": process.env.private_key_id,
-	"private_key": process.env.private_key,
-	"client_email": process.env.client_email,
-	"client_id": process.env.client_id,
-	"auth_uri": process.env.auth_uri,
-	"token_uri": process.env.token_uri,
-	"auth_provider_x509_cert_url": process.env.auth_provider_x509_cert_url,
-	"client_x509_cert_url": process.env.client_x509_cert_url
-}
+const credentials = require("./private/SpreadsheetPlaygroundCredentials.json");
+// const credentials = {
+// 	"type": process.env.type,
+// 	"project_id": process.env.project_id,
+// 	"private_key_id": process.env.private_key_id,
+// 	"private_key": process.env.private_key,
+// 	"client_email": process.env.client_email,
+// 	"client_id": process.env.client_id,
+// 	"auth_uri": process.env.auth_uri,
+// 	"token_uri": process.env.token_uri,
+// 	"auth_provider_x509_cert_url": process.env.auth_provider_x509_cert_url,
+// 	"client_x509_cert_url": process.env.client_x509_cert_url
+// }
 
 const configSheetName = ".config";
 
@@ -31,14 +31,10 @@ module.exports = {
  * Retrieves the labels/headers at the top row of the main sheet.
  *
  * @param {string} id String that is the id of the spreadsheet on Google Spreadsheets
- * @returns {string} Returns stringified JSON object containing the key value pairs of
- * 	header name and whether it is a required input.
+ * @returns {string} Returns JSON object containing the key value pairs of
+ * 	header name and whether it is a required input as a string.
  */
 async function getSheetHeaders(id) {
-	var sheet = await getWorksheets(id).then(async sheets => {
-		return await getMain(sheets);
-	}, err => sheetError.specificErr(err, "Invalid SheetID"));
-
 	//Array of objects containing the name of a column and what kind of field it is
 	const headers = await getRequirements(id, false);
 
@@ -56,19 +52,12 @@ async function getSheetHeaders(id) {
  * 	as keys and their required status as its value.
  */
 function processRequirements(requirements) {
-	var headers = {};
-	for(var headerCol = 0; headerCol < requirements.length; headerCol++) {
-		if(requirements[headerCol].required != "EXCLUDE") {
-			var formatted = requirements[headerCol].name.toLowerCase().replace(/\s/g, "").replace(/\W/g, "").replace(/_/g, "");
-			//removes all leading numbers in the header
-			for(var i = 0; i < formatted.length; i++) {
-				if(!isNaN(parseInt(formatted.substring(0, 1)))) {
-					formatted = formatted.substring(1);
-				} else {
-					break;
-				}
-			}
-			headers[formatted] = requirements[headerCol].required;
+	const headers = {};
+	for(const headerCol of requirements) {
+		if(headerCol.required !== "EXCLUDE") {
+			// Removes all leading numbers in the header as well as spacing and non-alphanumerical characters and underscores
+			const formatted = headerCol.name.toLowerCase().replace(/\s/g, "").replace(/\W/g, "").replace(/_/g, "").replace(/^\d*/, "");
+			headers[formatted] = headerCol.required;
 		}
 	}
 	return headers;
@@ -82,10 +71,7 @@ function processRequirements(requirements) {
  * @returns {Object} Returns JSON object with key value pairs of header name and whether it is a required input.
  */
 async function getRequirements(id, keepExcluded) {
-	const config = await getWorksheets(id).then(async sheets => {
-		return await getConfig(sheets);
-	});
-
+	const config = await getConfig(await getWorksheets(id));
 	const colNames = await valueLookup(config, "COLUMNS", false);
 	const topCells = await promisify(config.getCells)({
 		'min-col': 1,
@@ -113,25 +99,27 @@ async function getRequirements(id, keepExcluded) {
 		'return-empty': false,
 	});
 
-	var combineData = [];
-	var adjustment = 0;
-	for(var i = 0; i < topCells.length; i++) {
-		combineData[i - adjustment] = {};
-		combineData[i - adjustment].name = topCells[i].value;
-		combineData[i - adjustment].required = "";
-		combineData[i - adjustment].defaultValue = "";
-		for(var ii = 0; ii < requirementCells.length; ii++) {
-			if(requirementCells[ii].col == topCells[i].col) {
-				if(!keepExcluded && requirementCells[ii].value == "EXCLUDE") {
+	let combineData = [];
+	let adjustment = 0;
+	for(let topCellNum = 0; topCellNum < topCells.length; topCellNum++) {
+		combineData[topCellNum - adjustment] = {
+			name: topCells[topCellNum].value,
+			required: "",
+			defaultValue: ""
+		};
+
+		for(let requirementCellNum = 0; requirementCellNum < requirementCells.length; requirementCellNum++) {
+			if(requirementCells[requirementCellNum].col === topCells[topCellNum].col) {
+				if(!keepExcluded && requirementCells[requirementCellNum].value === "EXCLUDE") {
 					combineData.pop();
 					adjustment++;
 					break;
 				}
-				combineData[i - adjustment].required = requirementCells[ii].value;
+				combineData[topCellNum - adjustment].required = requirementCells[requirementCellNum].value;
 
-				for(var iii = 0; iii < defaultCells.length; iii++) {
-					if(defaultCells[iii].col == topCells[i].col) {
-						combineData[i - adjustment].defaultValue = defaultCells[iii].value;
+				for(const defaultCell of defaultCells) {
+					if(defaultCell.col === topCells[topCellNum].col) {
+						combineData[topCellNum - adjustment].defaultValue = defaultCell.value;
 						break;
 					}
 				}
@@ -139,16 +127,18 @@ async function getRequirements(id, keepExcluded) {
 			}
 		}
 
-		for(var iii = 0; iii < defaultCells.length; iii++) {
-			if(defaultCells[iii].col == topCells[i].col) {
-				combineData[i - adjustment].defaultValue = defaultCells[iii].value;
+		for(const defaultCell of defaultCells) {
+			if(defaultCell.col === topCells[topCellNum].col) {
+				combineData[topCellNum - adjustment].defaultValue = defaultCell.value;
 				break;
 			}
 		}
 	}
 
 	//This just overwrites the COLUMN label with the title of the Google Sheets
-	combineData[0] = {"name": await getFileTitle(id)};
+	combineData[0] = {
+		name: await getFileTitle(id)
+	};
 	//console.log(combineData);
 	return combineData;
 }
@@ -163,11 +153,14 @@ async function getRequirements(id, keepExcluded) {
  * @returns {Object} Returns JSON object with key value pairs of header name and whether it is a required input.
  */
 async function getCell(formId, x, y, sheetName) {
-	var sheet = await getWorksheets(formId).then(worksheets => {
-		return worksheets;
-	}, sheetError.genericErr);
+	let sheet;
+	try {
+		sheet = await getWorksheets(formId);
+	} catch(err) {
+		sheetError.genericErr(err);
+	}
 
-	sheet = await (sheetName ? getSheetByName(sheet, sheetName) : getMain(sheet));
+	sheet = sheetName ? getSheetByName(sheet, sheetName) : await getMain(sheet);
 
 	return await promisify(sheet.getCells)({
 		'min-col': x,
@@ -186,24 +179,26 @@ async function getCell(formId, x, y, sheetName) {
  */
 async function fillRow(userInput) {
 	//change index number to access different sheet
-	var sheet = await getWorksheets(userInput["formId"]).then(async worksheets => {
-		return await getMain(worksheets);
-	}, sheetError.worksheetErr);
+	let sheet;
+	try {
+		sheet = await getMain(getWorksheets(userInput["formId"]));
+	} catch(err) {
+		sheetError.worksheetErr(err);
+	}
 
 	const requirements = processRequirements(await getRequirements(userInput["formId"]));
 
 	delete userInput["formId"];
 
-	for(var dataProp in userInput) {
-		if(!requirements.hasOwnProperty(dataProp) || requirements[dataProp] == "EXCLUDE") {
+	for(const dataProp in userInput) {
+		if(!requirements.hasOwnProperty(dataProp) || requirements[dataProp] === "EXCLUDE") {
 			delete userInput[dataProp];
 		}
 	}
 
-	for(var mayRequire in requirements) {
-		if(!userInput[mayRequire] != "" && requirements[mayRequire] == "REQUIRE") {
-			sheetError.throwErr("REQUIRED INPUT NONEXISTANT", "Required Input Missing");
-			return;
+	for(const mayRequire in requirements) {
+		if(userInput[mayRequire].trim() === "" && requirements[mayRequire] === "REQUIRE") {
+			return sheetError.throwErr("REQUIRED INPUT NONEXISTENT", "Required Input Missing");
 		}
 	}
 
@@ -214,7 +209,8 @@ async function fillRow(userInput) {
 		userInput
 		, (err, row) => {
 			return (err) ? err : JSON.stringify(row);
-		})
+		}
+	);
 }
 
 /**
@@ -258,7 +254,7 @@ async function getAllCells(sheet, returnEmpty) {
 		'max-row': sheet.rowCount,
 		'min-col': 1,
 		'max-col': sheet.colCount,
-		'return-empty': (returnEmpty ? true : false),
+		'return-empty': Boolean(returnEmpty)
 	});
 }
 
@@ -273,15 +269,13 @@ async function getAllCells(sheet, returnEmpty) {
  * 	If returnMultiple is true, multiple arrays are placed into one.
  */
 async function valueLookup(sheet, value, returnMultiple) {
-	returnMultiple = returnMultiple ? true : false;
+	returnMultiple = Boolean(returnMultiple);
 
 	const cells = await getAllCells(sheet, false);
 
-	var result = cells.filter(cell => {
-		return cell.value == value;
-	});
+	let result = cells.filter(cell => cell.value === value);
 
-	for(var matchedCell = 0; matchedCell < result.length; matchedCell++) {
+	for(let matchedCell = 0; matchedCell < result.length; matchedCell++) {
 		result[matchedCell] = [result[matchedCell].col, result[matchedCell].row];
 	}
 
@@ -298,26 +292,26 @@ async function valueLookup(sheet, value, returnMultiple) {
  * @param {Object} sheet A singular worksheet from any Google Sheet
  * @param {string} value The value to look for the position of.
  * @param {number} offsetCol Value to offset returned position columns by.
- * @param {number} offsetRow Value to offset returned postion rows by.
+ * @param {number} offsetRow Value to offset returned position rows by.
  * @param {boolean} [returnMultiple = false] Determines whether to return array of multiple position
  * 	pair arrays or only one position pair array.
  * @returns {number[] | number[][]} Position of first match in column, row format (Not zero indexed) in an array.
  * 	If returnMultiple is true, multiple arrays are placed into one.
  */
 async function offsetLookup(sheet, value, offsetCol, offsetRow, returnMultiple) {
-	returnMultiple = returnMultiple ? true : false;
+	returnMultiple = Boolean(returnMultiple);
 
-	var matches = await valueLookup(sheet, value, returnMultiple);
+	const matches = await valueLookup(sheet, value, returnMultiple);
 
 	if(!returnMultiple) {
 		return [matches[0] + offsetCol, matches[1] + offsetRow];
 	}
 
-	for(var matchPair = 0; matchPair < matches.length; matchPair++) {
-		matches[matchPair][0] += offsetCol;
-		matches[matchPair][1] += offsetRow;
-		if(matches[matchPair][0] < 1 || matches[matchPair][1] < 1) {
-			sheetError.nonErr("Potential Error: This Offset Pair is invalid - " + matches[matchPair]);
+	for(const matchPair of matches) {
+		matchPair[0] += offsetCol;
+		matchPair[1] += offsetRow;
+		if(matchPair[0] < 1 || matchPair[1] < 1) {
+			sheetError.nonErr("Potential Error: This Offset Pair is invalid - " + matchPair);
 		}
 	}
 
@@ -333,15 +327,17 @@ async function offsetLookup(sheet, value, offsetCol, offsetRow, returnMultiple) 
  * @returns {string} Value of the given cell.
  */
 async function parseValue(sheet, col, row) {
-	return cell = await promisify(sheet.getCells)({
-		'min-col': col,
-		'max-col': col,
-		'min-row': row,
-		'max-row': row,
-		'return-empty': true,
-	}).then(cell => {
-		return cell[0].value;
-	}, err => sheetError.specificErr(err, "Cell parseValue error"));
+	try {
+		return (await promisify(sheet.getCells)({
+			'min-col': col,
+			'max-col': col,
+			'min-row': row,
+			'max-row': row,
+			'return-empty': true,
+		}))[0].value;
+	} catch(err) {
+		sheetError.specificErr(err, "Cell parseValue error");
+	}
 }
 
 /**
@@ -351,21 +347,18 @@ async function parseValue(sheet, col, row) {
  * @param {string} searchKey The value to look for the position of before offsetting.
  * @param {number} colOffset Value to offset returned position columns by.
  * @param {string} defaultVal Value to return in case the search key is not found.
- * @param {number} rowOffset Value to offset returned postion rows by.
+ * @param {number} rowOffset Value to offset returned position rows by.
  * @returns {string} Value of the given cell.
  */
-async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal) {
-	defaultVal = defaultVal || "";
+async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal = "") {
+	try {
+		const res = await offsetLookup(sheet, searchKey, colOffset, rowOffset, false)
+		return await parseValue(sheet, res[0], res[1]);
+	} catch(err) {
+		sheetError.handledErr("Failed to offset and parse. Returning empty String or default value.");
+		return defaultVal;
+	}
 
-	return await offsetLookup(sheet, searchKey, colOffset, rowOffset, false).then(async pos => {
-		//console.log("Position at :" + pos);
-		return await parseValue(sheet, pos[0], pos[1], false).then(value => {
-			return value;
-		}, err => {
-			sheetError.handledErr("Failed to offset and parse. Returning empty String or default value.");
-			return defaultVal;
-		});
-	});
 }
 
 /**
@@ -377,16 +370,19 @@ async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal) {
  * @returns {number} Row position of the last cell with a value in it. Not zero indexed.
  */
 async function getLastRow(sheet) {
-	return await getAllCells(sheet, false).then(allCells => {
-		return allCells[Object.keys(allCells).length - 1].row;
-	}, sheetError.genericErr);
+	try {
+		const cells = await getAllCells(sheet, false);
+		return cells[Object.keys(cells).length - 1].row;
+	} catch(err) {
+		sheetError.genericErr(err);
+	}
 }
 
 /**
  * Returns the sheet labeled as the config from an array of worksheets.
  *
  * @param {Object[]} spreadsheets An array of worksheets from Google Sheets.
- * @returns {number} Row position of the last cell with a value in it. Not zero indexed.
+ * @returns {Object} The config worksheet
  */
 function getConfig(spreadsheets) {
 	return getSheetByName(spreadsheets, configSheetName);
@@ -396,7 +392,7 @@ function getConfig(spreadsheets) {
  * Returns the sheet labeled as the main sheet from an array of worksheets based on the config sheet.
  *
  * @param {Object[]} spreadsheets An array of worksheets from Google Sheets.
- * @returns {number} Row position of the last cell with a value in it. Not zero indexed.
+ * @returns {Object} The main worksheet
  */
 async function getMain(spreadsheets) {
 	//console.log("Searching for main");
@@ -412,18 +408,12 @@ async function getMain(spreadsheets) {
  *
  * @param {Object[]} spreadsheets An array of worksheets from Google Sheets.
  * @param {string} name The name of the worksheet to search for
- * @returns {number} Row position of the last cell with a value in it. Not zero indexed.
+ * @returns {Object} The spreadsheet that matches the name or the default worksheet
  */
 function getSheetByName(spreadsheets, name) {
 	//console.log("Now in getSheets");
-	for(var i = 0; i < spreadsheets.length; i++) {
-		/*console.log(spreadsheets[i].title);
-		console.log("Comparing " + name + " to " + spreadsheets[i].title);*/
-		if(spreadsheets[i].title === name) {
-			//console.log(spreadsheets[i].title);
-			return spreadsheets[i];
-		}
-	}
+	const found = spreadsheets.find(sheet => sheet.title === name);
+	if(found) return found;
 	sheetError.handledErr("Sheet not found by name. Defaulting to first sheet.");
 	return spreadsheets[0];
 }

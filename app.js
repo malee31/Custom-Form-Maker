@@ -1,8 +1,7 @@
 //ExpressJS imports
 const express = require('express');
-const app = express();
 const path = require("path");
-const url = require('url');
+const app = express();
 
 //Imports module imports from spreadsheet.js
 const sheet = require("./spreadsheet.js");
@@ -36,7 +35,7 @@ app.post("/", (req, res) => {
 				//returns the headers to site as a json file to be parsed
 				res.json(headers);
 			},
-			err => {
+			() => {
 				//Unprocessable Entity - caused usually by invalid spreadsheet ids
 				res.sendStatus(422);
 			});
@@ -55,12 +54,7 @@ app.post("/", (req, res) => {
 
 app.get("/form/:sheetId", (req, res) => {
 	console.log(req.params);
-	res.redirect(url.format({
-		pathname: "/",
-		query: {
-			"id": req.params.sheetId
-		}
-	}));
+	res.redirect(`/?id=${req.params.sheetId}`);
 });
 
 // Error 404
@@ -69,7 +63,7 @@ app.use((req, res) => {
 });
 
 // Error 500
-app.use((error, req, res, next) => {
+app.use((error, req, res) => {
 	res.status(500).sendFile(path.resolve(__dirname, "views/500.html"));
 });
 
