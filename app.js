@@ -31,14 +31,14 @@ app.post("/", (req, res) => {
 	} else if(info.id) {
 		//Runs if we are retrieving spreadsheet form
 		sheet.getHeaders(info.id).then(headers => {
-				//console.log(headers);
-				//returns the headers to site as a json file to be parsed
-				res.json(headers);
-			},
-			() => {
-				//Unprocessable Entity - caused usually by invalid spreadsheet ids
-				res.sendStatus(422);
-			});
+			//console.log(headers);
+			//returns the headers to site as a json file to be parsed
+			res.json(JSON.stringify(headers));
+		}).catch(err => {
+			console.log(err);
+			//Unprocessable Entity - caused usually by invalid spreadsheet ids
+			res.sendStatus(422);
+		});
 	} else {
 		//Submitting data
 		//console.log(info);

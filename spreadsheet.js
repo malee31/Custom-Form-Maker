@@ -1,4 +1,4 @@
-const GoogleSpreadsheet = require('google-spreadsheet');
+const {GoogleSpreadsheet} = require('google-spreadsheet');
 const {promisify} = require('util');
 const sheetError = require('./sheetError.js');
 
@@ -16,36 +16,41 @@ const credentials = require("./private/SpreadsheetPlaygroundCredentials.json");
 // 	"client_x509_cert_url": process.env.client_x509_cert_url
 // }
 
-const configSheetName = ".config";
+const CONFIG_SHEET_NAME = ".config";
 
 module.exports = {
 	newRow: fillRow,
 	getHeaders: getSheetHeaders,
 }
 
-/*Example codes
-	console.log(`Title: ${sheet.title}\nRows: ${sheet.rowCount}`);
-*/
+/**
+ * Initializes a GoogleSpreadsheet object from a specified id and loads their worksheets.
+ * @async
+ * @param {string} formId Id of the target Google Spreadsheet meant for inputted data.
+ * @returns {GoogleSpreadsheet} Google Spreadsheet object with all worksheets loaded in
+ */
+async function getWorksheets(formId) {
+	const doc = new GoogleSpreadsheet(formId);
+	await doc.useServiceAccountAuth(credentials);
+	await doc.loadInfo();
+	if(!doc.sheetCount >= 1) throw "No worksheets";
+	return doc;
+}
 
 /**
- * Retrieves the labels/headers at the top row of the main sheet.
- *
+ * Retrieves the labels/headers at the top row of the main sheet
+ * @async
  * @param {string} id String that is the id of the spreadsheet on Google Spreadsheets
- * @returns {string} Returns JSON object containing the key value pairs of
- * 	header name and whether it is a required input as a string.
+ * @returns {Object} Returns JSON object containing the header names paired with whether they are required inputs
  */
 async function getSheetHeaders(id) {
-	//Array of objects containing the name of a column and what kind of field it is
-	const headers = await getRequirements(id, false);
-
-	//console.log(headers);
-	return JSON.stringify(headers);
+	const doc = await getWorksheets(id);
+	return await getRequirements(doc, false);
 }
 
 /**
  * Formats the name of the requirement headers into object keys used by the google-sheets api
  * along with whether they are required in the form to continue.
- *
  * @param {Object[]} requirements Array of Objects with a string name key and string required key.
  * 	corresponding to a column header and required key for whether it is required to submit the form.
  * @returns {Object} Returns singular object containing sanitized column names in order
@@ -66,28 +71,38 @@ function processRequirements(requirements) {
 /**
  * Retrieves the labels/headers at the top row of the main sheet along with their requirement status.
  *
- * @param {string} id String that is the id of the spreadsheet on Google Spreadsheets
+ * @param {GoogleSpreadsheet} doc Google Spreadsheet to get requirements from
  * @param {boolean} [keepExcluded = false] Determines whether or not the returned object will include excluded headers.
  * @returns {Object} Returns JSON object with key value pairs of header name and whether it is a required input.
  */
-async function getRequirements(id, keepExcluded) {
-	const config = await getConfig(await getWorksheets(id));
-	const colNames = await valueLookup(config, "COLUMNS", false);
-	const topCells = await promisify(config.getCells)({
-		'min-col': 1,
-		'max-col': config.colCount,
-		'min-row': colNames[1],
-		'max-row': colNames[1],
-		'return-empty': false,
+async function getRequirements(doc, keepExcluded) {
+	const config = getConfig(doc);
+	// const colNames = await valueLookup(config, "COLUMNS", false);
+	await config.loadCells({
+		"startColumnIndex": 0,
+		"startRowIndex": 0,
+		"endColumnIndex": config.columnCount,
+		"endRowIndex": 1
 	});
 
-	const requirementStart = await valueLookup(config, "REQUIREMENT", false);
+	const topCells = [];
+	for(let columnNum = 0; columnNum < config.columnCount; columnNum++) {
+		const cellValue = config.getCell(0, columnNum).value;
+		if(cellValue === null) break;
+		topCells.push({
+			name: cellValue,
+			required: "",
+			defaultValue: ""
+		});
+	}
+
+	/*const requirementStart = await valueLookup(config, "REQUIREMENT", false);
 	const requirementCells = await promisify(config.getCells)({
 		'min-col': 1,
 		'max-col': config.colCount,
 		'min-row': requirementStart[1],
 		'max-row': requirementStart[1],
-		'return-empty': false,
+		'return-empty': false
 	});
 
 	const defaultStart = await valueLookup(config, "DEFAULT", false);
@@ -133,14 +148,14 @@ async function getRequirements(id, keepExcluded) {
 				break;
 			}
 		}
-	}
+	}*/
 
 	//This just overwrites the COLUMN label with the title of the Google Sheets
-	combineData[0] = {
-		name: await getFileTitle(id)
+	topCells[0] = {
+		name: doc.title
 	};
 	//console.log(combineData);
-	return combineData;
+	return topCells;
 }
 
 /**
@@ -160,7 +175,7 @@ async function getCell(formId, x, y, sheetName) {
 		sheetError.genericErr(err);
 	}
 
-	sheet = sheetName ? getSheetByName(sheet, sheetName) : await getMain(sheet);
+	sheet = sheet.sheetsByTitle(sheetName) || await getMain(sheet);
 
 	return await promisify(sheet.getCells)({
 		'min-col': x,
@@ -181,7 +196,7 @@ async function fillRow(userInput) {
 	//change index number to access different sheet
 	let sheet;
 	try {
-		sheet = await getMain(getWorksheets(userInput["formId"]));
+		sheet = await getMain(await getWorksheets(userInput["formId"]));
 	} catch(err) {
 		sheetError.worksheetErr(err);
 	}
@@ -202,43 +217,12 @@ async function fillRow(userInput) {
 		}
 	}
 
-	//console.log("USERINPUT FILTERED");
-	//console.log(userInput);
+	try {
+		await sheet.addRow(userInput);
+	} catch(err) {
+		console.error(err);
+	}
 
-	sheet.addRow(
-		userInput
-		, (err, row) => {
-			return (err) ? err : JSON.stringify(row);
-		}
-	);
-}
-
-/**
- * Retrieves all worksheets from a specified form id.
- *
- * @param {string} formId String that is the id of the spreadsheet on Google Spreadsheets
- * 	names and inputted data.
- * @returns {Object[]} Array of all the Google Sheets worksheets for the specified id.
- */
-async function getWorksheets(formId) {
-	const doc = new GoogleSpreadsheet(formId);
-	await promisify(doc.useServiceAccountAuth)(credentials);
-	const data = await promisify(doc.getInfo)();
-	return data.worksheets;
-}
-
-/**
- * Retrieves the name of the entire Google Spreadsheet file.
- *
- * @param {string} formId String that is the id of the spreadsheet on Google Spreadsheets
- * 	names and inputted data.
- * @returns {string} The title of the entire Google Spreadsheet file.
- */
-async function getFileTitle(formId) {
-	const doc = new GoogleSpreadsheet(formId);
-	await promisify(doc.useServiceAccountAuth)(credentials);
-	const data = await promisify(doc.getInfo)();
-	return data.title;
 }
 
 /**
@@ -380,40 +364,22 @@ async function getLastRow(sheet) {
 
 /**
  * Returns the sheet labeled as the config from an array of worksheets.
- *
- * @param {Object[]} spreadsheets An array of worksheets from Google Sheets.
- * @returns {Object} The config worksheet
+ * @param {GoogleSpreadsheet} doc Google Spreadsheet to get Config worksheet from
+ * @returns {GoogleSpreadsheetWorksheet} The config worksheet
  */
-function getConfig(spreadsheets) {
-	return getSheetByName(spreadsheets, configSheetName);
+function getConfig(doc) {
+	return doc.sheetsByTitle[CONFIG_SHEET_NAME];
 }
 
 /**
  * Returns the sheet labeled as the main sheet from an array of worksheets based on the config sheet.
- *
- * @param {Object[]} spreadsheets An array of worksheets from Google Sheets.
- * @returns {Object} The main worksheet
+ * @param {GoogleSpreadsheet} doc Google Spreadsheet to get Main worksheet from
+ * @returns {GoogleSpreadsheetWorksheet} The main worksheet
  */
-async function getMain(spreadsheets) {
-	//console.log("Searching for main");
-	const config = getConfig(spreadsheets);
+async function getMain(doc) {
+	console.log("Searching for main");
+	const config = getConfig(doc);
 	const main = await offsetParse(config, "DATA", 1, 0, "Main");
-	//console.log("Main sheet is called: " + main);
-	return getSheetByName(spreadsheets, main);
-}
-
-/**
- * Returns the sheet that matches a given name from an array of worksheets.
- * Defaults to the first sheet if nothing is found by that name.
- *
- * @param {Object[]} spreadsheets An array of worksheets from Google Sheets.
- * @param {string} name The name of the worksheet to search for
- * @returns {Object} The spreadsheet that matches the name or the default worksheet
- */
-function getSheetByName(spreadsheets, name) {
-	//console.log("Now in getSheets");
-	const found = spreadsheets.find(sheet => sheet.title === name);
-	if(found) return found;
-	sheetError.handledErr("Sheet not found by name. Defaulting to first sheet.");
-	return spreadsheets[0];
+	console.log("Main sheet is called: " + main);
+	return doc.sheetsByTitle[main];
 }
