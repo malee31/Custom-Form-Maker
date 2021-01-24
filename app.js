@@ -1,7 +1,7 @@
 //ExpressJS imports
 const express = require('express');
-const path = require("path");
 const app = express();
+const path = require("path");
 
 //Imports module imports from spreadsheet.js
 const sheet = require("./spreadsheet.js");
@@ -21,7 +21,6 @@ app.get("/", (req, res) => {
 });
 
 app.post("/", (req, res) => {
-	//sheet.pasteName();
 	const info = req.body;
 
 	//Invalid Request error on empty POST request
@@ -31,6 +30,7 @@ app.post("/", (req, res) => {
 	} else if(info.id) {
 		//Runs if we are retrieving spreadsheet form
 		sheet.getHeaders(info.id).then(headers => {
+			console.log(headers);
 			//console.log(headers);
 			//returns the headers to site as a json file to be parsed
 			res.json(JSON.stringify(headers));
@@ -67,4 +67,4 @@ app.use((error, req, res) => {
 	res.status(500).sendFile(path.resolve(__dirname, "views/500.html"));
 });
 
-app.listen(process.env.PORT || 8080);
+app.listen(process.env.PORT || 3000);

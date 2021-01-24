@@ -45,7 +45,56 @@ async function getWorksheets(formId) {
  */
 async function getSheetHeaders(id) {
 	const doc = await getWorksheets(id);
-	return await getRequirements(doc, false);
+	return (await getRequirements(doc));
+}
+
+/**
+ * Retrieves the labels/headers at the top row of the main sheet along with their requirement status.
+ * @async
+ * @param {GoogleSpreadsheet} doc Google Spreadsheet to get requirements from
+ * @param {boolean} [keepExcluded = false] Determines whether or not the returned object will include excluded headers.
+ * @returns {Object[]} Returns array of objects with the name of the column, default values, and whether or not they are required
+ */
+async function getRequirements(doc, keepExcluded = false) {
+	const config = getConfig(doc) || getMain(doc);
+	await config.loadCells({
+		"startColumnIndex": 0,
+		"startRowIndex": 0,
+		"endColumnIndex": config.columnCount,
+		"endRowIndex": 3
+	});
+
+	const topCells = [];
+	for(let columnNum = 0; columnNum < config.columnCount; columnNum++) {
+		const cellValue = config.getCell(0, columnNum).value;
+		if(cellValue === null) break;
+		topCells.push({
+			name: cellValue,
+			required: config.getCell(1, columnNum).value,
+			defaultValue: config.getCell(2, columnNum).value
+		});
+	}
+
+	// Post-processing
+	for(let inputHeader = 1; inputHeader < topCells.length; inputHeader++) {
+		if(topCells[inputHeader].required && topCells[inputHeader].required.trim().toUpperCase() === "EXCLUDE") {
+			if(!keepExcluded) {
+				topCells.splice(inputHeader, 1);
+				inputHeader--;
+				continue;
+			}
+			topCells[inputHeader].required = "EXCLUDE";
+		} else {
+			topCells[inputHeader].required = (Boolean(topCells[inputHeader].required) && topCells[inputHeader].required.trim().toUpperCase() === "REQUIRED");
+		}
+		topCells[inputHeader].defaultValue = topCells[inputHeader].defaultValue || "";
+	}
+
+	//This just overwrites the COLUMN label with the title of the Google Sheet
+	topCells[0] = {
+		name: doc.title
+	};
+	return topCells;
 }
 
 /**
@@ -69,126 +118,7 @@ function processRequirements(requirements) {
 }
 
 /**
- * Retrieves the labels/headers at the top row of the main sheet along with their requirement status.
- *
- * @param {GoogleSpreadsheet} doc Google Spreadsheet to get requirements from
- * @param {boolean} [keepExcluded = false] Determines whether or not the returned object will include excluded headers.
- * @returns {Object} Returns JSON object with key value pairs of header name and whether it is a required input.
- */
-async function getRequirements(doc, keepExcluded) {
-	const config = getConfig(doc);
-	// const colNames = await valueLookup(config, "COLUMNS", false);
-	await config.loadCells({
-		"startColumnIndex": 0,
-		"startRowIndex": 0,
-		"endColumnIndex": config.columnCount,
-		"endRowIndex": 1
-	});
-
-	const topCells = [];
-	for(let columnNum = 0; columnNum < config.columnCount; columnNum++) {
-		const cellValue = config.getCell(0, columnNum).value;
-		if(cellValue === null) break;
-		topCells.push({
-			name: cellValue,
-			required: "",
-			defaultValue: ""
-		});
-	}
-
-	/*const requirementStart = await valueLookup(config, "REQUIREMENT", false);
-	const requirementCells = await promisify(config.getCells)({
-		'min-col': 1,
-		'max-col': config.colCount,
-		'min-row': requirementStart[1],
-		'max-row': requirementStart[1],
-		'return-empty': false
-	});
-
-	const defaultStart = await valueLookup(config, "DEFAULT", false);
-	const defaultCells = await promisify(config.getCells)({
-		'min-col': 1,
-		'max-col': config.colCount,
-		'min-row': defaultStart[1],
-		'max-row': defaultStart[1],
-		'return-empty': false,
-	});
-
-	let combineData = [];
-	let adjustment = 0;
-	for(let topCellNum = 0; topCellNum < topCells.length; topCellNum++) {
-		combineData[topCellNum - adjustment] = {
-			name: topCells[topCellNum].value,
-			required: "",
-			defaultValue: ""
-		};
-
-		for(let requirementCellNum = 0; requirementCellNum < requirementCells.length; requirementCellNum++) {
-			if(requirementCells[requirementCellNum].col === topCells[topCellNum].col) {
-				if(!keepExcluded && requirementCells[requirementCellNum].value === "EXCLUDE") {
-					combineData.pop();
-					adjustment++;
-					break;
-				}
-				combineData[topCellNum - adjustment].required = requirementCells[requirementCellNum].value;
-
-				for(const defaultCell of defaultCells) {
-					if(defaultCell.col === topCells[topCellNum].col) {
-						combineData[topCellNum - adjustment].defaultValue = defaultCell.value;
-						break;
-					}
-				}
-				break;
-			}
-		}
-
-		for(const defaultCell of defaultCells) {
-			if(defaultCell.col === topCells[topCellNum].col) {
-				combineData[topCellNum - adjustment].defaultValue = defaultCell.value;
-				break;
-			}
-		}
-	}*/
-
-	//This just overwrites the COLUMN label with the title of the Google Sheets
-	topCells[0] = {
-		name: doc.title
-	};
-	//console.log(combineData);
-	return topCells;
-}
-
-/**
- * Retrieves a specific cell from a sheet based on sheet id, position, and sheet name.
- *
- * @param {string} formId String that is the id of the spreadsheet on Google Spreadsheets
- * @param {number} x The x position of the cell (Not zero indexed).
- * @param {number} y The y position of the cell (Not zero indexed).
- * @param {string} [sheetName] The name of the worksheet. Defaults to the main sheet.
- * @returns {Object} Returns JSON object with key value pairs of header name and whether it is a required input.
- */
-async function getCell(formId, x, y, sheetName) {
-	let sheet;
-	try {
-		sheet = await getWorksheets(formId);
-	} catch(err) {
-		sheetError.genericErr(err);
-	}
-
-	sheet = sheet.sheetsByTitle(sheetName) || await getMain(sheet);
-
-	return await promisify(sheet.getCells)({
-		'min-col': x,
-		'max-col': x,
-		'min-row': y,
-		'max-row': y,
-		'return-empty': true,
-	});
-}
-
-/**
  * Fills a new row in the main sheet with form input after checking input. Returns 422 on failure.
- *
  * @param {Object} userInput JSON object containing user form input in key value pairs of sanitized header
  * 	names and inputted data.
  */
@@ -377,9 +307,9 @@ function getConfig(doc) {
  * @returns {GoogleSpreadsheetWorksheet} The main worksheet
  */
 async function getMain(doc) {
-	console.log("Searching for main");
+	// console.log("Searching for main");
 	const config = getConfig(doc);
 	const main = await offsetParse(config, "DATA", 1, 0, "Main");
-	console.log("Main sheet is called: " + main);
+	// console.log("Main sheet is called: " + main);
 	return doc.sheetsByTitle[main];
 }
