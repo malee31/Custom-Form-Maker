@@ -1,17 +1,15 @@
-var canPost = true;
-var disableSubmit = false;
+let canPost = true;
+let disableSubmit = false;
 toggleLoader(false);
 
 
 /**
- *
  * Toggles the loading wheel by hiding or showing it
- *
- * @param {boolean} show Determines whether to show the loader or hide it.
+ * @param {boolean} [show = false] Whether to show or hide the loader. Defaults to hiding it
  */
-function toggleLoader(show) {
-	var loader = document.getElementsByClassName("loadWheel")[0];
-	var idSubmit = document.getElementsByName("submit")[0];
+function toggleLoader(show = false) {
+	const loader = document.getElementsByClassName("loadWheel")[0];
+	const idSubmit = document.getElementsByName("submit")[0];
 
 	canPost = !show;
 
@@ -33,13 +31,13 @@ function toggleLoader(show) {
  * @param {string} [desc] Additional description about the error.
  */
 function toggleErrorBox(show, title, desc) {
-	var errBox = document.getElementById("errorBox");
+	const errBox = document.getElementById("errorBox");
 
 	if(show) {
 		errBox.style.display = "flex";
-		errBox.style.opacity = 1;
+		errBox.style.opacity = "1";
 	} else {
-		errBox.style.opacity = 0;
+		errBox.style.opacity = "0";
 		setTimeout(() => {
 			errBox.style.display = "none";
 		}, 500);
@@ -53,7 +51,7 @@ function toggleErrorBox(show, title, desc) {
  *
  * Handles all the overriding of the id getter form
  *
- * @param {Event} event Event object passed in from addEventListerner.
+ * @param {Event} event Event object passed in from addEventListener.
  */
 function idGetOverride(event) {
 	event.preventDefault();
@@ -67,12 +65,12 @@ function idGetOverride(event) {
 
 		req.addEventListener("load", event => {
 			toggleLoader(false);
-			if(event.target.status == 200) {
-				var resp = JSON.parse(event.target.response);
+			if(event.target.status === 200) {
+				const resp = JSON.parse(event.target.response);
 				const defaultCookie = cookieValue("defaultVals").split(",");
 
-				for(var inputIndex = 0; inputIndex < Math.min(resp.length, defaultCookie.length); inputIndex++) {
-					if(defaultCookie[inputIndex] != "") {
+				for(let inputIndex = 0; inputIndex < Math.min(resp.length, defaultCookie.length); inputIndex++) {
+					if(defaultCookie[inputIndex] !== "") {
 						resp[inputIndex + 1].defaultValue = defaultCookie[inputIndex];
 					}
 				}
@@ -80,7 +78,7 @@ function idGetOverride(event) {
 				loadInputs(resp);
 			} else {
 				console.log(event);
-				toggleErrorBox(true, `Status Code ${req.status}: ${req.statusText}`, (req.status == 422) ? "The ID is invalid." : "An error has occurred. Try again later.");
+				toggleErrorBox(true, `Status Code ${req.status}: ${req.statusText}`, (req.status === 422) ? "The ID is invalid." : "An error has occurred. Try again later.");
 				toggleLoader(false);
 			}
 		});
@@ -109,10 +107,10 @@ function idGetOverride(event) {
 
 		req.send(JSON.stringify(data));
 
-		var defaultInput = document.getElementsByName("defaultVals")[0].value;
+		const defaultInput = document.getElementsByName("defaultVals")[0].value;
 
-		if(defaultInput == "clear" || cookieValue("defaultVals") == "Error 404") setCookie("defaultVals", "");
-		else if(defaultInput != "") setCookie("defaultVals", defaultInput);
+		if(defaultInput === "clear" || cookieValue("defaultVals") === "Error 404") setCookie("defaultVals", "");
+		else if(defaultInput !== "") setCookie("defaultVals", defaultInput);
 	}
 }
 
@@ -123,7 +121,7 @@ function idGetOverride(event) {
  *
  */
 function redirectedHandler() {
-	if(window.location.search != "") {
+	if(window.location.search !== "") {
 		document.getElementsByName("sheetId")[0].value = window.location.search.substring(window.location.search.indexOf("id=") + 3).split("&")[0];
 		document.getElementsByName("submit")[0].click();
 	}
@@ -143,7 +141,7 @@ function mainFormOverride() {
 
 		if(disableSubmit) return;
 
-		var data = {};
+		const data = {};
 
 		data["formId"] = cookieValue("id");
 
@@ -156,14 +154,14 @@ function mainFormOverride() {
 		const req = new XMLHttpRequest();
 
 		req.addEventListener("load", event => {
-			if(event.target.status != 422) {
+			if(event.target.status !== 422) {
 				form.parentNode.removeChild(form);
 			}
 
 			toggleLoader(false);
 			disableSubmit = false;
 
-			toggleErrorBox(true, event.target.status == 200 ? "Thank You!" : ("Status code " + event.target.status), event.target.responseText);
+			toggleErrorBox(true, event.target.status === 200 ? "Thank You!" : ("Status code " + event.target.status), event.target.responseText);
 		});
 
 		req.addEventListener("error", event => {

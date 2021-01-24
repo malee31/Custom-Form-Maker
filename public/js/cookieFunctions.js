@@ -10,13 +10,11 @@ function setCookie(name, value) {
 }
 
 /**
- *
  * Returns an object with every cookie in name: value format in default cookie order.
- *
  * @returns {object} returns an object containing every document.cookie in name: value format.
  */
 function getCookies() {
-	var cookies = {};
+	const cookies = {};
 	document.cookie.split("; ").forEach(cookie => {
 		cookies[cookie.substring(0, cookie.indexOf("="))] = cookie.substring(cookie.indexOf("=") + 1);
 	});
@@ -35,7 +33,7 @@ function cookieValue(key) {
 	//Just in case a number was used as a key
 	key = "" + key;
 
-	for(cookie of document.cookie.split("; ")) {
+	for(const cookie of document.cookie.split("; ")) {
 		const cookieName = cookie.substring(0, cookie.indexOf("="));
 		if(cookieName === key) return cookie.substring(cookieName.length + 1);
 	}
