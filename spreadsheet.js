@@ -49,6 +49,28 @@ async function getSheetHeaders(id) {
 }
 
 /**
+ * Returns the sheet labeled as the main sheet from an array of worksheets based on the config sheet.
+ * @param {GoogleSpreadsheet} doc Google Spreadsheet to get Main worksheet from
+ * @returns {GoogleSpreadsheetWorksheet} The main worksheet
+ */
+async function getMain(doc) {
+	// console.log("Searching for main");
+	const config = getConfig(doc);
+	const main = await offsetParse(config, "DATA", 1, 0, "Main");
+	// console.log("Main sheet is called: " + main);
+	return doc.sheetsByTitle[main] || doc.sheetsByIndex[0];
+}
+
+/**
+ * Returns the sheet labeled as the config from an array of worksheets.
+ * @param {GoogleSpreadsheet} doc Google Spreadsheet to get Config worksheet from
+ * @returns {GoogleSpreadsheetWorksheet} The config worksheet
+ */
+function getConfig(doc) {
+	return doc.sheetsByTitle[CONFIG_SHEET_NAME];
+}
+
+/**
  * Retrieves the labels/headers at the top row of the main sheet along with their requirement status.
  * @async
  * @param {GoogleSpreadsheet} doc Google Spreadsheet to get requirements from
@@ -108,7 +130,7 @@ async function getRequirements(doc, keepExcluded = false) {
 function processRequirements(requirements) {
 	const headers = {};
 	for(const headerCol of requirements) {
-		if(headerCol.required !== "EXCLUDE") {
+		if(headerCol.required && headerCol.required !== "EXCLUDE") {
 			// Removes all leading numbers in the header as well as spacing and non-alphanumerical characters and underscores
 			const formatted = headerCol.name.toLowerCase().replace(/\s/g, "").replace(/\W/g, "").replace(/_/g, "").replace(/^\d*/, "");
 			headers[formatted] = headerCol.required;
@@ -123,17 +145,10 @@ function processRequirements(requirements) {
  * 	names and inputted data.
  */
 async function fillRow(userInput) {
-	//change index number to access different sheet
-	let sheet;
-	try {
-		sheet = await getMain(await getWorksheets(userInput["formId"]));
-	} catch(err) {
-		sheetError.worksheetErr(err);
-	}
-
-	const requirements = processRequirements(await getRequirements(userInput["formId"]));
-
+	const sheets = await getWorksheets(userInput["formId"]);
 	delete userInput["formId"];
+
+	const requirements = processRequirements(await getRequirements(sheets));
 
 	for(const dataProp in userInput) {
 		if(!requirements.hasOwnProperty(dataProp) || requirements[dataProp] === "EXCLUDE") {
@@ -148,11 +163,12 @@ async function fillRow(userInput) {
 	}
 
 	try {
-		await sheet.addRow(userInput);
+		console.log(userInput)
+		const target = await getMain(sheets);
+		await target.addRow(userInput);
 	} catch(err) {
 		console.error(err);
 	}
-
 }
 
 /**
@@ -235,7 +251,7 @@ async function offsetLookup(sheet, value, offsetCol, offsetRow, returnMultiple) 
 /**
  * Returns the value of a cell position in a given sheet.
  *
- * @param {Object} sheet A singular worksheet from any Google Sheet
+ * @param {GoogleSpreadsheetWorksheet} sheet A singular worksheet from any Google Sheet
  * @param {number} col Column position of the cell to retrieve the value from.
  * @param {number} row Row position of the cell to retrieve the value from.
  * @returns {string} Value of the given cell.
@@ -273,43 +289,4 @@ async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal = 
 		return defaultVal;
 	}
 
-}
-
-/**
- * Returns the row position of the lowest cell with a value in it.
- * With the API updates, this is now useless but will be kept as a relic lol
- * Note: Empty checkboxes or validation are counted as nonempty and can affect the value this returns.
- *
- * @param {Object} sheet A singular worksheet from any Google Sheet
- * @returns {number} Row position of the last cell with a value in it. Not zero indexed.
- */
-async function getLastRow(sheet) {
-	try {
-		const cells = await getAllCells(sheet, false);
-		return cells[Object.keys(cells).length - 1].row;
-	} catch(err) {
-		sheetError.genericErr(err);
-	}
-}
-
-/**
- * Returns the sheet labeled as the config from an array of worksheets.
- * @param {GoogleSpreadsheet} doc Google Spreadsheet to get Config worksheet from
- * @returns {GoogleSpreadsheetWorksheet} The config worksheet
- */
-function getConfig(doc) {
-	return doc.sheetsByTitle[CONFIG_SHEET_NAME];
-}
-
-/**
- * Returns the sheet labeled as the main sheet from an array of worksheets based on the config sheet.
- * @param {GoogleSpreadsheet} doc Google Spreadsheet to get Main worksheet from
- * @returns {GoogleSpreadsheetWorksheet} The main worksheet
- */
-async function getMain(doc) {
-	// console.log("Searching for main");
-	const config = getConfig(doc);
-	const main = await offsetParse(config, "DATA", 1, 0, "Main");
-	// console.log("Main sheet is called: " + main);
-	return doc.sheetsByTitle[main];
 }

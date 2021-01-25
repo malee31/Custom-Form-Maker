@@ -63,7 +63,7 @@ app.use((req, res) => {
 });
 
 // Error 500
-app.use((error, req, res) => {
+app.use((req, res) => {
 	res.status(500).sendFile(path.resolve(__dirname, "views/500.html"));
 });
 
