@@ -1,7 +1,5 @@
 /**
- *
  * Sets a cookie with a value.
- *
  * @param {string} name The name of the cookie to be set.
  * @param {string} value The value to assign to a cookie.
  */
@@ -15,28 +13,21 @@ function setCookie(name, value) {
  */
 function getCookies() {
 	const cookies = {};
-	document.cookie.split("; ").forEach(cookie => {
-		cookies[cookie.substring(0, cookie.indexOf("="))] = cookie.substring(cookie.indexOf("=") + 1);
+	document.cookie.split(/;\s?/).forEach(cookie => {
+		cookie = cookie.split('=');
+		cookies[cookie[0]] = cookie[1];
 	});
 	return cookies;
 }
 
-
 /**
- *
  * Given a case-sensitive key value, this function returns the value of a cookie with the name of key.
- *
- * @param {(string|number)} key case-sensitive string containing the exact name of a cookie.
+ * @param {(string|number)} key case-sensitive string containing the exact name of a cookie. Numbers will be converted to strings
  * @returns {string} returns the value of the cookie with the name stored in the parameter key. If not found, logs a problem and returns "Error 404".
  */
 function cookieValue(key) {
-	//Just in case a number was used as a key
-	key = "" + key;
-
-	for(const cookie of document.cookie.split("; ")) {
-		const cookieName = cookie.substring(0, cookie.indexOf("="));
-		if(cookieName === key) return cookie.substring(cookieName.length + 1);
-	}
+	let value = getCookies()[key.toString()];
+	if(!value) return value;
 
 	console.log("Error 404: Cookie " + key + " not found");
 	return "Error 404";

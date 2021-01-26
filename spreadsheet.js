@@ -51,14 +51,15 @@ async function getSheetHeaders(id) {
 /**
  * Returns the sheet labeled as the main sheet from an array of worksheets based on the config sheet.
  * @param {GoogleSpreadsheet} doc Google Spreadsheet to get Main worksheet from
+ * @param {boolean} [defaultToFirst = true] Whether to default to the first sheet if a main sheet is not found
  * @returns {GoogleSpreadsheetWorksheet} The main worksheet
  */
-async function getMain(doc) {
+async function getMain(doc, defaultToFirst = true) {
 	// console.log("Searching for main");
 	const config = getConfig(doc);
 	const main = await offsetParse(config, "DATA", 1, 0, "Main");
 	// console.log("Main sheet is called: " + main);
-	return doc.sheetsByTitle[main] || doc.sheetsByIndex[0];
+	return doc.sheetsByTitle[main] || (defaultToFirst ? doc.sheetsByIndex[0] : undefined);
 }
 
 /**
@@ -173,7 +174,6 @@ async function fillRow(userInput) {
 
 /**
  * Retrieves all worksheets from a specified form id.
- *
  * @param {Object} sheet A singular worksheet from any Google Sheet
  * @param {boolean} [returnEmpty = false] Determines whether to return cells containing no value.
  * @returns {Object[]} Array of all the cells in the given worksheet.

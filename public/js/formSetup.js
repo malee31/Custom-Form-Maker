@@ -1,41 +1,25 @@
 /**
  * Formats the name of the headers into object keys used by the google-sheets api.
- * @param {string} header Singular unformatted string which is the name of a column in the default data sheet.
+ * @param {string} header Unformatted header name from the default data sheet.
  * @returns {string} Formatted string without whitespace, capitalization, leading numbers, or underscores.
  */
 function sheetFormatHeaders(header) {
-	let formatted = header.toLowerCase().replace(/\s/g, "").replace(/\W/g, "").replace(/_/g, "");
-	//removes all leading numbers in the header
-	for(let i = 0; i < header.length; i++) {
-		if(!isNaN(parseInt(formatted.substring(0, 1)))) {
-			formatted = formatted.substring(1);
-		} else {
-			break;
-		}
-	}
-	return formatted;
+	return header.replace(/[\W_\s]/g, "").replace(/^\d+/, "").toLowerCase();
 }
 
 /**
  * Uses JSON received from a request to find the sheet with sheet id to load inputs in the main form.
- * @param {Object} ids JSON containing the unformatted column names for the sheet requested in order.
+ * @param {Object[]} ids Array of Objects containing the unformatted column names in order.
  */
 function loadInputs(ids) {
-	//console.log(ids);
-
 	const mainForm = document.getElementsByName("mainForm")[0];
 	mainForm.style.display = "flex";
-
-	const submitButton = mainForm.lastChild;
 
 	document.getElementById("fileTitle").innerText = ids.shift().name;
 
 	for(const inputField of ids) {
-		//console.log(inputField);
-		mainForm.insertBefore(generateInput(inputField.name, inputField.required, inputField.defaultValue), submitButton);
+		mainForm.insertBefore(generateInput(inputField.name, inputField.required, inputField.defaultValue), mainForm.lastChild);
 	}
-
-	//console.log(ids);
 
 	let idPrompt = document.getElementById("getId");
 	idPrompt.parentNode.removeChild(idPrompt);
@@ -45,8 +29,8 @@ function loadInputs(ids) {
  * Given a column name, a new input is created with a formatted key and label using the column name the input corresponds to.
  * @param {string} columnName Name of a column in the requested sheet.
  * @param {boolean} [required = false] Whether the field is required to be filled out in order to submit
- * @param {string} defaultValue Text to autofill the field with when generating form
- * @returns {object} formInput Contains an html input tag with proper attributes
+ * @param {string} [defaultValue] Text to autofill the field with when generating form
+ * @returns {HTMLElement} formInput Contains an html input tag with proper attributes
  */
 function generateInput(columnName, required = false, defaultValue) {
 	const formInput = document.createElement("INPUT");

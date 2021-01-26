@@ -2,7 +2,6 @@ let canPost = true;
 let disableSubmit = false;
 toggleLoader(false);
 
-
 /**
  * Toggles the loading wheel by hiding or showing it
  * @param {boolean} [show = false] Whether to show or hide the loader. Defaults to hiding it
@@ -10,7 +9,6 @@ toggleLoader(false);
 function toggleLoader(show = false) {
 	const loader = document.getElementsByClassName("loadWheel")[0];
 	const idSubmit = document.getElementsByName("submit")[0];
-
 	canPost = !show;
 
 	if(show) {
@@ -23,9 +21,7 @@ function toggleLoader(show = false) {
 }
 
 /**
- *
  * Toggles the error window by hiding or showing it. Also sets the text if provided.
- *
  * @param {boolean} show Determines whether to show the loader or hide it.
  * @param {string} [title] The name of the error used as the title.
  * @param {string} [desc] Additional description about the error.
@@ -43,106 +39,89 @@ function toggleErrorBox(show, title, desc) {
 		}, 500);
 	}
 
-	if(title) document.getElementById("errorName").innerHTML = title;
-	if(desc) document.getElementById("errorDesc").innerHTML = desc;
+	if(title) document.getElementById("errorName").innerText = title;
+	if(desc) document.getElementById("errorDesc").innerText = desc;
 }
 
 /**
- *
  * Handles all the overriding of the id getter form
- *
  * @param {Event} event Event object passed in from addEventListener.
  */
 function idGetOverride(event) {
 	event.preventDefault();
 
 	const idInput = document.getElementsByName("sheetId")[0];
+	if(!canPost && idInput.value === "") return;
 
-	if(canPost && idInput.value !== "") {
-		toggleLoader(true);
-
-		const req = new XMLHttpRequest();
-
-		req.addEventListener("load", event => {
-			toggleLoader(false);
-			if(event.target.status === 200) {
-				const resp = JSON.parse(event.target.response);
-				const defaultCookie = cookieValue("defaultVals").split(",");
-
-				for(let inputIndex = 0; inputIndex < Math.min(resp.length, defaultCookie.length); inputIndex++) {
-					if(defaultCookie[inputIndex] !== "") {
-						resp[inputIndex + 1].defaultValue = defaultCookie[inputIndex];
-					}
-				}
-
-				loadInputs(resp);
-			} else {
-				console.log(event);
-				toggleErrorBox(true, `Status Code ${req.status}: ${req.statusText}`, (req.status === 422) ? "The ID is invalid." : "An error has occurred. Try again later.");
-				toggleLoader(false);
-			}
-		});
-
-		req.addEventListener("onerror", event => {
-			console.log("There's been an error");
+	toggleLoader(true);
+	const req = new XMLHttpRequest();
+	req.addEventListener("load", event => {
+		toggleLoader(false);
+		if(event.target.status !== 200) {
 			console.log(event);
+			toggleErrorBox(true, `Status Code ${req.status}: ${req.statusText}`, (req.status === 422) ? "The ID is invalid." : "An error has occurred. Try again later.");
 			toggleLoader(false);
-		});
+			return;
+		}
+		const resp = JSON.parse(event.target.response);
+		const defaultCookie = cookieValue("defaultVals").split(",");
 
-		req.onerror = (err) => {
-			toggleErrorBox(true, "An Error Occurred", "Try again later.");
-			console.log(err);
-			toggleLoader(false);
+		for(let inputIndex = 0; inputIndex < Math.min(resp.length, defaultCookie.length); inputIndex++) {
+			if(defaultCookie[inputIndex] !== "") resp[inputIndex + 1].defaultValue = defaultCookie[inputIndex];
 		}
 
-		req.open("POST", window.location, true);
+		loadInputs(resp);
+	});
 
-		req.responseType = "json";
+	req.addEventListener("error", event => {
+		console.log("There's been an error");
+		console.log(event);
+		toggleLoader(false);
+	});
 
-		req.setRequestHeader("Content-Type", "application/json");
-
-		const data = {"id": idInput.value};
-
-		setCookie("id", data.id);
-
-		req.send(JSON.stringify(data));
-
-		const defaultInput = document.getElementsByName("defaultVals")[0].value;
-
-		if(defaultInput === "clear" || cookieValue("defaultVals") === "Error 404") setCookie("defaultVals", "");
-		else if(defaultInput !== "") setCookie("defaultVals", defaultInput);
+	req.onerror = (err) => {
+		console.log(err);
+		toggleErrorBox(true, "An Error Occurred", "Try again later.");
+		toggleLoader(false);
 	}
+
+	req.open("POST", window.location, true);
+	req.setRequestHeader("Content-Type", "application/json");
+
+	const data = {"id": idInput.value};
+	setCookie("id", data.id);
+
+	req.responseType = "json";
+	req.send(JSON.stringify(data));
+
+	const defaultInput = document.getElementsByName("defaultVals")[0].value;
+
+	if(defaultInput.toLowerCase() === "clear" || cookieValue("defaultVals") === "Error 404") setCookie("defaultVals", "");
+	else if(defaultInput !== "") setCookie("defaultVals", defaultInput);
 }
 
 
 /**
- *
- * When redirected from /forms/:id, this handles the sending of the POST request by simulating manual input.
- *
+ * When redirected from /forms/:id, this handles the simulated manual input to send the ID POST request
  */
 function redirectedHandler() {
-	if(window.location.search !== "") {
-		document.getElementsByName("sheetId")[0].value = window.location.search.substring(window.location.search.indexOf("id=") + 3).split("&")[0];
-		document.getElementsByName("submit")[0].click();
-	}
+	if(window.location.search === "") return;
+	document.getElementsByName("sheetId")[0].value = window.location.search.substring(window.location.search.indexOf("id=") + 3).split("&")[0];
+	document.getElementsByName("submit")[0].click();
 }
 
 
 /**
- *
  * Handles all the overriding of the mainForm.
- *
  */
 function mainFormOverride() {
 	let form = document.forms["mainForm"];
 
 	form.addEventListener("submit", event => {
 		event.preventDefault();
-
 		if(disableSubmit) return;
 
 		const data = {};
-
 		data["formId"] = cookieValue("id");
 
 		for(const input of form.elements) {
@@ -152,7 +131,6 @@ function mainFormOverride() {
 		}
 
 		const req = new XMLHttpRequest();
-
 		req.addEventListener("load", event => {
 			if(event.target.status !== 422) {
 				form.parentNode.removeChild(form);
@@ -169,12 +147,9 @@ function mainFormOverride() {
 			console.log(event);
 		});
 
-		req.open("POST", window.location, true);
-
-		req.setRequestHeader("Content-Type", "application/json");
-
 		//console.log("Sending " + data);
-
+		req.open("POST", window.location, true);
+		req.setRequestHeader("Content-Type", "application/json");
 		req.send(JSON.stringify(data));
 
 		toggleLoader(true);
@@ -184,10 +159,7 @@ function mainFormOverride() {
 
 // Overrides all the forms and handles redirects once the window loads.
 window.addEventListener("load", () => {
-
 	document.forms["idGetter"].addEventListener("submit", idGetOverride);
-
 	redirectedHandler();
-
 	mainFormOverride();
 });
