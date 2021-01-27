@@ -64,10 +64,13 @@ function idGetOverride(event) {
 			return;
 		}
 		const resp = JSON.parse(event.target.response);
-		const defaultCookie = cookieValue("defaultVals").split(",");
+		let defaultCookie = cookieValue("defaultVals");
 
-		for(let inputIndex = 0; inputIndex < Math.min(resp.length, defaultCookie.length); inputIndex++) {
-			if(defaultCookie[inputIndex] !== "") resp[inputIndex + 1].defaultValue = defaultCookie[inputIndex];
+		if(defaultCookie) {
+			defaultCookie = defaultCookie.split(",");
+			for(let inputIndex = 0; inputIndex < Math.min(resp.length, defaultCookie.length); inputIndex++) {
+				if(defaultCookie[inputIndex] !== "") resp[inputIndex + 1].defaultValue = defaultCookie[inputIndex];
+			}
 		}
 
 		loadInputs(resp);

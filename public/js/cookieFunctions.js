@@ -27,8 +27,6 @@ function getCookies() {
  */
 function cookieValue(key) {
 	let value = getCookies()[key.toString()];
-	if(!value) return value;
-
+	if(value) return value;
 	console.log("Error 404: Cookie " + key + " not found");
-	return "Error 404";
 }

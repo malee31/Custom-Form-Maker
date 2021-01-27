@@ -13,12 +13,13 @@ function sheetFormatHeaders(header) {
  */
 function loadInputs(ids) {
 	const mainForm = document.getElementsByName("mainForm")[0];
+	const submitButton = mainForm.lastElementChild;
 	mainForm.style.display = "flex";
 
 	document.getElementById("fileTitle").innerText = ids.shift().name;
 
 	for(const inputField of ids) {
-		mainForm.insertBefore(generateInput(inputField.name, inputField.required, inputField.defaultValue), mainForm.lastChild);
+		mainForm.insertBefore(generateInput(inputField.name, inputField.required, inputField.defaultValue), submitButton);
 	}
 
 	let idPrompt = document.getElementById("getId");
