@@ -88,7 +88,7 @@ function idGetOverride(event) {
 		toggleLoader(false);
 	}
 
-	req.open("POST", window.location, true);
+	req.open("POST", window.location.origin, true);
 	req.setRequestHeader("Content-Type", "application/json");
 
 	const data = {"id": idInput.value};
@@ -151,7 +151,7 @@ function mainFormOverride() {
 		});
 
 		//console.log("Sending " + data);
-		req.open("POST", window.location, true);
+		req.open("POST", window.location.origin, true);
 		req.setRequestHeader("Content-Type", "application/json");
 		req.send(JSON.stringify(data));
 

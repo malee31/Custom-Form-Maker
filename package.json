@@ -14,9 +14,11 @@
 	"author": "Marvin Lee",
 	"license": "ISC",
 	"dependencies": {
+		"ejs": "^3.1.5",
 		"express": "^4.17.1",
 		"google-spreadsheet": "^3.1.15",
-		"minimist": ">=1.2.2"
+		"minimist": ">=1.2.2",
+		"serve-favicon": "^2.5.0"
 	},
 	"devDependencies": {
 		"jsdoc": "^3.6.6"

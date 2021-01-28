@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <%- include("/partials/head", {title: "Form"}); %>
+    </head>
+    <body>
+        <div class="loadWheel"></div>
+        <section class="floatBox" id="errorBox" style="display: none; opacity: 0;">
+            <h1 id="errorName">Error</h1>
+            <p id="errorDesc">Something has gone wrong! Try again in a moment.</p>
+            <button onclick="toggleErrorBox(false)">Ok</button>
+        </section>
+        <section class="floatBox" id="getId">
+            <form action="/" enctype="application/json" method="POST" name="idGetter">
+                <h1>Enter the ID</h1>
+                <input name="sheetId" placeholder="Google Sheet ID" type="text">
+                <input name="defaultVals" placeholder="OPTIONAL: Default Values" type="text">
+                <input name="submit" type="submit">
+            </form>
+        </section>
+        <main>
+            <form action="/" enctype="application/json" method="POST" name="mainForm" style="display: none;">
+                <h1 id="fileTitle"><i>Form</i></h1>
+                <input name="mainSubmit" type="submit" value="Submit and Test"/>
+            </form>
+        </main>
+        <%- include("/partials/footer"); %>
+        <script src="static/js/cookieFunctions.js"></script>
+        <script src="static/js/override.js"></script>
+        <script src="static/js/formSetup.js"></script>
+    </body>
+</html>

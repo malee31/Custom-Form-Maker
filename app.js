@@ -1,7 +1,8 @@
 //ExpressJS imports
 const express = require('express');
-const app = express();
 const path = require("path");
+const favicon = require('serve-favicon');
+const app = express();
 
 //Imports module imports from spreadsheet.js
 const sheet = require("./spreadsheet.js");
@@ -11,13 +12,17 @@ const sheetError = require("./sheetError.js");
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
-//Serves static file like local js and css
-app.use("/static", express.static(path.resolve(__dirname, "public")));
-app.use("/favicon.ico", express.static(path.resolve(__dirname, "public/img/favicon.ico")));
+// Use EJS Templating Engine with certain options set
+app.set('view engine', 'ejs');
+app.set('view options', {root: path.resolve(__dirname, "views")});
 
-//Sends html file when the page is accessed
+//Serves static file like local js and css
+app.use("/static", express.static(path.resolve(__dirname, "static")));
+app.use(favicon(path.resolve(__dirname, "static/img/favicon.ico")));
+
+// Renders HTML file when the page is accessed
 app.get("/", (req, res) => {
-	res.sendFile(path.resolve(__dirname, "views/index.html"));
+	res.render(path.resolve(__dirname, "views/pages/index"));
 });
 
 app.post("/", (req, res) => {
@@ -59,12 +64,7 @@ app.get("/form/:sheetId", (req, res) => {
 
 // Error 404
 app.use((req, res) => {
-	res.status(404).sendFile(path.resolve(__dirname, "views/404.html"));
-});
-
-// Error 500
-app.use((req, res) => {
-	res.status(500).sendFile(path.resolve(__dirname, "views/500.html"));
+	res.status(404).render(path.resolve(__dirname, "views/pages/404.ejs"));
 });
 
 app.listen(process.env.PORT || 3000);
