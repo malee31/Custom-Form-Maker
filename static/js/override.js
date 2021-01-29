@@ -88,7 +88,7 @@ function idGetOverride(event) {
 		toggleLoader(false);
 	}
 
-	req.open("POST", window.location.origin, true);
+	req.open("POST", window.location.origin + "/redirect", true);
 	req.setRequestHeader("Content-Type", "application/json");
 
 	const data = {"id": idInput.value};

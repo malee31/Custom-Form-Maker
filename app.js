@@ -57,9 +57,14 @@ app.post("/", (req, res) => {
 	}
 });
 
-app.get("/form/:sheetId", (req, res) => {
-	console.log(req.params);
-	res.redirect(`/?id=${req.params.sheetId}`);
+app.post("/redirect", (req, res) => {
+	console.log(req.body);
+	res.redirect(`/form/${encodeURIComponent(req.body.sheetId)}`);
+});
+
+app.get("/form/:sheetId", async(req, res) => {
+	const headers = await sheet.getHeaders(req.params.sheetId);
+	res.render(path.resolve(__dirname, "views/pages/form"), {formId: req.params.sheetId, formData: headers});
 });
 
 // Error 404
