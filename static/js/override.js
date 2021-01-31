@@ -7,17 +7,9 @@ toggleLoader(false);
  * @param {boolean} [show = false] Whether to show or hide the loader. Defaults to hiding it
  */
 function toggleLoader(show = false) {
-	const loader = document.getElementsByClassName("loadWheel")[0];
-	const idSubmit = document.getElementsByName("submit")[0];
+	const loader = document.querySelector(".loadWheel");
 	canPost = !show;
-
-	if(show) {
-		loader.style.visibility = "visible";
-		if(idSubmit) idSubmit.value = "Loading...";
-	} else {
-		loader.style.visibility = "hidden";
-		if(idSubmit) idSubmit.value = "Submit";
-	}
+	loader.style.visibility = show ? "visible" : "hidden";
 }
 
 /**
@@ -50,7 +42,7 @@ function toggleErrorBox(show, title, desc) {
 function idGetOverride(event) {
 	event.preventDefault();
 
-	const idInput = document.getElementsByName("sheetId")[0];
+	const idInput = document.getElementById("sheetId");
 	if(!canPost && idInput.value === "") return;
 
 	toggleLoader(true);
@@ -103,17 +95,6 @@ function idGetOverride(event) {
 	else if(defaultInput !== "") setCookie("defaultVals", defaultInput);
 }
 
-
-/**
- * When redirected from /forms/:id, this handles the simulated manual input to send the ID POST request
- */
-function redirectedHandler() {
-	if(window.location.search === "") return;
-	document.getElementsByName("sheetId")[0].value = window.location.search.substring(window.location.search.indexOf("id=") + 3).split("&")[0];
-	document.getElementsByName("submit")[0].click();
-}
-
-
 /**
  * Handles all the overriding of the mainForm.
  */
@@ -163,6 +144,5 @@ function mainFormOverride() {
 // Overrides all the forms and handles redirects once the window loads.
 window.addEventListener("load", () => {
 	document.forms["idGetter"].addEventListener("submit", idGetOverride);
-	redirectedHandler();
 	mainFormOverride();
 });

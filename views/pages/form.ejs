@@ -11,13 +11,13 @@
             <button onclick="toggleErrorBox(false)">Ok</button>
         </section>
         <main>
-            <form action="/" enctype="application/json" method="POST" name="mainForm">
+            <form action="/submit" enctype="application/x-www-form-urlencoded" method="POST" name="mainForm">
                 <h1 id="fileTitle"><i><%= formData[0].name %></i></h1>
                 <% formData.slice(1).forEach( data => { %>
-                    <input name="<%=data.name.replace(/[\W_\s]/g, "").replace(/^\d+/, "").toLowerCase() %>" placeholder="<%= data.name %>" type="text" <%= (data.required ? "required" : "") %>>
+                    <input name="<%=data.name.replace(/[\W_\s]/g, "").replace(/^\d+/, "").toLowerCase() %>" id="<%=data.name.replace(/[\W_\s]/g, "").replace(/^\d+/, "").toLowerCase() %>" placeholder="<%= data.name %>" type="text" <%= (data.required ? "required" : "") %> value="<%= (typeof data.defaultValue === "string" ? data.defaultValue : "") %>">
                 <% }) %>
-                <input name="mainSubmit" type="submit" value="Submit and Test"/>
-                <input name="formId" value="<%= formId %>" style="display: none;">
+                <input type="submit" value="Submit and Test"/>
+                <input name="formId" id="formId" value="<%= formId %>" style="display: none;">
             </form>
         </main>
         <%- include("/partials/footer"); %>
