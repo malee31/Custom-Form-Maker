@@ -129,12 +129,13 @@ async function getRequirements(doc, keepExcluded = false) {
  * 	as keys and their required status as its value.
  */
 function processRequirements(requirements) {
+	// Remove form name object
+	requirements.shift();
 	const headers = {};
 	for(const headerCol of requirements) {
-		if(headerCol.required && headerCol.required !== "EXCLUDE") {
+		if(headerCol.required !== "EXCLUDE") {
 			// Removes all leading numbers in the header as well as spacing and non-alphanumerical characters and underscores
-			const formatted = headerCol.name.toLowerCase().replace(/\s/g, "").replace(/\W/g, "").replace(/_/g, "").replace(/^\d*/, "");
-			headers[formatted] = headerCol.required;
+			headers[headerCol.name] = headerCol.required;
 		}
 	}
 	return headers;
@@ -153,18 +154,20 @@ async function fillRow(userInput) {
 
 	for(const dataProp in userInput) {
 		if(!requirements.hasOwnProperty(dataProp) || requirements[dataProp] === "EXCLUDE") {
+			console.log(`Deleted ${dataProp}: ${userInput[dataProp]}`);
 			delete userInput[dataProp];
 		}
 	}
 
 	for(const mayRequire in requirements) {
-		if(userInput[mayRequire].trim() === "" && requirements[mayRequire] === "REQUIRE") {
+		console.log(requirements)
+		if(userInput[mayRequire] === "" && requirements[mayRequire] === "REQUIRE") {
 			return sheetError.throwErr("REQUIRED INPUT NONEXISTENT", "Required Input Missing");
 		}
 	}
 
 	try {
-		console.log(userInput)
+		console.log(userInput);
 		const target = await getMain(sheets);
 		await target.addRow(userInput);
 	} catch(err) {
@@ -273,7 +276,7 @@ async function parseValue(sheet, col, row) {
 /**
  * Returns the value of a cell position in a given sheet.
  *
- * @param {Object} sheet A singular worksheet from any Google Sheet
+ * @param {GoogleSpreadsheetWorksheet} sheet A singular worksheet from any Google Sheet
  * @param {string} searchKey The value to look for the position of before offsetting.
  * @param {number} colOffset Value to offset returned position columns by.
  * @param {string} defaultVal Value to return in case the search key is not found.

@@ -14,7 +14,7 @@
             <form action="/submit" enctype="application/x-www-form-urlencoded" method="POST" name="mainForm">
                 <h1 id="fileTitle"><i><%= formData[0].name %></i></h1>
                 <% formData.slice(1).forEach( data => { %>
-                    <input name="<%=data.name.replace(/[\W_\s]/g, "").replace(/^\d+/, "").toLowerCase() %>" id="<%=data.name.replace(/[\W_\s]/g, "").replace(/^\d+/, "").toLowerCase() %>" placeholder="<%= data.name %>" type="text" <%= (data.required ? "required" : "") %> value="<%= (typeof data.defaultValue === "string" ? data.defaultValue : "") %>">
+                    <input name="<%=data.name %>" id="<%=data.name %>" placeholder="<%= data.name %>" type="text" <%= (data.required ? "required" : "") %> value="<%= (typeof data.defaultValue === "string" ? data.defaultValue : "") %>">
                 <% }) %>
                 <input type="submit" value="Submit and Test"/>
                 <input name="formId" id="formId" value="<%= formId %>" style="display: none;">
