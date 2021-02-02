@@ -3,8 +3,8 @@
 		"include": [
 			"."
 		],
-		"includePattern": ".js$",
-		"excludePattern": "(node_modules/|docs)"
+		"includePattern": "\\.js$",
+		"excludePattern": "(node_modules|docs)"
 	},
 	"plugins": [
 		"plugins/markdown"

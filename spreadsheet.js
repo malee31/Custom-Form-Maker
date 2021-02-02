@@ -1,5 +1,4 @@
 const {GoogleSpreadsheet} = require('google-spreadsheet');
-const {promisify} = require('util');
 const sheetError = require('./sheetError.js');
 
 const credentials = require("./private/SpreadsheetPlaygroundCredentials.json");
@@ -50,6 +49,7 @@ async function getSheetHeaders(id) {
 
 /**
  * Returns the sheet labeled as the main sheet from an array of worksheets based on the config sheet.
+ * @async
  * @param {GoogleSpreadsheet} doc Google Spreadsheet to get Main worksheet from
  * @param {boolean} [defaultToFirst = true] Whether to default to the first sheet if a main sheet is not found
  * @returns {GoogleSpreadsheetWorksheet} The main worksheet
@@ -80,12 +80,7 @@ function getConfig(doc) {
  */
 async function getRequirements(doc, keepExcluded = false) {
 	const config = getConfig(doc) || getMain(doc);
-	await config.loadCells({
-		"startColumnIndex": 0,
-		"startRowIndex": 0,
-		"endColumnIndex": config.columnCount,
-		"endRowIndex": 3
-	});
+	await loadCells(config, 0, 0, 3, config.columnCount);
 
 	const topCells = [];
 	for(let columnNum = 0; columnNum < config.columnCount; columnNum++) {
@@ -143,6 +138,7 @@ function processRequirements(requirements) {
 
 /**
  * Fills a new row in the main sheet with form input after checking input. Returns 422 on failure.
+ * @async
  * @param {Object} userInput JSON object containing user form input in key value pairs of sanitized header
  * 	names and inputted data.
  */
@@ -168,78 +164,65 @@ async function fillRow(userInput) {
 
 	try {
 		console.log(userInput);
-		const target = await getMain(sheets);
-		await target.addRow(userInput);
+		await (await getMain(sheets)).addRow(userInput);
 	} catch(err) {
 		console.error(err);
 	}
 }
 
 /**
- * Retrieves all worksheets from a specified form id.
- * @param {Object} sheet A singular worksheet from any Google Sheet
- * @param {boolean} [returnEmpty = false] Determines whether to return cells containing no value.
- * @returns {Object[]} Array of all the cells in the given worksheet.
+ * Retrieves the labels/headers at the top row of the main sheet along with their requirement status.
+ * @async
+ * @param {GoogleSpreadsheetWorksheet} doc Google Spreadsheet to load cells from
+ * @param {number} [minRow = 0] Zero-indexed row number minimum
+ * @param {number} [minCol = 0] Zero-indexed column number minimum
+ * @param {number} [maxRow = doc.rowCount] Zero-indexed row number maximum
+ * @param {number} [maxCol = doc.columnCount] Zero-indexed column number maximum
  */
-async function getAllCells(sheet, returnEmpty) {
-	return await promisify(sheet.getCells)({
-		'min-row': 1,
-		'max-row': sheet.rowCount,
-		'min-col': 1,
-		'max-col': sheet.colCount,
-		'return-empty': Boolean(returnEmpty)
+async function loadCells(doc, minRow = 0, minCol = 0, maxRow, maxCol) {
+	maxRow = maxRow || doc.rowCount;
+	maxCol = maxCol || doc.columnCount;
+	return await doc.loadCells({
+		"startRowIndex": Math.min(minRow, doc.rowCount - 1),
+		"startColumnIndex": Math.min(minCol, doc.columnCount - 1),
+		"endRowIndex": Math.min(maxRow, doc.rowCount),
+		"endColumnIndex": Math.min(maxCol, doc.columnCount)
 	});
 }
 
 /**
- * Returns the position of cells in a given sheet that match a given value. Not zero indexed.
- *
- * @param {Object} sheet A singular worksheet from any Google Sheet
- * @param {string} value The value to look for the position of.
- * @param {boolean} [returnMultiple = false] Determines whether to return array of multiple position
- * 	pair arrays or only one position pair array.
- * @returns {number[] | number[][]} Position of first match in column, row format (Not zero indexed) in an array.
- * 	If returnMultiple is true, multiple arrays are placed into one.
+ * Returns the position of cells in a given sheet that match a given value.
+ * @async
+ * @param {GoogleSpreadsheetWorksheet} sheet A singular worksheet from any Google Sheet
+ * @param {string} value The value to look for the positions of.
+ * @returns {number[][]} Position of first match in [row, column] format (Zero-indexed) in an array.
  */
-async function valueLookup(sheet, value, returnMultiple) {
-	returnMultiple = Boolean(returnMultiple);
+async function valueLookup(sheet, value) {
+	await loadCells(sheet);
 
-	const cells = await getAllCells(sheet, false);
-
-	let result = cells.filter(cell => cell.value === value);
-
-	for(let matchedCell = 0; matchedCell < result.length; matchedCell++) {
-		result[matchedCell] = [result[matchedCell].col, result[matchedCell].row];
+	const result = [];
+	for(let rowNum = 0; rowNum < sheet.rowCount; rowNum++) {
+		for(let colNum = 0; colNum < sheet.columnCount; colNum++) {
+			const cell = sheet.getCell(rowNum, colNum);
+			if(cell.value === value) {
+				result.push([rowNum, colNum]);
+			}
+		}
 	}
-
-	if(!returnMultiple && result.length >= 1) {
-		result = result[0];
-	}
-
 	return result;
 }
 
 /**
  * Returns the position of cells in a given sheet that match a given value, offset by given offsets. Not zero indexed.
- *
- * @param {Object} sheet A singular worksheet from any Google Sheet
+ * @async
+ * @param {GoogleSpreadsheetWorksheet} sheet A singular worksheet from any Google Sheet
  * @param {string} value The value to look for the position of.
  * @param {number} offsetCol Value to offset returned position columns by.
  * @param {number} offsetRow Value to offset returned position rows by.
- * @param {boolean} [returnMultiple = false] Determines whether to return array of multiple position
- * 	pair arrays or only one position pair array.
- * @returns {number[] | number[][]} Position of first match in column, row format (Not zero indexed) in an array.
- * 	If returnMultiple is true, multiple arrays are placed into one.
+ * @returns {number[][]} Array of offset matches in [row, column] format (Zero-indexed).
  */
-async function offsetLookup(sheet, value, offsetCol, offsetRow, returnMultiple) {
-	returnMultiple = Boolean(returnMultiple);
-
-	const matches = await valueLookup(sheet, value, returnMultiple);
-
-	if(!returnMultiple) {
-		return [matches[0] + offsetCol, matches[1] + offsetRow];
-	}
-
+async function offsetLookup(sheet, value, offsetCol, offsetRow) {
+	const matches = await valueLookup(sheet, value);
 	for(const matchPair of matches) {
 		matchPair[0] += offsetCol;
 		matchPair[1] += offsetRow;
@@ -247,13 +230,12 @@ async function offsetLookup(sheet, value, offsetCol, offsetRow, returnMultiple) 
 			sheetError.nonErr("Potential Error: This Offset Pair is invalid - " + matchPair);
 		}
 	}
-
 	return matches;
 }
 
 /**
  * Returns the value of a cell position in a given sheet.
- *
+ * @async
  * @param {GoogleSpreadsheetWorksheet} sheet A singular worksheet from any Google Sheet
  * @param {number} col Column position of the cell to retrieve the value from.
  * @param {number} row Row position of the cell to retrieve the value from.
@@ -261,13 +243,8 @@ async function offsetLookup(sheet, value, offsetCol, offsetRow, returnMultiple) 
  */
 async function parseValue(sheet, col, row) {
 	try {
-		return (await promisify(sheet.getCells)({
-			'min-col': col,
-			'max-col': col,
-			'min-row': row,
-			'max-row': row,
-			'return-empty': true,
-		}))[0].value;
+		await loadCells(sheet, row, col, row + 1, col + 1);
+		return sheet.getCell(row, col);
 	} catch(err) {
 		sheetError.specificErr(err, "Cell parseValue error");
 	}
@@ -275,21 +252,20 @@ async function parseValue(sheet, col, row) {
 
 /**
  * Returns the value of a cell position in a given sheet.
- *
+ * @async
  * @param {GoogleSpreadsheetWorksheet} sheet A singular worksheet from any Google Sheet
  * @param {string} searchKey The value to look for the position of before offsetting.
  * @param {number} colOffset Value to offset returned position columns by.
- * @param {string} defaultVal Value to return in case the search key is not found.
+ * @param {string} [defaultVal = ""] Value to return in case the search key is not found.
  * @param {number} rowOffset Value to offset returned position rows by.
  * @returns {string} Value of the given cell.
  */
 async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal = "") {
 	try {
-		const res = await offsetLookup(sheet, searchKey, colOffset, rowOffset, false)
+		const res = (await offsetLookup(sheet, searchKey, colOffset, rowOffset))[0];
 		return await parseValue(sheet, res[0], res[1]);
 	} catch(err) {
 		sheetError.handledErr("Failed to offset and parse. Returning empty String or default value.");
 		return defaultVal;
 	}
-
 }
