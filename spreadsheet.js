@@ -40,7 +40,7 @@ async function getWorksheets(formId) {
  * Retrieves the labels/headers at the top row of the main sheet
  * @async
  * @param {string} id String that is the id of the spreadsheet on Google Spreadsheets
- * @returns {Object} Returns JSON object containing the header names paired with whether they are required inputs
+ * @returns {Object[]} Returns Array of JSON objects containing the header names and whether they are required inputs along with their default values
  */
 async function getSheetHeaders(id) {
 	const doc = await getWorksheets(id);

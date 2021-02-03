@@ -63,11 +63,15 @@ app.post("/submit", async(req, res) => {
 
 app.post("/redirect", (req, res) => {
 	console.log(req.body);
-	res.redirect(`/form/${encodeURIComponent(req.body.sheetId)}`);
+	res.redirect(`/form/${encodeURIComponent(req.body.sheetId)}/?default=${encodeURIComponent(req.body.defaultVals)}`);
 });
 
 app.get("/form/:sheetId", async(req, res) => {
 	const headers = await sheet.getHeaders(req.params.sheetId);
+	(req.query.default || "").split(/(?=\s*(?<=[^\\])),/).forEach((val, index) => {
+		val = val.replace(/\\,/g, ",").trim();
+		if(val && index + 1 < headers.length) headers[index + 1].defaultValue = val;
+	});
 	console.log(headers);
 	res.render(path.resolve(__dirname, "views/pages/form"), {formId: req.params.sheetId, formData: headers});
 });
