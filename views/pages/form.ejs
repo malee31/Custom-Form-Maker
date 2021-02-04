@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
         <%- include("/partials/head", {title: formData[0].name}); %>
+        <link href="/static/css/form.css" rel="stylesheet" type="text/css">
     </head>
     <body>
         <div class="loadWheel"></div>
@@ -21,8 +22,6 @@
             </form>
         </main>
         <%- include("/partials/footer"); %>
-        <script src="/static/js/cookieFunctions.js"></script>
         <script src="/static/js/override.js"></script>
-        <script src="/static/js/formSetup.js"></script>
     </body>
 </html>

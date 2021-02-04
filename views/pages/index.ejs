@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-    <%- include("/partials/head", {title: "Form"}); %>
+    <head>
+        <%- include("/partials/head", {title: "Form"}); %>
+        <link href="/static/css/index.css" rel="stylesheet" type="text/css">
+    </head>
     <body>
-        <section class="floatBox" id="getId">
-            <form action="/redirect" enctype="application/x-www-form-urlencoded" method="POST" name="idGetter">
-                <h1>Enter the ID</h1>
-                <label for="sheetId">
-                    Google Sheet ID
-                </label>
-                <input name="sheetId" id="sheetId" placeholder="Google Sheet ID" type="text" required>
-                <label for="defaultVals">
-                    Default Values (Optional)
-                </label>
-                <input name="defaultVals" id="defaultVals" placeholder="OPTIONAL: Default Values" type="text">
-                <input type="submit">
-            </form>
-        </section>
-        <%- include("/partials/footer"); %>
+        <form action="/redirect" enctype="application/x-www-form-urlencoded" method="POST">
+            <h3>Start Form</h3>
+            <label for="sheetId">
+                Google Sheet ID<span class="required">*</span>
+            </label>
+            <input name="sheetId" id="sheetId" type="text" required>
+            <label for="defaultVals">
+                Default Values (Optional)
+            </label>
+            <input name="defaultVals" id="defaultVals" type="text">
+            <input type="submit">
+        </form>
     </body>
 </html>

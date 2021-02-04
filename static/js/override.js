@@ -36,66 +36,6 @@ function toggleErrorBox(show, title, desc) {
 }
 
 /**
- * Handles all the overriding of the id getter form
- * @param {Event} event Event object passed in from addEventListener.
- */
-function idGetOverride(event) {
-	event.preventDefault();
-
-	const idInput = document.getElementById("sheetId");
-	if(!canPost && idInput.value === "") return;
-
-	toggleLoader(true);
-	const req = new XMLHttpRequest();
-	req.addEventListener("load", event => {
-		toggleLoader(false);
-		if(event.target.status !== 200) {
-			console.log(event);
-			toggleErrorBox(true, `Status Code ${req.status}: ${req.statusText}`, (req.status === 422) ? "The ID is invalid." : "An error has occurred. Try again later.");
-			toggleLoader(false);
-			return;
-		}
-		const resp = JSON.parse(event.target.response);
-		let defaultCookie = cookieValue("defaultVals");
-
-		if(defaultCookie) {
-			defaultCookie = defaultCookie.split(",");
-			for(let inputIndex = 0; inputIndex < Math.min(resp.length, defaultCookie.length); inputIndex++) {
-				if(defaultCookie[inputIndex] !== "") resp[inputIndex + 1].defaultValue = defaultCookie[inputIndex];
-			}
-		}
-
-		loadInputs(resp);
-	});
-
-	req.addEventListener("error", event => {
-		console.log("There's been an error");
-		console.log(event);
-		toggleLoader(false);
-	});
-
-	req.onerror = (err) => {
-		console.log(err);
-		toggleErrorBox(true, "An Error Occurred", "Try again later.");
-		toggleLoader(false);
-	}
-
-	req.open("POST", window.location.origin + "/redirect", true);
-	req.setRequestHeader("Content-Type", "application/json");
-
-	const data = {"id": idInput.value};
-	setCookie("id", data.id);
-
-	req.responseType = "json";
-	req.send(JSON.stringify(data));
-
-	const defaultInput = document.getElementsByName("defaultVals")[0].value;
-
-	if(defaultInput.toLowerCase() === "clear" || cookieValue("defaultVals") === "Error 404") setCookie("defaultVals", "");
-	else if(defaultInput !== "") setCookie("defaultVals", defaultInput);
-}
-
-/**
  * Handles all the overriding of the mainForm.
  */
 function mainFormOverride() {
@@ -106,12 +46,9 @@ function mainFormOverride() {
 		if(disableSubmit) return;
 
 		const data = {};
-		data["formId"] = cookieValue("id");
 
-		for(const input of form.elements) {
-			if(input.nodeName === "INPUT") {
-				data[input.name] = input.value;
-			}
+		for(const input of form.querySelectorAll("input")) {
+			data[input.name] = input.value;
 		}
 
 		const req = new XMLHttpRequest();
