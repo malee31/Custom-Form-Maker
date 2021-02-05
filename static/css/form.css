@@ -19,24 +19,44 @@
     z-index: 3;
 }
 
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 main {
     display: flex;
     align-items: center;
     flex-direction: column;
     justify-content: center;
-    padding: 0;
+    padding: 2rem 3rem;
     text-align: center;
 }
 
 form {
     display: flex;
+    width: 100%;
     align-content: center;
     align-items: center;
     flex-direction: column;
     justify-content: center;
-    padding: 5%;
     text-align: center;
     vertical-align: middle;
+}
+
+label {
+    background-color: #CCC;
+    margin: .25rem 0;
+    padding: .5rem .5rem 0;
+    border-radius: .25rem;
+}
+
+label .label {
+    font-size: 1.25rem;
+    text-align: left;
+    margin: 0;
+    padding: .25rem;
 }
 
 input {
@@ -46,11 +66,6 @@ input {
     padding: 2%;
     border-radius: 5px;
     box-shadow: 0 0 .1em .1em #BBB;
-}
-
-input[type="submit"]:hover {
-    color: #DDD;
-    background-color: #2B83E2;
 }
 
 .loadWheel {

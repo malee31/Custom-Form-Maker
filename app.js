@@ -63,7 +63,7 @@ app.post("/submit", async(req, res) => {
 
 app.post("/redirect", (req, res) => {
 	console.log(req.body);
-	res.redirect(`/form/${encodeURIComponent(req.body.sheetId)}/?default=${encodeURIComponent(req.body.defaultVals)}`);
+	res.redirect(`/form/${encodeURIComponent(req.body.sheetId)}/${req.body.defaultVals ? `?default=${encodeURIComponent(req.body.defaultVals)}` : ""}`);
 });
 
 app.get("/form/:sheetId", async(req, res) => {

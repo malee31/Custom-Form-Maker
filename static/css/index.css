@@ -3,7 +3,6 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
 }
 
 form {
@@ -20,27 +19,4 @@ form {
 
 form h3 {
     margin: 0 0 0.5rem;
-}
-
-form input {
-    width: 100%;
-    height: 2.5rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 0.2rem;
-    margin: 0 0 0.5rem 0;
-    border-width: 0;
-    outline: none;
-}
-
-form label {
-    width: 100%;
-}
-
-form input[type="submit"]:hover {
-    cursor: pointer;
-    background-color: #BBB;
-}
-
-span.required {
-    color: red;
 }
