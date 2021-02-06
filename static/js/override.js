@@ -1,16 +1,4 @@
-let canPost = true;
 let disableSubmit = false;
-toggleLoader(false);
-
-/**
- * Toggles the loading wheel by hiding or showing it
- * @param {boolean} [show = false] Whether to show or hide the loader. Defaults to hiding it
- */
-function toggleLoader(show = false) {
-	const loader = document.querySelector(".loadWheel");
-	canPost = !show;
-	loader.style.visibility = show ? "visible" : "hidden";
-}
 
 /**
  * Toggles the error window by hiding or showing it. Also sets the text if provided.
@@ -79,7 +67,4 @@ function mainFormOverride() {
 }
 
 // Overrides all the forms and handles redirects once the window loads.
-window.addEventListener("load", () => {
-	document.forms["idGetter"].addEventListener("submit", idGetOverride);
-	mainFormOverride();
-});
+// window.addEventListener("load", mainFormOverride);

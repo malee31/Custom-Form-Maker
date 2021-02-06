@@ -67,21 +67,3 @@ input {
     border-radius: 5px;
     box-shadow: 0 0 .1em .1em #BBB;
 }
-
-.loadWheel {
-    position: fixed;
-    z-index: 99;
-    top: calc(50% - min(30vw, 25vh) - 16px);
-    left: calc(50% - min(30vw, 25vh) - 16px);
-    width: min(60vw, 50vh);
-    height: min(60vw, 50vh);
-    animation: load 2s linear infinite;
-    border: 16px solid #F3F3F3;
-    border-top: 16px solid #3498DB;
-    border-radius: 50%;
-}
-
-@keyframes load {
-    0% {transform: rotate(0deg);}
-    100% {transform: rotate(360deg);}
-}

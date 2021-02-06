@@ -5,6 +5,7 @@
         <link href="/static/css/index.css" rel="stylesheet" type="text/css">
     </head>
     <body>
+        <%- include("/partials/loader") %>
         <form action="/redirect" enctype="application/x-www-form-urlencoded" method="POST">
             <h3>Start Form</h3>
             <label for="sheetId">
@@ -15,7 +16,7 @@
                 Default Values (Optional)
             </label>
             <input name="defaultVals" id="defaultVals" type="text">
-            <input type="submit">
+            <input type="submit" onclick="toggleLoader(true)">
         </form>
     </body>
 </html>
