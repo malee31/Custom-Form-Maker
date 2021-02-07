@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <%- include("/partials/head", {title: formData[0].name}); %>
+        <%- include("/partials/head", {title: formData.name}); %>
         <link href="/static/css/form.css" rel="stylesheet" type="text/css">
     </head>
     <body>
@@ -12,16 +12,18 @@
             <button onclick="toggleErrorBox(false)">Ok</button>
         </section>
         <main>
-            <form action="/submit" enctype="application/x-www-form-urlencoded" method="POST" name="mainForm">
-                <h1 id="fileTitle"><i><%= formData[0].name %></i></h1>
-                <% formData.slice(1).forEach( data => { %>
-                    <label for="<%=data.name %>">
-                        <p class="label">
-                            <%= data.name %>
-                        </p>
-                        <input name="<%=data.name %>" id="<%=data.name %>" type="text" <%= (data.required ? "required" : "") %> value="<%= (typeof data.defaultValue === "string" ? data.defaultValue : "") %>">
-                    </label>
-                <% }) %>
+            <form name="mainForm">
+                <h1 id="fileTitle"><i><%= formData.name %></i></h1>
+                <% formData.headers.forEach( inputOptions => { %>
+                    <% switch(inputOptions.type) {
+                        case "password": %>
+                            <%- include("/partials/form/passwordInput", {inputOptions}); %>
+                        <% break;
+                        case "text":
+                        default: %>
+                            <%- include("/partials/form/textInput", {inputOptions}); %>
+                    <% }
+                }) %>
                 <input type="submit" value="Submit and Test"/>
                 <input name="formId" id="formId" value="<%= formId %>" style="display: none;">
             </form>

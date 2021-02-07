@@ -76,14 +76,14 @@ function getConfig(doc) {
  * @async
  * @param {GoogleSpreadsheet} doc Google Spreadsheet to get requirements from
  * @param {boolean} [keepExcluded = false] Determines whether or not the returned object will include excluded headers.
- * @returns {Object[]} Returns array of objects with the name of the column, default values, and whether or not they are required
+ * @returns {Object} Returns object containing metadata and an array of objects with the column name, default values, and whether or not they are required
  */
 async function getRequirements(doc, keepExcluded = false) {
 	const config = getConfig(doc) || getMain(doc);
 	await loadCells(config, 0, 0, 3, config.columnCount);
 
 	const topCells = [];
-	for(let columnNum = 0; columnNum < config.columnCount; columnNum++) {
+	for(let columnNum = 1; columnNum < config.columnCount; columnNum++) {
 		const cellValue = config.getCell(0, columnNum).value;
 		if(cellValue === null) break;
 		topCells.push({
@@ -108,26 +108,22 @@ async function getRequirements(doc, keepExcluded = false) {
 		topCells[inputHeader].defaultValue = topCells[inputHeader].defaultValue || "";
 	}
 
-	//This just overwrites the COLUMN label with the title of the Google Sheet
-	topCells[0] = {
-		name: doc.title
+	return {
+		name: doc.title,
+		headers: topCells
 	};
-	return topCells;
 }
 
 /**
  * Formats the name of the requirement headers into object keys used by the google-sheets api
  * along with whether they are required in the form to continue.
- * @param {Object[]} requirements Array of Objects with a string name key and string required key.
- * 	corresponding to a column header and required key for whether it is required to submit the form.
+ * @param {Object} requirements Data from getRequirements()
  * @returns {Object} Returns singular object containing sanitized column names in order
  * 	as keys and their required status as its value.
  */
 function processRequirements(requirements) {
-	// Remove form name object
-	requirements.shift();
 	const headers = {};
-	for(const headerCol of requirements) {
+	for(const headerCol of requirements.headers) {
 		if(headerCol.required !== "EXCLUDE") {
 			// Removes all leading numbers in the header as well as spacing and non-alphanumerical characters and underscores
 			headers[headerCol.name] = headerCol.required;

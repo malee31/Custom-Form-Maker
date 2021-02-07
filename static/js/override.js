@@ -1,14 +1,15 @@
+const mainForm = document.forms["mainForm"];
+const errBox = document.getElementById("errorBox");
 let disableSubmit = false;
 
 /**
  * Toggles the error window by hiding or showing it. Also sets the text if provided.
- * @param {boolean} show Determines whether to show the loader or hide it.
+ * @param {boolean} [show] Determines whether to show the loader or hide it. Will default to toggle mode
  * @param {string} [title] The name of the error used as the title.
  * @param {string} [desc] Additional description about the error.
  */
 function toggleErrorBox(show, title, desc) {
-	const errBox = document.getElementById("errorBox");
-
+	if(typeof show !== "boolean") show = errBox.style.opacity === "0";
 	if(show) {
 		errBox.style.display = "flex";
 		errBox.style.opacity = "1";
@@ -27,22 +28,20 @@ function toggleErrorBox(show, title, desc) {
  * Handles all the overriding of the mainForm.
  */
 function mainFormOverride() {
-	let form = document.forms["mainForm"];
-
-	form.addEventListener("submit", event => {
+	mainForm.addEventListener("submit", event => {
 		event.preventDefault();
 		if(disableSubmit) return;
 
 		const data = {};
 
-		for(const input of form.querySelectorAll("input")) {
-			data[input.name] = input.value;
+		for(const input of mainForm.querySelectorAll("input")) {
+			if(input.name) data[input.name] = input.value;
 		}
 
 		const req = new XMLHttpRequest();
 		req.addEventListener("load", event => {
 			if(event.target.status !== 422) {
-				form.parentNode.removeChild(form);
+				mainForm.parentNode.removeChild(mainForm);
 			}
 
 			toggleLoader(false);
@@ -57,7 +56,7 @@ function mainFormOverride() {
 		});
 
 		//console.log("Sending " + data);
-		req.open("POST", window.location.origin, true);
+		req.open("POST", `${window.location.origin}/submit`, true);
 		req.setRequestHeader("Content-Type", "application/json");
 		req.send(JSON.stringify(data));
 
@@ -67,4 +66,4 @@ function mainFormOverride() {
 }
 
 // Overrides all the forms and handles redirects once the window loads.
-// window.addEventListener("load", mainFormOverride);
+window.addEventListener("load", mainFormOverride);
