@@ -1,4 +1,5 @@
 const {GoogleSpreadsheet} = require('google-spreadsheet');
+const {RequirementCollection} = require("./requirement.js");
 const sheetError = require('./sheetError.js');
 
 const credentials = require("./private/SpreadsheetPlaygroundCredentials.json");
@@ -82,41 +83,21 @@ async function getRequirements(doc, keepExcluded = false) {
 	const config = getConfig(doc) || getMain(doc);
 	await loadCells(config, 0, 0, 3, config.columnCount);
 
-	const topCells = [];
+	const topCells = new RequirementCollection();
 	for(let columnNum = 1; columnNum < config.columnCount; columnNum++) {
 		const cellValue = config.getCell(0, columnNum).value;
 		if(cellValue === null) break;
-		topCells.push({
-			name: cellValue,
-			required: config.getCell(1, columnNum).value,
-			defaultValue: config.getCell(2, columnNum).value
-		});
-	}
-
-	// Post-processing
-	for(let inputHeader = 1; inputHeader < topCells.length; inputHeader++) {
-		if(topCells[inputHeader].required && topCells[inputHeader].required.trim().toUpperCase() === "EXCLUDE") {
-			if(!keepExcluded) {
-				topCells.splice(inputHeader, 1);
-				inputHeader--;
-				continue;
-			}
-			topCells[inputHeader].required = "EXCLUDE";
-		} else {
-			topCells[inputHeader].required = (Boolean(topCells[inputHeader].required) && topCells[inputHeader].required.trim().toUpperCase() === "REQUIRED");
-		}
-		topCells[inputHeader].defaultValue = topCells[inputHeader].defaultValue || "";
+		topCells.createRequirement(cellValue, config.getCell(1, columnNum).value, config.getCell(2, columnNum).value, config.getCell(1, columnNum).value);
 	}
 
 	return {
 		name: doc.title,
-		headers: topCells
+		headers: topCells.toRequirementArray(keepExcluded)
 	};
 }
 
 /**
- * Formats the name of the requirement headers into object keys used by the google-sheets api
- * along with whether they are required in the form to continue.
+ * Formats the name of the requirement headers into object keys used by the google-sheets api along with whether they are required in the form to continue.
  * @param {Object} requirements Data from getRequirements()
  * @returns {Object} Returns singular object containing sanitized column names in order
  * 	as keys and their required status as its value.
@@ -124,8 +105,7 @@ async function getRequirements(doc, keepExcluded = false) {
 function processRequirements(requirements) {
 	const headers = {};
 	for(const headerCol of requirements.headers) {
-		if(headerCol.required !== "EXCLUDE") {
-			// Removes all leading numbers in the header as well as spacing and non-alphanumerical characters and underscores
+		if(!headerCol.excluded) {
 			headers[headerCol.name] = headerCol.required;
 		}
 	}
@@ -145,16 +125,16 @@ async function fillRow(userInput) {
 	const requirements = processRequirements(await getRequirements(sheets));
 
 	for(const dataProp in userInput) {
-		if(!requirements.hasOwnProperty(dataProp) || requirements[dataProp] === "EXCLUDE") {
+		if(!requirements.hasOwnProperty(dataProp)) {
 			console.log(`Deleted ${dataProp}: ${userInput[dataProp]}`);
 			delete userInput[dataProp];
 		}
 	}
 
+	console.log(requirements);
 	for(const mayRequire in requirements) {
-		console.log(requirements)
-		if(userInput[mayRequire] === "" && requirements[mayRequire] === "REQUIRE") {
-			return sheetError.throwErr("REQUIRED INPUT NONEXISTENT", "Required Input Missing");
+		if(!userInput[mayRequire] && requirements[mayRequire]) {
+			return sheetError.throwErr("REQUIRED INPUT NONEXISTENT", `Required Input ${mayRequire} Missing: ${JSON.stringify(userInput)}`);
 		}
 	}
 
