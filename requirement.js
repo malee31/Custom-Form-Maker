@@ -12,7 +12,8 @@ const requiredStrings = ["REQUIRE", "REQUIRED", "YES", "TRUE", "Y", "T", "ON"];
 class Requirement {
 	/**
 	 * Creates a requirement object
-	 * @member Requirement
+	 * @class Requirement
+	 * @memberOf module:requirement
 	 * @param {string} [name = ""] Name of column
 	 * @param {boolean|number|string} [required = false] Whether the input is a required question. Non-booleans will be coerced into booleans (All numbers are true except 0 and strings will be matched to specific values)
 	 * @param {boolean|number|string} [excluded = false] Whether the input should be excluded from the form. Non-booleans will be coerced into booleans (All numbers are true except 0 and strings will be matched to specific values)
@@ -90,7 +91,8 @@ class Requirement {
 class RequirementCollection {
 	/**
 	 * Initiates a collection for Requirement objects
-	 * @member RequirementCollection
+	 * @class RequirementCollection
+	 * @memberOf module:requirement
 	 */
 	constructor() {
 		this.requirements = [];
@@ -131,7 +133,7 @@ class RequirementCollection {
 
 /**
  * Contains all the classes for managing requirements
- * @module Requirements
+ * @module requirement
  */
 module.exports = {
 	Requirement: Requirement,

@@ -18,6 +18,10 @@ const credentials = require("./private/SpreadsheetPlaygroundCredentials.json");
 
 const CONFIG_SHEET_NAME = ".config";
 
+/**
+ * Handles wrangling with Google Spreadsheet API functions
+ * @module spreadsheet
+ */
 module.exports = {
 	newRow: fillRow,
 	getHeaders: getSheetHeaders,

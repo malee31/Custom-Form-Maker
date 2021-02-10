@@ -1,3 +1,7 @@
+/**
+ * Error logging functions. See file for exported functions (Didn't bother with documentation)
+ * @module sheetError
+ */
 module.exports = {
 	sheetIdErr: sheetIdError,
 	worksheetErr: worksheetError,

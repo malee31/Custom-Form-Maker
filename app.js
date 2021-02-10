@@ -1,3 +1,8 @@
+/**
+ * @fileOverview Main file for the project containing all the routes and handles file rendering and serving
+ * @author Marvin Lee
+ */
+
 //ExpressJS imports
 const express = require('express');
 const path = require("path");
