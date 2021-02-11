@@ -1,0 +1,35 @@
+{
+	"name": "Spreadsheet Playground 2",
+	"headers": [
+		{
+			"name": "name",
+			"displayName": "Insert Name Here",
+			"defaultValue": "Doe, John",
+			"placeholderText": "Last, First",
+			"type": "text",
+			"subtype": null,
+			"required": true,
+			"excluded": false
+		},
+		{
+			"name": "passcode",
+			"displayName": "Enter Passcode",
+			"defaultValue": "passcode",
+			"placeholderText": "",
+			"type": "password",
+			"subtype": null,
+			"required": true,
+			"excluded": false
+		},
+		{
+			"name": "first",
+			"displayName": "First Choice",
+			"defaultValue": "",
+			"placeholderText": "",
+			"type": "text",
+			"subtype": null,
+			"required": false,
+			"excluded": false
+		}
+	]
+}

@@ -4,6 +4,7 @@ const requiredStrings = ["REQUIRE", "REQUIRED", "YES", "TRUE", "Y", "T", "ON"];
 /**
  * @typedef RequirementObject
  * @property {string} name Name of input
+ * @property {string} [displayName] Name for label of input. Defaults to name property
  * @property {string} defaultValue Default value for input. Defaults to empty string
  * @property {boolean} required Whether or not the input is required
  * @property {boolean} excluded Whether or not the input should be excluded from the form
@@ -70,7 +71,10 @@ class Requirement {
 	 * @returns {string} Returns the name set
 	 */
 	setName(name="", ignoreEmpty=false) {
-		if(!ignoreEmpty || name) this.name = name;
+		if(!ignoreEmpty || name) {
+			if(!this.displayName || this.name === this.displayName) this.displayName = name;
+			this.name = name;
+		}
 		return this.name;
 	}
 
@@ -81,6 +85,7 @@ class Requirement {
 	toObject() {
 		return {
 			name: this.name,
+			displayName: this.displayName,
 			defaultValue: this.defaultValue,
 			required: this.required,
 			excluded: this.excluded

@@ -32,10 +32,10 @@ function mainFormOverride() {
 		event.preventDefault();
 		if(disableSubmit) return;
 
-		const data = {};
+		const data = {formId: document.getElementById("formId").value};
 
 		for(const input of mainForm.querySelectorAll("input")) {
-			if(input.name) data[input.name] = input.value;
+			if(input.dataset.columnname) data[input.dataset.columnname] = input.value;
 		}
 
 		const req = new XMLHttpRequest();
