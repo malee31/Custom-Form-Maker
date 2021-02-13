@@ -6,7 +6,7 @@
 	"scripts": {
 		"run": "node app.js",
 		"dev": "node app.js &> output.txt",
-		"docs": "jsdoc -c jsdoc.json",
+		"docs": "echo 'Note: Requires Dev-Dependencies to be Installed' && jsdoc -c jsdoc.json",
 		"start": "node app.js",
 		"test": "node spreadsheet.js"
 	},
@@ -21,10 +21,11 @@
 		"serve-favicon": "^2.5.0"
 	},
 	"devDependencies": {
+		"docdash": "^1.2.0",
 		"jsdoc": "^3.6.6"
 	},
 	"engines": {
-		"node": "^13.9.0"
+		"node": ">=13.9.0"
 	},
 	"repository": {
 		"type": "git",

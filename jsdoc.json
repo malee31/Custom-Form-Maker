@@ -13,6 +13,11 @@
 		"encoding": "utf8",
 		"readme": "./README.md",
 		"destination": "docs/",
+		"template": "node_modules/docdash",
 		"recurse": true
+	},
+	"docdash": {
+		"sort": true,
+		"search": true
 	}
 }
