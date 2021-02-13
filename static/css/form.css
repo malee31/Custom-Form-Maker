@@ -61,11 +61,11 @@ label .label {
     padding: .25rem;
 }
 
-input {
-    width: 100%;
-    height: 2rem;
-    margin: .2em;
-    padding: 2%;
-    border-radius: 5px;
-    box-shadow: 0 0 .1em .1em #BBB;
-}
+/*input {*/
+/*    width: 100%;*/
+/*    height: 2rem;*/
+/*    margin: .2rem;*/
+/*    padding: .1rem;*/
+/*    border-radius: 5px;*/
+/*    box-shadow: 0 0 .1em .1em #BBB;*/
+/*}*/

@@ -17,13 +17,17 @@ body {
 }
 
 form input {
-    width: 100%;
     height: 2.5rem;
     padding: 0.25rem 0.75rem;
     border-radius: 0.2rem;
     margin: 0 0 0.5rem 0;
     border-width: 0;
     outline: none;
+}
+
+form input[type="text"],
+form input[type="password"] {
+    width: 100%;
 }
 
 form label {
