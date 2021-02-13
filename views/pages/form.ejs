@@ -15,15 +15,8 @@
             <form name="mainForm">
                 <h1 id="fileTitle"><i><%= formData.name %></i></h1>
                 <% formData.headers.forEach( inputOptions => { %>
-                    <% switch(inputOptions.type) {
-                        case "password": %>
-                            <%- include("/partials/form/passwordInput", {inputOptions}); %>
-                        <% break;
-                        case "text":
-                        default: %>
-                            <%- include("/partials/form/textInput", {inputOptions}); %>
-                    <% }
-                }) %>
+                    <%- include("/partials/inputField", {inputOptions}); %>
+                <% }) %>
                 <input type="submit" value="Submit and Test"/>
                 <input id="formId" value="<%= formId %>" style="display: none;">
             </form>

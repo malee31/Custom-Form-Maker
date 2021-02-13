@@ -30,6 +30,64 @@
 			"subtype": null,
 			"required": false,
 			"excluded": false
+		},
+		{
+			"name": "favcolor",
+			"displayName": "Favorite Color",
+			"defaultValue": "#00CCFF",
+			"placeholderText": "",
+			"type": "color",
+			"subtype": null,
+			"required": false,
+			"excluded": false
+		},
+		{
+			"name": "choice",
+			"displayName": "Choose One",
+			"defaultValue": "",
+			"placeholderText": "",
+			"choices": [
+				{
+					"value": "First",
+					"default": true
+				},
+				{
+					"value": "Second",
+					"default": false
+				},
+				{
+					"value": "Third",
+					"default": false
+				}
+			],
+			"type": "radio",
+			"subtype": null,
+			"required": false,
+			"excluded": false
+		},
+		{
+			"name": "check",
+			"displayName": "Select All",
+			"defaultValue": "",
+			"placeholderText": "",
+			"choices": [
+				{
+					"value": "One",
+					"checked": true
+				},
+				{
+					"value": "Two",
+					"checked": false
+				},
+				{
+					"value": "Three",
+					"checked": true
+				}
+			],
+			"type": "checkbox",
+			"subtype": null,
+			"required": false,
+			"excluded": false
 		}
 	]
 }

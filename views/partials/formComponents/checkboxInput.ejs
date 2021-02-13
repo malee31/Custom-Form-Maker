@@ -1,0 +1,13 @@
+<label>
+    <span class="label">
+        <%= inputOptions.displayName %>
+    </span>
+    <% inputOptions.choices.forEach( choice => { %>
+        <label>
+            <span class="label">
+                <%= choice.value %>
+            </span>
+            <input name="<%=inputOptions.name %>" data-columnname="<%=inputOptions.name %>" type="checkbox" value="<%= choice.value %>" <%= (choice.checked ? "checked" : "") %>>
+        </label>
+    <% }) %>
+</label>

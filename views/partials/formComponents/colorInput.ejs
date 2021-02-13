@@ -1,0 +1,6 @@
+<label>
+    <span class="label">
+        <%= inputOptions.displayName %>
+    </span>
+    <input data-columnname="<%=inputOptions.name %>" type="color" value="<%= (typeof inputOptions.defaultValue === "string" ? inputOptions.defaultValue : "") %>" <%= (inputOptions.required ? "required" : "") %>>
+</label>
