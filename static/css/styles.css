@@ -39,10 +39,10 @@ body {
 
 form input {
     height: 2.5rem;
-    padding: 0.25rem 0.75rem;
     border-radius: 0.2rem;
+    border: 1px solid #CCC;
+    padding: 0.25rem 0.75rem;
     margin: 0;
-    border-width: 0;
 }
 
 form input[type="text"],
@@ -60,6 +60,14 @@ form input[type="radio"] {
     width: 1.5rem;
 }
 
+form input[type="color"] {
+    background-color: transparent;
+}
+
+form input[data-bindto] {
+    width: 100%;
+}
+
 form input[type="submit"]:hover {
     cursor: pointer;
     background-color: #BBB;
@@ -67,4 +75,29 @@ form input[type="submit"]:hover {
 
 span.required {
     color: red;
+}
+
+footer {
+    width: 100%;
+    margin: 0;
+    padding: 1rem;
+    background-color: #B0D0E0;
+}
+
+.loadWheel {
+    position: fixed;
+    z-index: 99;
+    top: calc(50vh - 30vmin);
+    left: calc(50vw - 30vmin);
+    width: 60vmin;
+    height: 60vmin;
+    animation: load 2s linear infinite;
+    border: 16px solid #F3F3F3;
+    border-top: 16px solid #3498DB;
+    border-radius: 50%;
+}
+
+@keyframes load {
+    0% {transform: rotate(0deg);}
+    100% {transform: rotate(360deg);}
 }

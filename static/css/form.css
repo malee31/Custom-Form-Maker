@@ -49,11 +49,11 @@ label, .pseudo-label {
     display: flex;
     flex-direction: column;
     width: min(100%, 60rem);
-    background-color: #DFDFDF;
+    background-color: #FAFAFA;
     margin: .25rem 0;
     padding: .5rem;
     border-radius: .25rem;
-    border: 1px solid #BABABA;
+    border: 1px solid #EEE;
 }
 
 .inline-label {
@@ -71,4 +71,10 @@ label, .pseudo-label {
     text-align: left;
     margin: 0;
     padding: 0 .25rem;
+}
+
+.color-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }

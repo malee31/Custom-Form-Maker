@@ -2,5 +2,8 @@
     <span class="sub-label">
         <%= inputOptions.displayName %>
     </span>
-    <input data-columnname="<%=inputOptions.name %>" type="color" value="<%= (typeof inputOptions.defaultValue === "string" ? inputOptions.defaultValue : "") %>" <%= (inputOptions.required ? "required" : "") %>>
+    <span class="color-wrapper">
+        <input data-bindto="<%=inputOptions.name %>" type="text" value="<%= (typeof inputOptions.defaultValue === "string" ? inputOptions.defaultValue : "#0000000") %>" <%= (inputOptions.required ? "required" : "") %>>
+        <input data-columnname="<%=inputOptions.name %>" type="color" value="<%= (typeof inputOptions.defaultValue === "string" ? inputOptions.defaultValue : "#0000000") %>" %>>
+    </span>
 </label>

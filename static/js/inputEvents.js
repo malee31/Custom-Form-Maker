@@ -2,8 +2,21 @@ window.addEventListener("load", () => {
 	document.querySelectorAll("input[type='checkbox'], input[type='radio']").forEach(elem => {
 		elem.addEventListener("change", () => {
 			labelCheckedUpdate(elem, true);
-		})
-	})
+		});
+		labelCheckedUpdate(elem, true);
+	});
+
+	document.querySelectorAll("input[type='color']").forEach(elem => {
+		elem.addEventListener("input", event => {
+			colorSync(event.target);
+		});
+	});
+
+	document.querySelectorAll("input[data-bindto]").forEach(elem => {
+		elem.addEventListener("input", event => {
+			reverseColorSync(event.target);
+		});
+	});
 });
 
 function labelCheckedUpdate(element, rippleRadios = false) {
@@ -28,4 +41,14 @@ function labelCheckedUpdate(element, rippleRadios = false) {
 	if(rippleRadios && element.type.toUpperCase() === "RADIO") {
 		document.querySelectorAll(`input[name='${element.name}']`).forEach(elem => labelCheckedUpdate(elem));
 	}
+}
+
+function colorSync(element) {
+	document.querySelector(`input[type="text"][data-bindto="${element.dataset.columnname}"]`).value = element.value.toUpperCase();
+}
+
+function reverseColorSync(element) {
+	// TODO: Add warning/fix inputs that are invalid
+	if(!/#[0-9A-F]{6}/.test(element.value.toUpperCase())) return;
+	document.querySelector(`input[type="color"][data-columnname="${element.dataset.bindto}"]`).value = element.value.toUpperCase();
 }
