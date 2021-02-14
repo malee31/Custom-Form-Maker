@@ -16,22 +16,48 @@ body {
     min-height: 100vh;
 }
 
+/* Custom Scrollbar. Not supported for IE or Firefox */
+::-webkit-scrollbar {
+    width: .9rem;
+}
+
+::-webkit-scrollbar-track {
+    background: #EEE;
+    box-shadow: inset -.2rem 0 .1rem #DDD;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #CCC;
+    border-radius: .35rem;
+    box-shadow: inset -.2rem -.1rem #C0C0C0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #C0C0C0;
+    box-shadow: inset -.2rem -.1rem #BBB;
+}
+
 form input {
     height: 2.5rem;
     padding: 0.25rem 0.75rem;
     border-radius: 0.2rem;
-    margin: 0 0 0.5rem 0;
+    margin: 0;
     border-width: 0;
-    outline: none;
 }
 
 form input[type="text"],
 form input[type="password"] {
     width: 100%;
+    outline: none;
 }
 
-form label {
-    width: 100%;
+label.label-checked {
+    border-color: #0075FF;
+}
+
+form input[type="checkbox"],
+form input[type="radio"] {
+    width: 1.5rem;
 }
 
 form input[type="submit"]:hover {

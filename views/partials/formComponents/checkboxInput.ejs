@@ -1,13 +1,13 @@
-<label>
-    <span class="label">
+<div class="pseudo-label">
+    <span class="sub-label">
         <%= inputOptions.displayName %>
     </span>
     <% inputOptions.choices.forEach( choice => { %>
-        <label>
-            <span class="label">
+        <label class="inline-label">
+            <span class="sub-label">
                 <%= choice.value %>
             </span>
             <input name="<%=inputOptions.name %>" data-columnname="<%=inputOptions.name %>" type="checkbox" value="<%= choice.value %>" <%= (choice.checked ? "checked" : "") %>>
         </label>
     <% }) %>
-</label>
+</div>
