@@ -48,7 +48,12 @@ function colorSync(element) {
 }
 
 function reverseColorSync(element) {
-	// TODO: Add warning/fix inputs that are invalid
-	if(!/#[0-9A-F]{6}/.test(element.value.toUpperCase())) return;
+	let cleanValue = element.value.toUpperCase().replaceAll(/[^A-F0-9]/g, "");
+	element.value = `#${cleanValue.substring(cleanValue.length - 6, cleanValue.length)}`
+	if(element.value.length !== 7) {
+		element.style.borderColor = "#FF0F0F";
+		return;
+	}
+	element.style.borderColor = "";
 	document.querySelector(`input[type="color"][data-columnname="${element.dataset.bindto}"]`).value = element.value.toUpperCase();
 }

@@ -11,6 +11,9 @@
     case "checkbox": %>
         <%- include("/partials/formComponents/checkboxInput", {inputOptions}); %>
     <% break;
+    case "date": %>
+        <%- include("/partials/formComponents/dateInput", {inputOptions}); %>
+    <% break;
     case "text":
     default: %>
         <%- include("/partials/formComponents/textInput", {inputOptions}); %>

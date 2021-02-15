@@ -13,7 +13,9 @@
         </section>
         <main>
             <form name="mainForm">
-                <h1 id="fileTitle"><i><%= formData.name %></i></h1>
+                <div class="pseudo-label">
+                    <h1 id="fileTitle"><%= formData.name %></h1>
+                </div>
                 <% formData.headers.forEach( inputOptions => { %>
                     <%- include("/partials/inputField", {inputOptions}); %>
                 <% }) %>
@@ -21,7 +23,7 @@
                 <input id="formId" value="<%= formId %>" style="display: none;">
             </form>
         </main>
-        <script src="/static/js/override.js"></script>
+        <script src="/static/js/submit.js"></script>
         <script src="/static/js/inputEvents.js"></script>
     </body>
 </html>

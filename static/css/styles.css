@@ -7,11 +7,8 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #D6C0C2;
+    background: #7FB8EF linear-gradient(135deg, #98C6F3 0%, #5396CA 100%) no-repeat fixed center center;
     background-image: url("/static/img/background.jpg");
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center center;
     background-size: cover;
     min-height: 100vh;
 }
@@ -35,6 +32,10 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #C0C0C0;
     box-shadow: inset -.2rem -.1rem #BBB;
+}
+
+form h1 {
+    margin: 0;
 }
 
 form input {
@@ -66,6 +67,11 @@ form input[type="color"] {
 
 form input[data-bindto] {
     width: 100%;
+}
+
+form input[type="submit"] {
+    align-self: flex-end;
+    margin: .25rem .5rem;
 }
 
 form input[type="submit"]:hover {
