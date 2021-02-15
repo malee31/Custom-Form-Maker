@@ -44,7 +44,7 @@ function labelCheckedUpdate(element, rippleRadios = false) {
 }
 
 function colorSync(element) {
-	document.querySelector(`input[type="text"][data-bindto="${element.dataset.columnname}"]`).value = element.value.toUpperCase();
+	document.querySelector(`input[type="text"][data-bindto="${element.dataset.bindfrom}"]`).value = element.value.toUpperCase();
 }
 
 function reverseColorSync(element) {
@@ -55,5 +55,5 @@ function reverseColorSync(element) {
 		return;
 	}
 	element.style.borderColor = "";
-	document.querySelector(`input[type="color"][data-columnname="${element.dataset.bindto}"]`).value = element.value.toUpperCase();
+	document.querySelector(`input[type="color"][data-bindfrom="${element.dataset.bindto}"]`).value = element.value.toUpperCase();
 }

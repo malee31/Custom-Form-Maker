@@ -59,7 +59,7 @@ class Requirement {
 	 * @param {boolean} [ignoreEmpty = false] If true, attempting to set the value to an empty string will be ignored
 	 * @returns {string} Returns the default value set
 	 */
-	setDefaultValue(defaultValue="", ignoreEmpty=false) {
+	setDefaultValue(defaultValue = "", ignoreEmpty = false) {
 		if(!ignoreEmpty || defaultValue) this.defaultValue = defaultValue;
 		return this.defaultValue;
 	}
@@ -70,7 +70,7 @@ class Requirement {
 	 * @param {boolean} [ignoreEmpty = false] If true, attempting to set the value to an empty string will be ignored
 	 * @returns {string} Returns the name set
 	 */
-	setName(name="", ignoreEmpty=false) {
+	setName(name = "", ignoreEmpty = false) {
 		if(!ignoreEmpty || name) {
 			if(!this.displayName || this.name === this.displayName) this.displayName = name;
 			this.name = name;

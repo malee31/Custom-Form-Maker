@@ -3,7 +3,7 @@
         <%= inputOptions.displayName %>
     </span>
     <span class="color-wrapper">
-        <input data-bindto="<%=inputOptions.name %>" type="text" value="<%= (typeof inputOptions.defaultValue === "string" ? inputOptions.defaultValue : "#0000000") %>" <%= (inputOptions.required ? "required" : "") %>>
-        <input data-columnname="<%=inputOptions.name %>" type="color" value="<%= (typeof inputOptions.defaultValue === "string" ? inputOptions.defaultValue : "#0000000") %>" %>>
+        <input data-bindto="<%= inputOptions.uuid %>" type="text" <%- inputOptions.attributes.value %>>
+        <input data-bindfrom="<%= inputOptions.uuid %>" data-columnname="<%= inputOptions.name %>" type="color" <%- inputOptions.attributes.value %> <%- inputOptions.attributes.required %>>
     </span>
 </label>

@@ -1,5 +1,5 @@
 {
-	"name": "Spreadsheet Playground 2",
+	"name": "Generation Test Form",
 	"headers": [
 		{
 			"name": "name",
@@ -22,11 +22,11 @@
 			"excluded": false
 		},
 		{
-			"name": "first",
-			"displayName": "First Choice",
+			"name": "date",
+			"displayName": "Today's date",
 			"defaultValue": "",
 			"placeholderText": "",
-			"type": "text",
+			"type": "date",
 			"subtype": null,
 			"required": false,
 			"excluded": false
@@ -38,7 +38,7 @@
 			"placeholderText": "",
 			"type": "color",
 			"subtype": null,
-			"required": false,
+			"required": true,
 			"excluded": false
 		},
 		{

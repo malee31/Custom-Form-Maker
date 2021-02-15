@@ -63,6 +63,7 @@ form input[type="radio"] {
 
 form input[type="color"] {
     background-color: transparent;
+    padding: .25rem .4rem;
 }
 
 form input[data-bindto] {

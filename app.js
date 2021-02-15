@@ -3,17 +3,20 @@
  * @author Marvin Lee
  */
 
-//ExpressJS imports
+// ExpressJS imports
 const express = require('express');
 const path = require("path");
 const favicon = require('serve-favicon');
 const app = express();
 
-//Imports module imports from spreadsheet.js
+// Imports module imports from spreadsheet.js
 const sheet = require("./spreadsheet.js");
 const sheetError = require("./sheetError.js");
 
-//Allows parsing of data in requests
+// For cleaning up input data for rendering
+const cleanData = require("./renderComponentProcessor.js");
+
+// Allows parsing of data in requests
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
@@ -72,13 +75,20 @@ app.post("/redirect", (req, res) => {
 	res.redirect(`/form/${encodeURIComponent(req.body.sheetId)}/${req.body.defaultVals ? `?default=${encodeURIComponent(req.body.defaultVals)}` : ""}`);
 });
 
+const testData = require("./GenerateTest.json");
 app.get("/form/:sheetId", async(req, res) => {
-	if(req.params.sheetId.toUpperCase() === "GENERATETEST") return res.render(path.resolve(__dirname, "views/pages/form"), {formId: "N/A", formData: require("./GenerateTest.json")});
+	if(req.params.sheetId.toUpperCase() === "GENERATETEST") {
+		testData.headers = testData.headers.map(header => cleanData(header));
+		return res.render(path.resolve(__dirname, "views/pages/form"), {formId: "N/A", formData: testData});
+	}
+
 	const headers = await sheet.getHeaders(req.params.sheetId);
+	headers.headers = headers.headers.map(header => cleanData(header));
 	(req.query.default || "").split(/(?=\s*(?<=[^\\])),/).forEach((val, index) => {
 		val = val.replace(/\\,/g, ",").trim();
 		if(val && index + 1 < headers.length) headers[index + 1].defaultValue = val;
 	});
+
 	console.log(headers);
 	res.render(path.resolve(__dirname, "views/pages/form"), {formId: req.params.sheetId, formData: headers});
 });

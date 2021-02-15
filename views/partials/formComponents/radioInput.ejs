@@ -7,7 +7,7 @@
             <span class="sub-label">
                 <%= choice.value %>
             </span>
-            <input name="<%=inputOptions.name %>" data-columnname="<%=inputOptions.name %>" type="radio" value="<%= choice.value %>" <%= (choice.default ? "checked" : "") %>>
+            <input name="<%= inputOptions.name %>" data-columnname="<%= inputOptions.name %>" type="radio" <%- inputOptions.attributes.value %> <%= (choice.default ? "checked" : "") %>>
         </label>
     <% }) %>
 </div>
