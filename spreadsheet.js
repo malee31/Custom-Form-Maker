@@ -101,23 +101,7 @@ async function getRequirements(doc, keepExcluded = false) {
 }
 
 /**
- * Formats the name of the requirement headers into object keys used by the google-sheets api along with whether they are required in the form to continue.
- * @param {Object} requirements Data from getRequirements()
- * @returns {Object} Returns singular object containing sanitized column names in order
- * 	as keys and their required status as its value.
- */
-function processRequirements(requirements) {
-	const headers = {};
-	for(const headerCol of requirements.headers) {
-		if(!headerCol.excluded) {
-			headers[headerCol.name] = headerCol.required;
-		}
-	}
-	return headers;
-}
-
-/**
- * Fills a new row in the main sheet with form input after checking input. Returns 422 on failure.
+ * Fills a new row in the main sheet with form input after validating input. Rejects on fail.
  * @async
  * @param {Object} userInput JSON object containing user form input in key value pairs of sanitized header
  * 	names and inputted data.
@@ -126,21 +110,23 @@ async function fillRow(userInput) {
 	const sheets = await getWorksheets(userInput["formId"]);
 	delete userInput["formId"];
 
-	const requirements = processRequirements(await getRequirements(sheets));
+	const requirements = (await getRequirements(sheets)).headers;
 
 	for(const dataProp in userInput) {
-		if(!requirements.hasOwnProperty(dataProp)) {
+		if(!requirements.find(req => req.name === dataProp)) {
 			console.log(`Deleted ${dataProp}: ${userInput[dataProp]}`);
 			delete userInput[dataProp];
+			continue;
 		}
+
+		// Concatenates arrays from checkboxes and HTML escapes commas in values
+		if (Array.isArray(userInput[dataProp]))
+			userInput[dataProp] = userInput[dataProp].map(val => val.replace(/,/g, "&comma;")).join(",");
 	}
 
-	console.log(requirements);
-	for(const mayRequire in requirements) {
-		if(!userInput[mayRequire] && requirements[mayRequire]) {
-			return sheetError.throwErr("REQUIRED INPUT NONEXISTENT", `Required Input ${mayRequire} Missing: ${JSON.stringify(userInput)}`);
-		}
-	}
+	// Checks to make sure that all required inputs have values
+	if(!requirements.every(req => !req.required || userInput[req.name]))
+		return sheetError.throwErr("REQUIRED INPUT NONEXISTENT", `Required Inputs Missing: \nUser Input: ${JSON.stringify(userInput)} \nRequired Inputs: ${JSON.stringify(requirements)}`);
 
 	try {
 		console.log(userInput);
@@ -236,8 +222,8 @@ async function parseValue(sheet, col, row) {
  * @param {GoogleSpreadsheetWorksheet} sheet A singular worksheet from any Google Sheet
  * @param {string} searchKey The value to look for the position of before offsetting.
  * @param {number} colOffset Value to offset returned position columns by.
- * @param {string} [defaultVal = ""] Value to return in case the search key is not found.
  * @param {number} rowOffset Value to offset returned position rows by.
+ * @param {string} [defaultVal = ""] Value to return in case the search key is not found.
  * @returns {string} Value of the given cell.
  */
 async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal = "") {

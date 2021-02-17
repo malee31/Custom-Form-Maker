@@ -60,10 +60,10 @@ app.post("/submit", async(req, res) => {
 	const info = req.body;
 	console.log(info);
 	try {
-		if(info.formId === "N/A") return res.sendStatus(422);
+		// if(info.formId === "N/A") return res.sendStatus(422);
 		await sheet.newRow(info);
 		console.log("A form was successfully completed.");
-		res.send("Thank you for filling out the form!");
+		res.status(200).send("Thank you for filling out the form!");
 	} catch(err) {
 		sheetError.specificErr(err, "Adding Rows")
 		res.sendStatus(422);
