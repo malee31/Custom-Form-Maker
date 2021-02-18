@@ -51,9 +51,9 @@ function reverseColorSync(element) {
 	let cleanValue = element.value.toUpperCase().replaceAll(/[^A-F0-9]/g, "");
 	element.value = `#${cleanValue.substring(cleanValue.length - 6, cleanValue.length)}`
 	if(element.value.length !== 7) {
-		element.style.borderColor = "#FF0F0F";
+		element.classList.add("error-border");
 		return;
 	}
-	element.style.borderColor = "";
+	element.classList.remove("error-border");
 	document.querySelector(`input[type="color"][data-bindfrom="${element.dataset.bindto}"]`).value = element.value.toUpperCase();
 }

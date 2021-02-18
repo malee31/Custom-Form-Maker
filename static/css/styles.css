@@ -70,6 +70,11 @@ form input[data-bindto] {
     width: 100%;
 }
 
+form input[type="range"] {
+    padding: 0.25rem 0;
+    margin: 0 0.75rem;
+}
+
 form input[type="submit"] {
     align-self: flex-end;
     margin: .25rem .5rem;
@@ -82,6 +87,10 @@ form input[type="submit"]:hover {
 
 span.required {
     color: red;
+}
+
+.error-border {
+    border-color: #FF0F0F;
 }
 
 footer {

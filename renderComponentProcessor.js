@@ -73,11 +73,60 @@ function typeFilter(inputData, assignTo) {
 			assignTo.type = "checkbox";
 			assignTo.path = "/partials/formComponents/checkboxInput";
 			break;
+		case "datetime":
+		case "datetimelocal":
+			assignTo.type = "datetime-local";
+			assignTo.path = "/partials/formComponents/dateTimeInput";
+			break;
 		case "date":
 		case "calendar":
 			assignTo.type = "date";
 			assignTo.path = "/partials/formComponents/dateInput";
 			break;
+		case "month":
+			assignTo.type = "month";
+			assignTo.path = "/partials/formComponents/monthInput";
+			break;
+		case "week":
+			assignTo.type = "week";
+			assignTo.path = "/partials/formComponents/weekInput";
+			break;
+		case "email":
+			assignTo.type = "email";
+			assignTo.path = "/partials/formComponents/emailInput";
+			break;
+		case "telephone":
+		case "phone":
+		case "tel":
+			assignTo.type = "tel";
+			assignTo.path = "/partials/formComponents/telInput";
+			break;
+		case "website":
+		case "site":
+		case "link":
+		case "url":
+			assignTo.type = "url";
+			assignTo.path = "/partials/formComponents/urlInput";
+			break;
+		case "time":
+			assignTo.type = "time";
+			assignTo.path = "/partials/formComponents/timeInput";
+			break;
+		case "num":
+		case "number":
+		case "int":
+		case "integer":
+			assignTo.type = "number";
+			assignTo.path = "/partials/formComponents/numberInput";
+			break;
+		case "range":
+			assignTo.type = "range";
+			assignTo.path = "/partials/formComponents/rangeInput";
+			break;
+		// case "file":
+		// 	assignTo.type = "file";
+		// 	assignTo.path = "/partials/formComponents/fileInput";
+		// 	break;
 		case "text":
 		default:
 			assignTo.type = "text";
@@ -142,7 +191,7 @@ function cleanData(inputData) {
 function attributeAssembly(inputData) {
 	const attributes = {};
 	attributes.value = attributePair("value", inputData.defaultValue);
-	attributes.placeholder = attributePair("value", inputData.placeholderText);
+	attributes.placeholder = attributePair("placeholder", inputData.placeholderText);
 	attributes.required = inputData.required ? "required" : "";
 	console.log(attributes);
 	return attributes;
