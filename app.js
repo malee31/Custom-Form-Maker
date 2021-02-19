@@ -14,7 +14,7 @@ const sheet = require("./spreadsheet.js");
 const sheetError = require("./sheetError.js");
 
 // For cleaning up input data for rendering
-const cleanData = require("./renderComponentProcessor.js");
+const {cleanData, typeFilter} = require("./renderComponentProcessor.js");
 
 // Allows parsing of data in requests
 app.use(express.urlencoded({extended: true}));
@@ -91,6 +91,27 @@ app.get("/form/:sheetId", async(req, res) => {
 
 	console.log(headers);
 	res.render(path.resolve(__dirname, "views/pages/form"), {formId: req.params.sheetId, formData: headers});
+});
+
+app.get("/create", (req, res) => {
+	res.render(path.resolve(__dirname, "views/pages/create"));
+});
+
+app.get("/templates", (req, res) => {
+	const requested = {type: req.query.type};
+	if(!requested.type) return res.status(422).send("No template type requested");
+	try {
+		return res.set("Content-Type", "text/plain").sendFile(path.resolve(__dirname, "views", `${typeFilter(requested).path.substring(1)}.ejs`));
+	} catch(err) {
+		return res.status(500).send("Unable to read template. Check to see if the requested template type exists and try again later");
+	}
+	/* fs.readFile(path.resolve(__dirname, "views", `${typeFilter(requested).path.substring(1)}.ejs`), "utf8", (err, data) => {
+		if(err) {
+			console.error(err);
+			return res.status(500).send("Unable to read template. Check to see if the requested template type exists and try again later");
+		}
+		res.send(data);
+	}); */
 });
 
 // Error 404

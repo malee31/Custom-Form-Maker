@@ -1,6 +1,9 @@
 const {v4: uuidv4} = require("uuid");
 
-module.exports = cleanData;
+module.exports = {
+	cleanData,
+	typeFilter
+};
 
 /**
  * @typedef InputComponent
@@ -49,8 +52,9 @@ module.exports = cleanData;
 /**
  * Coerces input type strings into the set of available types and sets the path of partial as well.
  * Affects InputData.type and InputData.path
- * @param {RawInputData|InputData} [inputData] Object to filter types and component path of
+ * @param {RawInputData|InputData|{type: string}} [inputData] Object to filter types and component path of
  * @param {RawInputData|InputData} [assignTo = inputData] Object to assign the selected types and paths to. Defaults to inputData
+ * @returns {RawInputData|InputData|{type: string, path: string}} Returns assignTo parameter value after mutating
  */
 function typeFilter(inputData, assignTo) {
 	if(typeof assignTo !== "object") assignTo = inputData;
@@ -132,6 +136,7 @@ function typeFilter(inputData, assignTo) {
 			assignTo.type = "text";
 			assignTo.path = "/partials/formComponents/textInput";
 	}
+	return assignTo;
 }
 
 /**

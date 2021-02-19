@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <%- include("/partials/head", {title: formData.name}); %>
+        <%- include("/partials/head", {title: "Form Builder"}); %>
         <link href="/static/css/form.css" rel="stylesheet" type="text/css">
     </head>
     <body>
@@ -14,16 +14,13 @@
         <main>
             <form name="mainForm">
                 <div class="pseudo-label">
-                    <h1 id="fileTitle"><%= formData.name %></h1>
+                    <h1 id="fileTitle">Form Creation Tool</h1>
                 </div>
-                <% formData.headers.forEach( inputOptions => { %>
-                    <%- include("/partials/inputField", {inputOptions}); %>
-                <% }) %>
                 <input type="submit" value="Submit"/>
-                <input id="formId" value="<%= formId %>" style="display: none;">
             </form>
         </main>
-        <script src="/static/js/submit.js"></script>
+        <script src="/static/js/ejs.min.js"></script>
         <script src="/static/js/inputEvents.js"></script>
+        <script src="/static/js/creation.js"></script>
     </body>
 </html>
