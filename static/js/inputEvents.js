@@ -1,25 +1,22 @@
-window.addEventListener("load", () => {
+window.addEventListener("load", updateListeners);
+
+function updateListeners() {
 	document.querySelectorAll("input[type='checkbox'], input[type='radio']").forEach(elem => {
-		elem.addEventListener("change", () => {
-			labelCheckedUpdate(elem, true);
-		});
-		labelCheckedUpdate(elem, true);
+		elem.addEventListener("change", labelCheckedUpdate);
+		labelCheckedUpdate(elem);
 	});
 
 	document.querySelectorAll("input[type='color']").forEach(elem => {
-		elem.addEventListener("input", event => {
-			colorSync(event.target);
-		});
+		elem.addEventListener("input", colorSync);
 	});
 
 	document.querySelectorAll("input[data-bindto]").forEach(elem => {
-		elem.addEventListener("input", event => {
-			reverseColorSync(event.target);
-		});
+		elem.addEventListener("input", reverseColorSync);
 	});
-});
+}
 
-function labelCheckedUpdate(element, rippleRadios = false) {
+function labelCheckedUpdate(element, rippleRadios = true) {
+	element = element.target || element;
 	let elementLabel = element.parentElement;
 	while(elementLabel.tagName.toUpperCase() !== "LABEL") {
 		if(elementLabel.tagName.toUpperCase() === "BODY") {
@@ -39,15 +36,17 @@ function labelCheckedUpdate(element, rippleRadios = false) {
 	}
 
 	if(rippleRadios && element.type.toUpperCase() === "RADIO") {
-		document.querySelectorAll(`input[name='${element.name}']`).forEach(elem => labelCheckedUpdate(elem));
+		document.querySelectorAll(`input[name='${element.name}']`).forEach(elem => labelCheckedUpdate(elem, false));
 	}
 }
 
 function colorSync(element) {
+	element = element.target || element;
 	document.querySelector(`input[type="text"][data-bindto="${element.dataset.bindfrom}"]`).value = element.value.toUpperCase();
 }
 
 function reverseColorSync(element) {
+	element = element.target || element;
 	let cleanValue = element.value.toUpperCase().replaceAll(/[^A-F0-9]/g, "");
 	element.value = `#${cleanValue.substring(cleanValue.length - 6, cleanValue.length)}`
 	if(element.value.length !== 7) {

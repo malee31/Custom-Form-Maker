@@ -105,13 +105,6 @@ app.get("/templates", (req, res) => {
 	} catch(err) {
 		return res.status(500).send("Unable to read template. Check to see if the requested template type exists and try again later");
 	}
-	/* fs.readFile(path.resolve(__dirname, "views", `${typeFilter(requested).path.substring(1)}.ejs`), "utf8", (err, data) => {
-		if(err) {
-			console.error(err);
-			return res.status(500).send("Unable to read template. Check to see if the requested template type exists and try again later");
-		}
-		res.send(data);
-	}); */
 });
 
 // Error 404

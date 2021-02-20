@@ -1,0 +1,10 @@
+<form name="mainForm">
+    <div class="pseudo-label">
+        <h1 id="fileTitle"><%= formData.name %></h1>
+    </div>
+    <% formData.headers.forEach( inputOptions => { %>
+        <%- include("/partials/inputField", {inputOptions}); %>
+    <% }) %>
+    <input type="submit" value="Submit"/>
+    <input id="formId" value="<%= formId %>" style="display: none;">
+</form>
