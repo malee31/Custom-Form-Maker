@@ -16,7 +16,7 @@ function updateListeners() {
 }
 
 function labelCheckedUpdate(element, rippleRadios = true) {
-	element = element.target || element;
+	element = grabElem(element);
 	let elementLabel = element.parentElement;
 	while(elementLabel.tagName.toUpperCase() !== "LABEL") {
 		if(elementLabel.tagName.toUpperCase() === "BODY") {
@@ -41,12 +41,12 @@ function labelCheckedUpdate(element, rippleRadios = true) {
 }
 
 function colorSync(element) {
-	element = element.target || element;
+	element = grabElem(element);
 	document.querySelector(`input[type="text"][data-bindto="${element.dataset.bindfrom}"]`).value = element.value.toUpperCase();
 }
 
 function reverseColorSync(element) {
-	element = element.target || element;
+	element = grabElem(element);
 	let cleanValue = element.value.toUpperCase().replaceAll(/[^A-F0-9]/g, "");
 	element.value = `#${cleanValue.substring(cleanValue.length - 6, cleanValue.length)}`
 	if(element.value.length !== 7) {
@@ -56,3 +56,5 @@ function reverseColorSync(element) {
 	element.classList.remove("error-border");
 	document.querySelector(`input[type="color"][data-bindfrom="${element.dataset.bindto}"]`).value = element.value.toUpperCase();
 }
+
+function grabElem(elem) { return elem instanceof Event ? elem.target : elem; }
