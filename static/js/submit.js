@@ -1,4 +1,5 @@
 const mainForm = document.forms["mainForm"];
+let disableLeaveWarning = false;
 let disableSubmit = false;
 
 /**
@@ -26,10 +27,21 @@ function collectFormData(targetObject, form) {
 	}
 }
 
+function unloadHandler(event) {
+	if(disableLeaveWarning) return;
+	// Note: Modern browsers have removed the ability to add a custom message to the pop-up
+	const warningMessage = "You will lose any information you have entered.\nAre you sure you want to exit?";
+	(event || window.event).returnValue = warningMessage;
+	return warningMessage;
+}
+
 /**
  * Handles all the overriding of the mainForm.
  */
 function mainFormOverride() {
+	window.addEventListener("beforeunload", unloadHandler);
+	window.onbeforeunload = unloadHandler;
+
 	mainForm.addEventListener("submit", event => {
 		event.preventDefault();
 		if(disableSubmit) return;
@@ -46,6 +58,7 @@ function mainFormOverride() {
 
 			toggleLoader(false);
 			disableSubmit = false;
+			disableLeaveWarning = true;
 
 			toggleErrorBox(true, event.target.status === 200 ? "Thank You!" : ("Status code " + event.target.status), event.target.responseText);
 		});

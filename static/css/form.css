@@ -64,3 +64,18 @@ form {
     flex-direction: row;
     justify-content: center;
 }
+
+/* Used together with JS to pad the bottom of the page for the URL bar.
+   Works as intended on browsers with URL bars on the bottom of the screen but adds a bit of (acceptable) unnecessary padding to browsers with URL bars on the top (Most of them)
+   Check mobileResize.js for the 3 lines of code and form.ejs for the two empty divs with the ids "control" and "pad" */
+#control {
+    width:0;
+    height: 100vh;
+    position: absolute;
+    transition: none;
+}
+
+#pad {
+    width: 100%;
+    max-height: 10vmin;
+}
