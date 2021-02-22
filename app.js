@@ -9,6 +9,10 @@ const path = require("path");
 const favicon = require('serve-favicon');
 const app = express();
 
+// Handle Multipart Form Data
+const multer = require("multer");
+const upload = multer({dest: "uploads/"});
+
 // Imports module imports from spreadsheet.js
 const sheet = require("./spreadsheet.js");
 const sheetError = require("./sheetError.js");
@@ -56,7 +60,7 @@ app.post("/", (req, res) => {
 	}
 });
 
-app.post("/submit", async(req, res) => {
+app.post("/submit", upload.any(), async(req, res) => {
 	const info = req.body;
 	console.log(info);
 	try {
@@ -77,7 +81,7 @@ app.post("/redirect", (req, res) => {
 
 const testData = require("./GenerateTest.json");
 app.get("/form/:sheetId", async(req, res) => {
-	if(req.params.sheetId.toUpperCase() === "GENERATETEST") {
+	if(req.params.sheetId.replace(/\W/g, "").toUpperCase() === "GENERATETEST") {
 		testData.headers = testData.headers.map(header => cleanData(header));
 		return res.render(path.resolve(__dirname, "views/pages/form"), {formId: "N/A", formData: testData});
 	}
