@@ -127,10 +127,11 @@ function typeFilter(inputData, assignTo) {
 			assignTo.type = "range";
 			assignTo.path = "/partials/formComponents/rangeInput";
 			break;
-		// case "file":
-		// 	assignTo.type = "file";
-		// 	assignTo.path = "/partials/formComponents/fileInput";
-		// 	break;
+		case "file":
+		case "upload":
+			assignTo.type = "file";
+			assignTo.path = "/partials/formComponents/fileInput";
+			break;
 		case "text":
 		default:
 			assignTo.type = "text";

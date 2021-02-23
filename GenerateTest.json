@@ -186,7 +186,7 @@
 			"placeholderText": "",
 			"type": "file",
 			"subtype": null,
-			"required": true,
+			"required": false,
 			"excluded": false
 		}
 	]

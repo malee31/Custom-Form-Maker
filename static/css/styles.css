@@ -55,7 +55,7 @@ form h1 {
     margin: 0;
 }
 
-form input {
+form input, .file-label {
     height: 2.5rem;
     border-radius: 0.2rem;
     border: 1px solid #CCC;
@@ -90,6 +90,10 @@ form input[data-bindto] {
 form input[type="range"] {
     padding: 0.25rem 0;
     margin: 0 0.75rem;
+}
+
+form input[type="file"] {
+    display: none;
 }
 
 form input[type="submit"] {

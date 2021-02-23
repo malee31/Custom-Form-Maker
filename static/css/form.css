@@ -59,6 +59,25 @@ form {
     padding: 0 .25rem;
 }
 
+.file-label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-sub-label {
+    text-align: center;
+}
+
+.file-label:hover {
+    border-color: #0075FF;
+}
+
+.file-label {
+    width: 100%;
+}
+
 .color-wrapper {
     display: flex;
     flex-direction: row;

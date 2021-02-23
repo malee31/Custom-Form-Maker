@@ -81,7 +81,7 @@ app.post("/redirect", (req, res) => {
 
 const testData = require("./GenerateTest.json");
 app.get("/form/:sheetId", async(req, res) => {
-	if(req.params.sheetId.replace(/\W/g, "").toUpperCase() === "GENERATETEST") {
+	if(req.params.sheetId.replace(/\W|\d|_/g, "").toUpperCase() === "GENERATETEST") {
 		testData.headers = testData.headers.map(header => cleanData(header));
 		return res.render(path.resolve(__dirname, "views/pages/form"), {formId: "N/A", formData: testData});
 	}
