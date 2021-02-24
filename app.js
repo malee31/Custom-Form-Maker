@@ -63,8 +63,9 @@ app.post("/", (req, res) => {
 app.post("/submit", upload.any(), async(req, res) => {
 	const info = req.body;
 	console.log(info);
+	console.log(req.files);
 	try {
-		// if(info.formId === "N/A") return res.sendStatus(422);
+		if(info.formId === "N/A") return res.sendStatus(422);
 		await sheet.newRow(info);
 		console.log("A form was successfully completed.");
 		res.status(200).send("Thank you for filling out the form!");
@@ -79,13 +80,14 @@ app.post("/redirect", (req, res) => {
 	res.redirect(`/form/${encodeURIComponent(req.body.sheetId)}/${req.body.defaultVals ? `?default=${encodeURIComponent(req.body.defaultVals)}` : ""}`);
 });
 
-const testData = require("./GenerateTest.json");
-app.get("/form/:sheetId", async(req, res) => {
-	if(req.params.sheetId.replace(/\W|\d|_/g, "").toUpperCase() === "GENERATETEST") {
-		testData.headers = testData.headers.map(header => cleanData(header));
-		return res.render(path.resolve(__dirname, "views/pages/form"), {formId: "N/A", formData: testData});
-	}
+const allTestData = require("./GenerateTest.json");
+app.get("/test/:testMode?", (req, res) => {
+	const testData = allTestData[req.params.testMode] || allTestData.full;
+	testData.headers = testData.headers.map(header => cleanData(header));
+	return res.render(path.resolve(__dirname, "views/pages/form"), {formId: "N/A", formData: testData});
+});
 
+app.get("/form/:sheetId", async(req, res) => {
 	const headers = await sheet.getHeaders(req.params.sheetId);
 	headers.headers = headers.headers.map(header => cleanData(header));
 	(req.query.default || "").split(/(?=\s*(?<=[^\\])),/).forEach((val, index) => {

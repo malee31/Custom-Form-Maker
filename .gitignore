@@ -10,6 +10,9 @@ node_modules/
 #JSDoc
 docs/
 
+#uploaded files
+uploads/*
+
 #dev files
 output.txt
 

@@ -4,28 +4,35 @@ let disableSubmit = false;
 
 /**
  * Collects all the data from form elements and assigns them to an object
- * @param {FormData} targetObject Object reference to assign the form data to
+ * @param {FormData} formData Object reference to assign the form data to
  * @param {HTMLFormElement} form The form to collect data from
  */
-function collectFormData(targetObject, form) {
+function collectFormData(formData, form) {
 	for(const input of form.querySelectorAll("input")) {
-		if(!input.dataset.columnname || targetObject.get(input.dataset.columnname)) continue;
-		if(input.type === "checkbox") {
-		// 	targetObject[input.dataset.columnname] = [];
-			form.querySelectorAll(`input[type="checkbox"][name=${input.name}]`)
-				.forEach(item => {
-					if(item.checked) targetObject.append(input.dataset.columnname, item.value);
-				});
-		} else if(input.type === "radio") {
-			form.querySelectorAll(`input[type="radio"][name=${input.name}]`)
-				.forEach(item => {
-					if(item.checked) targetObject.set(input.dataset.columnname, item.value);
-				});
-		} else {
-			targetObject.set(input.dataset.columnname, input.value);
+		if(!input.dataset.columnname || formData.get(input.dataset.columnname)) continue;
+		switch(input.type) {
+			case "checkbox":
+				// targetObject[input.dataset.columnname] = [];
+				form.querySelectorAll(`input[type="checkbox"][name=${input.name}]`)
+					.forEach(item => {
+						if(item.checked) formData.append(input.dataset.columnname, item.value);
+					});
+				break;
+			case "radio":
+				form.querySelectorAll(`input[type="radio"][name=${input.name}]`)
+					.forEach(item => {
+						if(item.checked) formData.set(input.dataset.columnname, item.value);
+					});
+				break;
+			case "file":
+				// TODO
+				formData.set(input.dataset.columnname, input.files[0]);
+				break;
+			default:
+				formData.set(input.dataset.columnname, input.value);
 		}
 	}
-	console.log(targetObject);
+	console.log(formData);
 }
 
 function unloadHandler(event) {
@@ -82,4 +89,4 @@ function mainFormOverride() {
 }
 
 // Overrides all the forms and handles redirects once the window loads.
-window.addEventListener("load", mainFormOverride);
+window.addEventListener("load", mainFormOverride)
