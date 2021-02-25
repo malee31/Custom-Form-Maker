@@ -1,3 +1,5 @@
+// TODO: Add validation for file inputs since making hidden fields required throws an error
+
 window.addEventListener("load", updateListeners);
 
 function updateListeners() {

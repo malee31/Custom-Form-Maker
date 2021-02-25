@@ -201,6 +201,18 @@
 				"defaultValue": "",
 				"placeholderText": "",
 				"type": "file",
+				"allowMultiple": true,
+				"subtype": null,
+				"required": true,
+				"excluded": false
+			},
+			{
+				"name": "single",
+				"displayName": "Attach Single File",
+				"defaultValue": "",
+				"placeholderText": "",
+				"type": "file",
+				"allowMultiple": false,
 				"subtype": null,
 				"required": false,
 				"excluded": false

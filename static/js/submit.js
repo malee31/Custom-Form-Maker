@@ -26,7 +26,10 @@ function collectFormData(formData, form) {
 				break;
 			case "file":
 				// TODO
-				formData.set(input.dataset.columnname, input.files[0]);
+				for(const attachedFile of input.files) {
+					console.log(attachedFile);
+					formData.append(input.dataset.columnname, attachedFile);
+				}
 				break;
 			default:
 				formData.set(input.dataset.columnname, input.value);

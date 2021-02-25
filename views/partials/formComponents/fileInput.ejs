@@ -4,6 +4,7 @@
     </span>
     <label class="file-label">
         <span class="sub-label file-sub-label">Upload</span>
-        <input data-columnname="<%= inputOptions.name %>" type="file" <%- inputOptions.attributes.value %> <%- inputOptions.attributes.placeholder %> <%- inputOptions.attributes.required %>>
+        <!-- TODO: Create a function to handle validation on file inputs instead of "required" since it throws an error -->
+        <input data-columnname="<%= inputOptions.name %>" type="file" <%- inputOptions.attributes.value %> <%- inputOptions.attributes.multiple %> <%- inputOptions.attributes.required %>>
     </label>
 </div>
