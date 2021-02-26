@@ -1,140 +1,140 @@
 * {
-    font-family: arial, times, sans-serif;
-    box-sizing: border-box;
-    transition-duration: 0.5s;
+	font-family: arial, times, sans-serif;
+	box-sizing: border-box;
+	transition-duration: 0.5s;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    background: #7FB8EF linear-gradient(135deg, #98C6F3 0%, #5396CA 100%) no-repeat fixed center center;
-    background-image: url("/static/img/background.jpg");
-    background-size: cover;
-    min-height: 100vh;
+	margin: 0;
+	padding: 0;
+	background: #7FB8EF linear-gradient(135deg, #98C6F3 0%, #5396CA 100%) no-repeat fixed center center;
+	background-image: url("/static/img/background.jpg");
+	background-size: cover;
+	min-height: 100vh;
 }
 
 /* Custom Scrollbar. Not supported for IE or Firefox */
 ::-webkit-scrollbar {
-    width: .9rem;
+	width: .9rem;
 }
 
 ::-webkit-scrollbar-track {
-    background: #EEE;
-    box-shadow: inset -.2rem 0 .1rem #DDD;
+	background: #EEE;
+	box-shadow: inset -.2rem 0 .1rem #DDD;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #CCC;
-    border-radius: .35rem;
-    box-shadow: inset -.2rem -.1rem #C0C0C0;
+	background: #CCC;
+	border-radius: .35rem;
+	box-shadow: inset -.2rem -.1rem #C0C0C0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #C0C0C0;
-    box-shadow: inset -.2rem -.1rem #BBB;
+	background: #C0C0C0;
+	box-shadow: inset -.2rem -.1rem #BBB;
 }
 
 .floatBox {
-    position: fixed;
-    z-index: 2;
-    top: 50%;
-    left: 50%;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    justify-content: center;
-    width: 60vw;
-    height: 50vh;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    border-radius: .5rem;
-    background-color: #EEE;
+	position: fixed;
+	z-index: 2;
+	top: 50%;
+	left: 50%;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	justify-content: center;
+	width: 60vw;
+	height: 50vh;
+	transform: translate(-50%, -50%);
+	text-align: center;
+	border-radius: .5rem;
+	background-color: #EEE;
 }
 
 form h1 {
-    margin: 0;
+	margin: 0;
 }
 
 form input, .file-label {
-    height: 2.5rem;
-    border-radius: 0.2rem;
-    border: 1px solid #CCC;
-    padding: 0.25rem 0.75rem;
-    margin: 0;
+	height: 2.5rem;
+	border-radius: 0.2rem;
+	border: 1px solid #CCC;
+	padding: 0.25rem 0.75rem;
+	margin: 0;
 }
 
 form input[type="text"],
 form input[type="password"] {
-    width: 100%;
-    outline: none;
+	width: 100%;
+	outline: none;
 }
 
 label.label-checked {
-    border-color: #0075FF;
+	border-color: #0075FF;
 }
 
 form input[type="checkbox"],
 form input[type="radio"] {
-    width: 1.5rem;
+	width: 1.5rem;
 }
 
 form input[type="color"] {
-    background-color: transparent;
-    padding: .25rem .4rem;
+	background-color: transparent;
+	padding: .25rem .4rem;
 }
 
 form input[data-bindto] {
-    width: 100%;
+	width: 100%;
 }
 
 form input[type="range"] {
-    padding: 0.25rem 0;
-    margin: 0 0.75rem;
+	padding: 0.25rem 0;
+	margin: 0 0.75rem;
 }
 
 form input[type="file"] {
-    display: none;
+	display: none;
 }
 
 form input[type="submit"] {
-    align-self: flex-end;
-    margin: .25rem .5rem;
+	align-self: flex-end;
+	margin: .25rem .5rem;
 }
 
 form input[type="submit"]:hover {
-    cursor: pointer;
-    background-color: #BBB;
+	cursor: pointer;
+	background-color: #BBB;
 }
 
 span.required {
-    color: red;
+	color: red;
 }
 
 .error-border {
-    border-color: #FF0F0F;
+	border-color: #FF0F0F;
 }
 
 footer {
-    width: 100%;
-    margin: 0;
-    padding: 1rem;
-    background-color: #B0D0E0;
+	width: 100%;
+	margin: 0;
+	padding: 1rem;
+	background-color: #B0D0E0;
 }
 
 .loadWheel {
-    position: fixed;
-    z-index: 99;
-    top: calc(50vh - 30vmin);
-    left: calc(50vw - 30vmin);
-    width: 60vmin;
-    height: 60vmin;
-    animation: load 2s linear infinite;
-    border: 16px solid #F3F3F3;
-    border-top: 16px solid #3498DB;
-    border-radius: 50%;
+	position: fixed;
+	z-index: 99;
+	top: calc(50vh - 30vmin);
+	left: calc(50vw - 30vmin);
+	width: 60vmin;
+	height: 60vmin;
+	animation: load 2s linear infinite;
+	border: 16px solid #F3F3F3;
+	border-top: 16px solid #3498DB;
+	border-radius: 50%;
 }
 
 @keyframes load {
-    0% {transform: rotate(0deg);}
-    100% {transform: rotate(360deg);}
+	0% {transform: rotate(0deg);}
+	100% {transform: rotate(360deg);}
 }

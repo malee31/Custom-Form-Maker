@@ -187,7 +187,9 @@ function cleanData(inputData) {
 	if(inputData.choices) cleanData.choices = inputData.choices;
 	cleanData.attributes = attributeAssembly(inputData);
 	// TODO: Add formal way of adding component specific config. This is a stop-gap for allowing multiple files for fileInputs
+	console.log(inputData.allowMultiple)
 	if(inputData.allowMultiple === true) cleanData.attributes.multiple = "multiple";
+	// console.log(cleanData);
 	return cleanData;
 }
 

@@ -82,8 +82,11 @@ app.post("/redirect", (req, res) => {
 
 const allTestData = require("./GenerateTest.json");
 app.get("/test/:testMode?", (req, res) => {
-	const testData = allTestData[req.params.testMode] || allTestData.full;
-	testData.headers = testData.headers.map(header => cleanData(header));
+	let testData = allTestData[req.params.testMode] || allTestData.full;
+	testData = {
+		name: testData.name,
+		headers: testData.headers.map(header => cleanData(header))
+	};
 	return res.render(path.resolve(__dirname, "views/pages/form"), {formId: "N/A", formData: testData});
 });
 

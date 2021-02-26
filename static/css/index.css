@@ -1,22 +1,22 @@
 body {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
 
 form {
-    text-align: center;
-    font-size: 1.5rem;
-    background-color: #FAFAFA;
-    padding: 1rem 3rem;
-    border-radius: 0.25rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+	text-align: center;
+	font-size: 1.5rem;
+	background-color: #FAFAFA;
+	padding: 1rem 3rem;
+	border-radius: 0.25rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
 
 form h3 {
-    margin: 0 0 0.5rem;
+	margin: 0 0 0.5rem;
 }

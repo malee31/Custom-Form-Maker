@@ -15,6 +15,10 @@ function updateListeners() {
 	document.querySelectorAll("input[data-bindto]").forEach(elem => {
 		elem.addEventListener("input", reverseColorSync);
 	});
+
+	document.querySelectorAll("input[type='file']").forEach(elem => {
+		elem.addEventListener("change", filePreviewSync);
+	});
 }
 
 function labelCheckedUpdate(element, rippleRadios = true) {
@@ -59,4 +63,40 @@ function reverseColorSync(element) {
 	document.querySelector(`input[type="color"][data-bindfrom="${element.dataset.bindto}"]`).value = element.value.toUpperCase();
 }
 
-function grabElem(elem) { return elem instanceof Event ? elem.target : elem; }
+const fileTypes = ["image/apng", "image/bmp", "image/gif", "image/jpeg", "image/pjpeg", "image/png", "image/svg+xml", "image/tiff", "image/webp", "image/x-icon"];
+function filePreviewSync(element) {
+	element = grabElem(element);
+	const preview = document.querySelector(`div[data-bindto="${element.dataset.bindfrom}"]`);
+	while(preview.firstChild) {
+		// TODO: Properly release memory with URL.revokeObjectURL()
+		preview.removeChild(preview.firstChild);
+	}
+
+	for(const file of element.files) {
+		const filePreview = document.createElement('div');
+		filePreview.classList.add("file-preview-item");
+		const previewText = document.createElement("p");
+		previewText.classList.add("file-preview-text");
+		previewText.textContent = `${file.name} [${fileSize(file.size)}]`;
+
+		if(fileTypes.includes(file.type)) {
+			const previewImage = document.createElement("img");
+			previewImage.classList.add("file-preview-image");
+			previewImage.src = URL.createObjectURL(file);
+			filePreview.appendChild(previewImage);
+		}
+
+		filePreview.appendChild(previewText);
+		preview.appendChild(filePreview);
+	}
+}
+
+function fileSize(bytes) {
+	if(bytes < 1024) return `${bytes} bytes`;
+	else if(bytes >= 1024 && bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+	else if(bytes >= 1048576) return `${(bytes / 1048576).toFixed(1)} MB`;
+}
+
+function grabElem(elem) {
+	return elem instanceof Event ? elem.target : elem;
+}
