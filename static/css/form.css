@@ -85,6 +85,12 @@ form {
 	flex-wrap: nowrap;
 	overflow-x: auto;
 	width: 100%;
+	padding: .5rem;
+}
+
+.file-preview-hide {
+	height: 0;
+	padding: 0;
 }
 
 .file-preview-item {
@@ -92,6 +98,9 @@ form {
 	max-width: 30vmin;
 	max-height: 30vmin;
 	overflow-y: auto;
+	border: 1px solid #CCC;
+	border-radius: .25rem;
+	padding: .25rem;
 }
 
 .file-preview-image {

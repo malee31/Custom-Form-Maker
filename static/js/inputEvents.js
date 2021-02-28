@@ -67,17 +67,21 @@ const fileTypes = ["image/apng", "image/bmp", "image/gif", "image/jpeg", "image/
 function filePreviewSync(element) {
 	element = grabElem(element);
 	const preview = document.querySelector(`div[data-bindto="${element.dataset.bindfrom}"]`);
+	preview.classList.remove("file-preview-hide");
 	while(preview.firstChild) {
 		// TODO: Properly release memory with URL.revokeObjectURL()
 		preview.removeChild(preview.firstChild);
 	}
 
+	if(element.files.length === 0) preview.classList.add("file-preview-hide");
 	for(const file of element.files) {
 		const filePreview = document.createElement('div');
 		filePreview.classList.add("file-preview-item");
+		filePreview.title = file.name;
 		const previewText = document.createElement("p");
 		previewText.classList.add("file-preview-text");
 		previewText.textContent = `${file.name} [${fileSize(file.size)}]`;
+		filePreview.appendChild(previewText);
 
 		if(fileTypes.includes(file.type)) {
 			const previewImage = document.createElement("img");
@@ -86,7 +90,6 @@ function filePreviewSync(element) {
 			filePreview.appendChild(previewImage);
 		}
 
-		filePreview.appendChild(previewText);
 		preview.appendChild(filePreview);
 	}
 }

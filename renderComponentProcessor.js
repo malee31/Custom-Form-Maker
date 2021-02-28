@@ -47,6 +47,7 @@ module.exports = {
  * @property {string} value Assembled from InputData.defaultValue
  * @property {string} placeholder Assembled from InputData.placeholderValue
  * @property {string} required Assembled from InputData.required
+ * @property {string} multiple Assembled from InputData.allowMultiple. Used for file inputs
  */
 
 /**
@@ -186,10 +187,6 @@ function cleanData(inputData) {
 	cleanData.required = Boolean(inputData.required);
 	if(inputData.choices) cleanData.choices = inputData.choices;
 	cleanData.attributes = attributeAssembly(inputData);
-	// TODO: Add formal way of adding component specific config. This is a stop-gap for allowing multiple files for fileInputs
-	console.log(inputData.allowMultiple)
-	if(inputData.allowMultiple === true) cleanData.attributes.multiple = "multiple";
-	// console.log(cleanData);
 	return cleanData;
 }
 
@@ -203,6 +200,8 @@ function attributeAssembly(inputData) {
 	attributes.value = attributePair("value", inputData.defaultValue);
 	attributes.placeholder = attributePair("placeholder", inputData.placeholderText);
 	attributes.required = inputData.required ? "required" : "";
+	// TODO: Add formal way of adding component specific config. This is a stop-gap for allowing multiple files for fileInputs
+	attributes.multiple = inputData.allowMultiple === true ? "multiple" : "";
 	console.log(attributes);
 	return attributes;
 }
