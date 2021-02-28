@@ -120,7 +120,7 @@ async function fillRow(userInput) {
 		}
 
 		// Concatenates arrays from checkboxes and HTML escapes commas in values
-		if (Array.isArray(userInput[dataProp]))
+		if(Array.isArray(userInput[dataProp]))
 			userInput[dataProp] = userInput[dataProp].map(val => val.replace(/,/g, "&comma;")).join(",");
 	}
 

@@ -64,6 +64,7 @@ function reverseColorSync(element) {
 }
 
 const fileTypes = ["image/apng", "image/bmp", "image/gif", "image/jpeg", "image/pjpeg", "image/png", "image/svg+xml", "image/tiff", "image/webp", "image/x-icon"];
+
 function filePreviewSync(element) {
 	element = grabElem(element);
 	const preview = document.querySelector(`div[data-bindto="${element.dataset.bindfrom}"]`);

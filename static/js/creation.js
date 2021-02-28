@@ -14,13 +14,13 @@ window.addEventListener("load", () => {
 const form = document.querySelector("form");
 const insertBefore = document.querySelector("input[type='submit']");
 
-function parseHTMLString(HTMLString="") {
-	const mockDOM = document.createElement( "body" );
+function parseHTMLString(HTMLString = "") {
+	const mockDOM = document.createElement("body");
 	mockDOM.innerHTML = HTMLString;
 	return mockDOM.childNodes;
 }
 
-function insertRendered(renderedString="") {
+function insertRendered(renderedString = "") {
 	const insertList = parseHTMLString(renderedString);
 	while(insertList.length) form.insertBefore(insertList[0], insertBefore);
 }
@@ -39,6 +39,7 @@ function makeData() {
 }
 
 const loadedTemplates = {};
+
 async function requestTemplate(templateType) {
 	if(!loadedTemplates[templateType]) {
 		const request = new XMLHttpRequest();
