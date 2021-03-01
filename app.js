@@ -12,16 +12,7 @@ const app = express();
 // Handle Multipart Form Data
 const multer = require("multer");
 const upload = multer({
-	dest: path.resolve(__dirname, "uploads"),
-	fileFilter: (req, file, cb) => {
-		// Can filter by mime type here but size has to be handled after downloading due to multer limitations
-		// console.log(req.headers);
-		cb(null, true);
-		// Reject File
-		// cb(null, false);
-		// Error
-		// cb(new Error("File Error"));
-	}
+	dest: path.resolve(__dirname, "uploads")
 });
 
 // Imports module imports from spreadsheet.js
@@ -72,10 +63,14 @@ app.post("/", (req, res) => {
 });
 
 app.post("/submit", upload.any(), async(req, res) => {
-	const info = req.body;
-	console.log("Submitted");
-	console.log(info);
-	console.log(req.files);
+	const info = Object.assign({}, req.body);
+	console.log("Submission Received");
+	req.files.forEach(fileObj => {
+		const objCopy = Object.assign({}, fileObj);
+		objCopy.type = "file";
+		info[objCopy.fieldname] = objCopy;
+	});
+	// console.log(info);
 	try {
 		if(info.formId === "N/A") return res.sendStatus(422);
 		await sheet.newRow(info);
