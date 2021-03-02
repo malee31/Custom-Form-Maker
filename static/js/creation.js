@@ -1,18 +1,39 @@
 console.log("Creation script attached");
 
+const form = document.forms["mainForm"];
+const creationOverlay = document.getElementById("creation-overlay");
+const creationInputs = {
+	template: creationOverlay.querySelector("#template-type"),
+	labelValue: creationOverlay.querySelector("#label-value"),
+	defaultValue: creationOverlay.querySelector("#default-value"),
+	placeholder: creationOverlay.querySelector("#placeholder-text")
+};
 const GeneratedData = {
 	name: "Custom Form",
 	headers: []
 };
 
 window.addEventListener("load", () => {
-	document.querySelectorAll("form").forEach(form => {
-		form.addEventListener("submit", e => e.preventDefault());
-	});
+	creationOverlay.addEventListener("submit", createToolOverride);
+	form.addEventListener("submit", e => e.preventDefault());
 });
 
-const form = document.querySelector("form");
-const insertBefore = document.querySelector("input[type='submit']");
+function createToolOverride(e) {
+	e.preventDefault();
+	requestTemplate(creationInputs.template.value).then(template => {
+		console.log("Template received");
+		const data = makeData();
+		data.displayName = creationInputs.labelValue.value;
+		data.type = creationInputs.template.value.toLowerCase();
+		data.attributes.placeholder = `placeholder='${creationInputs.placeholder.value}'`;
+		data.attributes.value = `value='${creationInputs.defaultValue.value}'`;
+		insertRendered(ejs.render(template, {inputOptions: data}));
+		console.log("Rendered");
+		GeneratedData.headers.push(data);
+	});
+	console.log("Add");
+}
+
 
 function parseHTMLString(HTMLString = "") {
 	const mockDOM = document.createElement("body");
@@ -22,7 +43,7 @@ function parseHTMLString(HTMLString = "") {
 
 function insertRendered(renderedString = "") {
 	const insertList = parseHTMLString(renderedString);
-	while(insertList.length) form.insertBefore(insertList[0], insertBefore);
+	while(insertList.length) form.append(insertList[0]);
 }
 
 function makeData() {

@@ -3,6 +3,7 @@
     <head>
         <%- include("/partials/head", {title: "Form Builder"}); %>
         <link href="/static/css/form.css" rel="stylesheet" type="text/css">
+        <link href="/static/css/create.css" rel="stylesheet" type="text/css">
     </head>
     <body>
         <%- include("/partials/loader") %>
@@ -16,8 +17,18 @@
                 <div class="pseudo-label">
                     <h1 id="fileTitle">Form Creation Tool</h1>
                 </div>
-                <input type="submit" value="Submit"/>
             </form>
+            <section id="creation-overlay-container">
+                <form id="creation-overlay">
+                    <div id="creation-overlay-controls">
+                        <input type="text" placeholder="Question Type" id="template-type">
+                        <input type="submit" value="Add">
+                    </div>
+                    <input type="text" placeholder="Label" id="label-value">
+                    <input type="text" placeholder="Default Value" id="default-value">
+                    <input type="text" placeholder="Placeholder" id="placeholder-text">
+                </form>
+            </section>
         </main>
         <script src="/static/js/ejs.min.js"></script>
         <script src="/static/js/errorBox.js"></script>
