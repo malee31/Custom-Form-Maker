@@ -1,6 +1,4 @@
-const {v4: uuidv4} = require("uuid");
-
-module.exports = {
+if(typeof module !== "undefined") module.exports = {
 	cleanData,
 	typeFilter
 };
@@ -169,9 +167,10 @@ const copyProps = ["name", "required", "defaultValue", "placeholderText", "choic
 /**
  * Cleans up raw input data and sets defaults for their properties
  * @param {RawInputData} inputData Data to be cleaned up and assigned an id and other information
+ * @param {string} [uuid = ""] Unique ID to assign to data
  * @returns {InputData} The resulting data
  */
-function cleanData(inputData) {
+function cleanData(inputData, uuid = "") {
 	if(typeof inputData !== "object") {
 		console.warn(inputData);
 		throw "Input data is not an object";
@@ -183,7 +182,7 @@ function cleanData(inputData) {
 	}
 	typeFilter(inputData, cleanData);
 	cleanData.displayName = inputData.displayName || inputData.name || "";
-	cleanData.uuid = uuidv4();
+	cleanData.uuid = uuid;
 	cleanData.required = Boolean(inputData.required);
 	if(inputData.choices) cleanData.choices = inputData.choices;
 	cleanData.attributes = attributeAssembly(inputData);

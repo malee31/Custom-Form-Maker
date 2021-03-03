@@ -18,17 +18,26 @@ window.addEventListener("load", () => {
 	form.addEventListener("submit", e => e.preventDefault());
 });
 
+let uuidCount = 0;
+
+function uuidCounter() {
+	return "" + uuidCount++;
+}
+
 function createToolOverride(e) {
 	e.preventDefault();
 	requestTemplate(creationInputs.template.value).then(template => {
 		console.log("Template received");
-		const data = makeData();
+		let data = makeData();
 		data.displayName = creationInputs.labelValue.value;
-		data.type = creationInputs.template.value.toLowerCase();
-		data.attributes.placeholder = `placeholder='${creationInputs.placeholder.value}'`;
-		data.attributes.value = `value='${creationInputs.defaultValue.value}'`;
+		data.type = creationInputs.template.value;
+		typeFilter({type: creationInputs.template.value});
+		data.placeholderText = creationInputs.placeholder.value;
+		data.defaultValue = creationInputs.defaultValue.value;
+		data = cleanData(data, uuidCounter());
 		insertRendered(ejs.render(template, {inputOptions: data}));
 		console.log("Rendered");
+		updateListeners();
 		GeneratedData.headers.push(data);
 	});
 	console.log("Add");

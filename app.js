@@ -20,7 +20,7 @@ const sheet = require("./spreadsheet.js");
 const sheetError = require("./sheetError.js");
 
 // For cleaning up input data for rendering
-const {cleanData, typeFilter} = require("./renderComponentProcessor.js");
+const {cleanData, typeFilter} = require("./serverDataProcessor.js");
 
 // Allows parsing of data in requests
 app.use(express.urlencoded({extended: true}));
@@ -32,6 +32,7 @@ app.set('view options', {root: path.resolve(__dirname, "views")});
 
 //Serves static file like local js and css
 app.use("/static", express.static(path.resolve(__dirname, "static")));
+app.use("/shared", express.static(path.resolve(__dirname, "shared")));
 app.use(favicon(path.resolve(__dirname, "static/img/favicon.ico")));
 
 // Renders HTML file when the page is accessed
