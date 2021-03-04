@@ -28,14 +28,18 @@ function createToolOverride(e) {
 	e.preventDefault();
 	requestTemplate(creationInputs.template.value).then(template => {
 		console.log("Template received");
-		let data = makeData();
+		const data = makeData();
 		data.displayName = creationInputs.labelValue.value;
 		data.type = creationInputs.template.value;
-		typeFilter({type: creationInputs.template.value});
+		typeFilter(data);
 		data.placeholderText = creationInputs.placeholder.value;
 		data.defaultValue = creationInputs.defaultValue.value;
-		data = cleanData(data, uuidCounter());
-		insertRendered(ejs.render(template, {inputOptions: data}));
+		const rendered = parseHTMLString(ejs.render(template, {inputOptions: cleanData(data, uuidCounter())}));
+		const renderWrapper = createRenderWrapper();
+		while(rendered.length) {
+			renderWrapper.prepend(attachEditListener(rendered[0], renderWrapper.querySelector(".edit-controls"), renderWrapper));
+		}
+		form.append(renderWrapper);
 		console.log("Rendered");
 		updateListeners();
 		GeneratedData.headers.push(data);
@@ -43,6 +47,38 @@ function createToolOverride(e) {
 	console.log("Add");
 }
 
+function attachEditListener(previewRender, editControls, wrapper) {
+	previewRender.addEventListener("click", e => {
+		if(!wrapper.classList.contains("edit-mode")) {
+			wrapper.classList.add("edit-mode");
+			editControls.classList.remove("dimensionless");
+		}
+	});
+
+	return previewRender;
+}
+
+function createRenderWrapper() {
+	const wrapper = document.createElement("div");
+	wrapper.classList.add("render-wrapper");
+
+	const editControls = document.createElement("div");
+	editControls.classList.add("edit-controls", "pseudo-label", "dimensionless");
+	wrapper.append(editControls);
+
+	const closeEditorButton = document.createElement("button");
+	closeEditorButton.classList.add("close-editor-button");
+	closeEditorButton.type = "button";
+	closeEditorButton.innerText = "Close Editor";
+	editControls.append(closeEditorButton);
+
+	closeEditorButton.addEventListener("click", e => {
+		wrapper.classList.remove("edit-mode");
+		editControls.classList.add("dimensionless");
+	});
+
+	return wrapper;
+}
 
 function parseHTMLString(HTMLString = "") {
 	const mockDOM = document.createElement("body");
