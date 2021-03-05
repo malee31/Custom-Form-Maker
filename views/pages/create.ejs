@@ -21,7 +21,24 @@
             <section id="creation-overlay-container">
                 <form id="creation-overlay">
                     <div id="creation-overlay-controls">
-                        <input type="text" placeholder="Question Type" id="template-type">
+                        <select id="template-type" required>
+                            <option value="text">Choose a Question Type (Default: Text)</option>
+                            <option value="password">Password Input</option>
+                            <option value="email">Email</option>
+                            <option value="number">Number</option>
+                            <option value="choice">Multiple Choice</option>
+                            <option value="check">Checkboxes</option>
+                            <option value="color">Color Picker</option>
+                            <option value="datetime">Date and Time</option>
+                            <option value="date">Date</option>
+                            <option value="month">Month</option>
+                            <option value="week">Week</option>
+                            <option value="time">Time</option>
+                            <option value="phone">Phone number</option>
+                            <option value="url">Website Link</option>
+                            <option value="range">Slider</option>
+                            <option value="file">File Upload</option>
+                        </select>
                         <input type="submit" value="Add">
                     </div>
                     <input type="text" placeholder="Label" id="label-value">

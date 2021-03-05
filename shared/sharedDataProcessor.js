@@ -123,6 +123,7 @@ function typeFilter(inputData, assignTo) {
 			assignTo.path = "/partials/formComponents/numberInput";
 			break;
 		case "range":
+		case "slider":
 			assignTo.type = "range";
 			assignTo.path = "/partials/formComponents/rangeInput";
 			break;

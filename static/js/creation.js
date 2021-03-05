@@ -69,6 +69,7 @@ function createRenderWrapper() {
 	const closeEditorButton = document.createElement("button");
 	closeEditorButton.classList.add("close-editor-button");
 	closeEditorButton.type = "button";
+	closeEditorButton.tabIndex = -1;
 	closeEditorButton.innerText = "Close Editor";
 	editControls.append(closeEditorButton);
 
