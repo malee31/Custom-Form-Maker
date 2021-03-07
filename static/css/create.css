@@ -1,3 +1,7 @@
+#fileTitle {
+	cursor: text;
+}
+
 .control-pad {
 	padding-bottom: 21vh
 }
@@ -44,6 +48,10 @@
 .render-wrapper {
 	width: 100%;
 	position: relative;
+}
+
+.render-replace {
+	display: none;
 }
 
 .edit-controls-wrapper {
