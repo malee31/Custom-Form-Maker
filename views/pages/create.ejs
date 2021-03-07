@@ -7,12 +7,13 @@
     </head>
     <body>
         <%- include("/partials/loader") %>
+        <%- include("/partials/renderWrapper") %>
         <section class="floatBox" id="errorBox" style="display: none; opacity: 0;">
             <h1 id="errorName">Error</h1>
             <p id="errorDesc">Something has gone wrong! Try again in a moment.</p>
             <button onclick="toggleErrorBox(false)">Ok</button>
         </section>
-        <main>
+        <main class="control-pad">
             <form name="mainForm">
                 <div class="pseudo-label">
                     <h1 id="fileTitle">Form Creation Tool</h1>

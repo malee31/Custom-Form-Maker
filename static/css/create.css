@@ -1,4 +1,4 @@
-main {
+.control-pad {
 	padding-bottom: 21vh
 }
 
@@ -43,28 +43,51 @@ main {
 
 .render-wrapper {
 	width: 100%;
+	position: relative;
 }
 
-.render-wrapper .edit-controls {
+.edit-controls-wrapper {
+	display: block;
 	width: 100%;
 	overflow: hidden;
 }
 
-.edit-mode .edit-controls {
-	height: 40vmin;
+.edit-controls {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
 	overflow-y: auto;
+	margin: 0;
+	opacity: 1;
+}
+
+.edit-mode .edit-controls-wrapper, .edit-controls {
+	height: 40vmin;
+}
+
+.edit-mode .edit-controls-wrapper > * {
+	opacity: 1;
 }
 
 .close-editor-button {
-	height: 2.5rem;
+	width: 2rem;
+	height: 2rem;
+	align-self: flex-end;
 	border-radius: .2rem;
 	border: 1px solid #CCC;
-	padding: .25rem .75rem;
+}
+
+.close-editor-button:hover {
+	cursor: pointer;
+	background-color: #BBB;
 }
 
 .dimensionless {
 	height: 0;
-	padding: 0;
-	margin: 0;
-	border: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+	border-width: 0;
 }

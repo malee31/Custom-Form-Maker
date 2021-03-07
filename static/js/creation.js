@@ -1,6 +1,7 @@
 console.log("Creation script attached");
 
 const form = document.forms["mainForm"];
+const renderWrapperTemplate = document.getElementById("render-wrapper-template");
 const creationOverlay = document.getElementById("creation-overlay");
 const creationInputs = {
 	template: creationOverlay.querySelector("#template-type"),
@@ -37,7 +38,7 @@ function createToolOverride(e) {
 		const rendered = parseHTMLString(ejs.render(template, {inputOptions: cleanData(data, uuidCounter())}));
 		const renderWrapper = createRenderWrapper();
 		while(rendered.length) {
-			renderWrapper.prepend(attachEditListener(rendered[0], renderWrapper.querySelector(".edit-controls"), renderWrapper));
+			renderWrapper.prepend(attachEditListener(rendered[0], renderWrapper.querySelector(".edit-controls-wrapper"), renderWrapper));
 		}
 		form.append(renderWrapper);
 		console.log("Rendered");
@@ -59,23 +60,14 @@ function attachEditListener(previewRender, editControls, wrapper) {
 }
 
 function createRenderWrapper() {
-	const wrapper = document.createElement("div");
-	wrapper.classList.add("render-wrapper");
-
-	const editControls = document.createElement("div");
-	editControls.classList.add("edit-controls", "pseudo-label", "dimensionless");
-	wrapper.append(editControls);
-
-	const closeEditorButton = document.createElement("button");
-	closeEditorButton.classList.add("close-editor-button");
-	closeEditorButton.type = "button";
-	closeEditorButton.tabIndex = -1;
-	closeEditorButton.innerText = "Close Editor";
-	editControls.append(closeEditorButton);
+	const renderWrapperClone = renderWrapperTemplate.content.cloneNode(true);
+	const wrapper = renderWrapperClone.querySelector(".render-wrapper");
+	const editControlsWrapper = renderWrapperClone.querySelector(".edit-controls-wrapper");
+	const closeEditorButton = renderWrapperClone.querySelector(".close-editor-button");
 
 	closeEditorButton.addEventListener("click", e => {
 		wrapper.classList.remove("edit-mode");
-		editControls.classList.add("dimensionless");
+		editControlsWrapper.classList.add("dimensionless");
 	});
 
 	return wrapper;
