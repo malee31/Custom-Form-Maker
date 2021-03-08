@@ -55,8 +55,10 @@ function restoreSelection(targetElem, restorePosition, collapse = false) {
 	const selection = window.getSelection();
 	const newRange = document.createRange();
 	if(!targetElem.firstChild) targetElem.appendChild(document.createTextNode(""));
-	newRange.setStart(targetElem.firstChild, restorePosition.start);
-	newRange.setEnd(targetElem.firstChild, collapse ? restorePosition.start : restorePosition.end);
+	const targetChild = targetElem.firstChild;
+	while(targetElem.childNodes.length > 1) targetElem.removeChild(targetElem.lastChild);
+	newRange.setStart(targetChild, Math.min(restorePosition.start, targetChild.length));
+	newRange.setEnd(targetChild, Math.min(collapse ? restorePosition.start : restorePosition.end, targetChild.length));
 	selection.addRange(newRange);
 }
 
