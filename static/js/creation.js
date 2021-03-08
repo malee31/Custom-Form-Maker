@@ -20,11 +20,51 @@ const GeneratedData = {
 window.addEventListener("load", () => {
 	creationOverlay.addEventListener("submit", createToolOverride);
 	form.addEventListener("submit", e => e.preventDefault());
-	document.getElementById("fileTitle").addEventListener("input", e => {
-		GeneratedData.name = e.target.innerText;
-		console.log(GeneratedData.name)
-	})
+	const fileTitle = document.getElementById("fileTitle");
+	fileTitle.addEventListener("input", e => {
+		GeneratedData.name = e.target.innerText.replace(/\s/g, " ");
+	});
+	editableListeners(fileTitle);
 });
+
+function editableListeners(editableElem) {
+	editableElem.addEventListener("keydown", e => {
+		editableContentFilter(e.target, e.target.innerText.replace(/\s/g, " "));
+	});
+	editableElem.addEventListener("blur", e => {
+		editableContentFilter(e.target, e.target.innerText.replace(/\s/g, " "), false);
+	});
+	editableElem.addEventListener("paste", e => {
+		// TODO: Manually implement pasting so that text/plain format is enforced
+		// return e.clipboardData.getData("text/plain").replace(/\s/g, " ");
+	});
+}
+
+function cutSelection() {
+	const selection = window.getSelection();
+	const currentRange = selection.rangeCount ? selection.getRangeAt(0) : {};
+	const savedRange = {
+		start: currentRange.startOffset || 0,
+		end: currentRange.endOffset || 0
+	};
+	selection.removeAllRanges();
+	return savedRange;
+}
+
+function restoreSelection(targetElem, restorePosition, collapse = false) {
+	const selection = window.getSelection();
+	const newRange = document.createRange();
+	if(!targetElem.firstChild) targetElem.appendChild(document.createTextNode(""));
+	newRange.setStart(targetElem.firstChild, restorePosition.start);
+	newRange.setEnd(targetElem.firstChild, collapse ? restorePosition.start : restorePosition.end);
+	selection.addRange(newRange);
+}
+
+function editableContentFilter(targetElem, filteredText, restore = true) {
+	const savedRange = cutSelection();
+	targetElem.innerText = filteredText;
+	if(restore) restoreSelection(targetElem, savedRange);
+}
 
 function createToolOverride(e) {
 	if(e) e.preventDefault();
