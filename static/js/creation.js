@@ -9,6 +9,9 @@ const creationInputs = {
 	defaultValue: creationOverlay.querySelector("#default-value"),
 	placeholder: creationOverlay.querySelector("#placeholder-text")
 };
+
+let uuidCounter = 0;
+const loadedTemplates = {};
 const GeneratedData = {
 	name: "Custom Form",
 	headers: []
@@ -17,39 +20,71 @@ const GeneratedData = {
 window.addEventListener("load", () => {
 	creationOverlay.addEventListener("submit", createToolOverride);
 	form.addEventListener("submit", e => e.preventDefault());
+	document.getElementById("fileTitle").addEventListener("input", e => {
+		GeneratedData.name = e.target.innerText;
+		console.log(GeneratedData.name)
+	})
 });
 
-let uuidCount = 0;
+function createToolOverride(e) {
+	if(e) e.preventDefault();
+	console.log("Creating New Input");
+	const data = fetchCreateToolValues();
+	requestTemplate(creationInputs.template.value).then(template => {
+		const rendered = parseHTMLString(ejs.render(template, {inputOptions: cleanData(data, generateUUID())}))[0];
+		const {renderWrapper, editor, replace} = createRenderWrapper();
+		attachEditListener(rendered, editor, renderWrapper);
 
-function uuidCounter() {
-	return "" + uuidCount++;
+		replace.replaceWith(rendered);
+		formAppend(renderWrapper);
+		GeneratedData.headers.push(data);
+		console.log("New Input Added");
+	});
 }
 
-function createToolOverride(e) {
-	e.preventDefault();
-	requestTemplate(creationInputs.template.value).then(template => {
-		console.log("Template received");
-		const data = makeData();
-		data.displayName = creationInputs.labelValue.value;
-		data.type = creationInputs.template.value;
-		typeFilter(data);
-		data.placeholderText = creationInputs.placeholder.value;
-		data.defaultValue = creationInputs.defaultValue.value;
-		const rendered = parseHTMLString(ejs.render(template, {inputOptions: cleanData(data, uuidCounter())}));
-		const renderWrapper = createRenderWrapper();
-		while(rendered.length) {
-			renderWrapper.prepend(attachEditListener(rendered[0], renderWrapper.querySelector(".edit-controls-wrapper"), renderWrapper));
-		}
-		form.append(renderWrapper);
-		console.log("Rendered");
-		updateListeners();
-		GeneratedData.headers.push(data);
+function fetchCreateToolValues(targetObj = makeData()) {
+	targetObj.displayName = creationInputs.labelValue.value;
+	targetObj.type = creationInputs.template.value;
+	typeFilter(targetObj);
+	targetObj.placeholderText = creationInputs.placeholder.value;
+	targetObj.defaultValue = creationInputs.defaultValue.value;
+	return targetObj;
+}
+
+function requestTemplate(templateType) {
+	return new Promise((resolve, reject) => {
+		if(loadedTemplates[templateType]) resolve(loadedTemplates[templateType]);
+
+		const request = new XMLHttpRequest();
+		request.addEventListener("load", res => {
+			loadedTemplates[templateType] = res.target.response;
+			resolve(loadedTemplates[templateType]);
+		});
+		request.addEventListener("error", reject);
+		request.open("GET", `${window.location.origin}/templates?type=${encodeURIComponent(templateType)}`);
+		request.send();
 	});
-	console.log("Add");
+}
+
+function createRenderWrapper() {
+	const renderWrapperClone = renderWrapperTemplate.content.cloneNode(true);
+	const renderElements = {
+		renderWrapper: renderWrapperClone.querySelector(".render-wrapper"),
+		editor: renderWrapperClone.querySelector(".edit-controls-wrapper"),
+		closeEditor: renderWrapperClone.querySelector(".close-editor-button"),
+		replace: renderWrapperClone.querySelector(".render-replace")
+	}
+
+	renderElements.closeEditor.addEventListener("click", () => {
+		renderElements.renderWrapper.classList.remove("edit-mode");
+		renderElements.editor.classList.add("dimensionless");
+	});
+
+	return renderElements;
 }
 
 function attachEditListener(previewRender, editControls, wrapper) {
-	previewRender.addEventListener("click", e => {
+	previewRender.addEventListener("click", () => {
 		if(!wrapper.classList.contains("edit-mode")) {
 			wrapper.classList.add("edit-mode");
 			editControls.classList.remove("dimensionless");
@@ -57,31 +92,6 @@ function attachEditListener(previewRender, editControls, wrapper) {
 	});
 
 	return previewRender;
-}
-
-function createRenderWrapper() {
-	const renderWrapperClone = renderWrapperTemplate.content.cloneNode(true);
-	const wrapper = renderWrapperClone.querySelector(".render-wrapper");
-	const editControlsWrapper = renderWrapperClone.querySelector(".edit-controls-wrapper");
-	const closeEditorButton = renderWrapperClone.querySelector(".close-editor-button");
-
-	closeEditorButton.addEventListener("click", e => {
-		wrapper.classList.remove("edit-mode");
-		editControlsWrapper.classList.add("dimensionless");
-	});
-
-	return wrapper;
-}
-
-function parseHTMLString(HTMLString = "") {
-	const mockDOM = document.createElement("body");
-	mockDOM.innerHTML = HTMLString;
-	return mockDOM.childNodes;
-}
-
-function insertRendered(renderedString = "") {
-	const insertList = parseHTMLString(renderedString);
-	while(insertList.length) form.append(insertList[0]);
 }
 
 function makeData() {
@@ -97,20 +107,17 @@ function makeData() {
 	};
 }
 
-const loadedTemplates = {};
+function parseHTMLString(HTMLString = "") {
+	const mockDOM = document.createElement("body");
+	mockDOM.innerHTML = HTMLString;
+	return mockDOM.childNodes;
+}
 
-async function requestTemplate(templateType) {
-	if(!loadedTemplates[templateType]) {
-		const request = new XMLHttpRequest();
-		await new Promise((resolve, reject) => {
-			request.addEventListener("load", res => {
-				loadedTemplates[templateType] = res.target.response;
-				resolve();
-			});
-			request.addEventListener("error", reject);
-			request.open("GET", `${window.location.origin}/templates?type=${encodeURIComponent(templateType)}`);
-			request.send();
-		});
-	}
-	return loadedTemplates[templateType];
+function formAppend(newNode) {
+	form.append(newNode);
+	updateListeners();
+}
+
+function generateUUID() {
+	return `Pseudo-UUID-${uuidCounter}`;
 }
