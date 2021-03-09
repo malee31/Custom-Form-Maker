@@ -36,7 +36,13 @@ function editableListeners(editableElem) {
 	});
 	editableElem.addEventListener("paste", e => {
 		// TODO: Manually implement pasting so that text/plain format is enforced
-		// return e.clipboardData.getData("text/plain").replace(/\s/g, " ");
+		const savedSelection = cutSelection();
+		const clippedText = e.clipboardData.getData("text/plain").replace(/\s/g, " ");
+		e.target.innerText = `${e.target.innerText.substring(0, savedSelection.start)}${clippedText}${e.target.innerText.substring(savedSelection.end)}`;
+		savedSelection.start += clippedText.length;
+		savedSelection.end += clippedText.length;
+		restoreSelection(e.target, savedSelection);
+		e.preventDefault();
 	});
 }
 
