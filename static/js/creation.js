@@ -7,7 +7,8 @@ const creationInputs = {
 	template: creationOverlay.querySelector("#template-type"),
 	labelValue: creationOverlay.querySelector("#label-value"),
 	defaultValue: creationOverlay.querySelector("#default-value"),
-	placeholder: creationOverlay.querySelector("#placeholder-text")
+	placeholder: creationOverlay.querySelector("#placeholder-text"),
+	requiredInput: creationOverlay.querySelector("#required-checkbox")
 };
 
 let uuidCounter = 0;
@@ -25,6 +26,19 @@ window.addEventListener("load", () => {
 		GeneratedData.name = e.target.innerText.replace(/\s/g, " ");
 	});
 	editableListeners(fileTitle);
+
+	document.getElementById("hide-creation-overlay-button").addEventListener("click", e => {
+		const overlayContainer = document.getElementById("creation-overlay-container");
+		if(e.target.classList.contains("hide-creation-overlay")) {
+			e.target.classList.remove("hide-creation-overlay");
+			overlayContainer.classList.remove("hide-creation-overlay");
+			document.querySelector("main").classList.add("control-pad");
+		} else {
+			e.target.classList.add("hide-creation-overlay");
+			overlayContainer.classList.add("hide-creation-overlay");
+			document.querySelector("main").classList.remove("control-pad");
+		}
+	});
 });
 
 function editableListeners(editableElem) {
@@ -96,6 +110,7 @@ function fetchCreateToolValues(targetObj = makeData()) {
 	typeFilter(targetObj);
 	targetObj.placeholderText = creationInputs.placeholder.value;
 	targetObj.defaultValue = creationInputs.defaultValue.value;
+	targetObj.required = creationInputs.requiredInput.checked;
 	return targetObj;
 }
 
