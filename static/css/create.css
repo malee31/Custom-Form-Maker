@@ -142,6 +142,24 @@ main {
 .close-editor-button:hover {
 	cursor: pointer;
 	background-color: #BBB;
+	margin-bottom: .5rem;
+}
+
+.edit-controls > label {
+	width: 90%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+}
+
+.edit-controls > label > span {
+	width: 7rem;
+	min-width: 7rem;
+	max-width: 7rem;
+	text-align: right;
+	white-space: nowrap;
+	margin-right: .5rem;
 }
 
 .dimensionless {
