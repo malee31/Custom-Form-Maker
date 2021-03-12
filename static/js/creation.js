@@ -17,6 +17,7 @@ const GeneratedData = {
 	name: "Custom Form",
 	headers: []
 };
+const dataMap = {};
 
 window.addEventListener("load", () => {
 	creationOverlay.addEventListener("submit", createToolOverride);
@@ -93,13 +94,16 @@ function createToolOverride(e) {
 	console.log("Creating New Input");
 	const data = fetchCreateToolValues();
 	requestTemplate(creationInputs.template.value).then(template => {
-		const rendered = parseHTMLString(ejs.render(template, {inputOptions: cleanData(data, generateUUID())}))[0];
+		const uuid = generateUUID();
+		const rendered = parseHTMLString(ejs.render(template, {inputOptions: cleanData(data, uuid)}))[0];
 		const {renderWrapper, editor, replace} = createRenderWrapper();
+		renderWrapper.dataset.uuid = uuid;
 		attachEditListener(rendered, editor, renderWrapper);
 
 		replace.replaceWith(rendered);
 		formAppend(renderWrapper);
 		GeneratedData.headers.push(data);
+		dataMap[uuid] = GeneratedData.headers.length - 1;
 		console.log("New Input Added");
 	});
 }
@@ -112,6 +116,23 @@ function fetchCreateToolValues(targetObj = makeData()) {
 	targetObj.defaultValue = creationInputs.defaultValue.value;
 	targetObj.required = creationInputs.requiredInput.checked;
 	return targetObj;
+}
+
+function fetchEditorValues(editWrapperElement, uuid) {
+	const editingHeader = GeneratedData.headers[dataMap[uuid]];
+	editingHeader.displayName = editWrapperElement.querySelector(".label-editor").value;
+	editingHeader.placeholderText = editWrapperElement.querySelector(".default-value-editor").value;
+	editingHeader.defaultValue = editWrapperElement.querySelector(".placeholder-editor").value;
+	editingHeader.required = editWrapperElement.querySelector(".required-editor").checked;
+	return editingHeader;
+}
+
+function updatePreview(editWrapperElement) {
+	const updatedData = fetchEditorValues(editWrapperElement, editWrapperElement.dataset.uuid);
+	requestTemplate(updatedData.type).then(template => {
+		const rendered = parseHTMLString(ejs.render(template, {inputOptions: cleanData(updatedData, editWrapperElement.dataset.uuid)}))[0];
+		editWrapperElement.querySelector(".pseudo-label").replaceWith(rendered);
+	});
 }
 
 function requestTemplate(templateType) {
