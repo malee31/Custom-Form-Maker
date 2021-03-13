@@ -137,12 +137,12 @@ main {
 	align-self: flex-end;
 	border-radius: .2rem;
 	border: 1px solid #CCC;
+	margin-bottom: .5rem;
 }
 
 .close-editor-button:hover {
 	cursor: pointer;
 	background-color: #BBB;
-	margin-bottom: .5rem;
 }
 
 .edit-controls > label {

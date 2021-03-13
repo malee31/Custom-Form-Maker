@@ -121,8 +121,8 @@ function fetchCreateToolValues(targetObj = makeData()) {
 function fetchEditorValues(editWrapperElement, uuid) {
 	const editingHeader = GeneratedData.headers[dataMap[uuid]];
 	editingHeader.displayName = editWrapperElement.querySelector(".label-editor").value;
-	editingHeader.placeholderText = editWrapperElement.querySelector(".default-value-editor").value;
-	editingHeader.defaultValue = editWrapperElement.querySelector(".placeholder-editor").value;
+	editingHeader.placeholderText = editWrapperElement.querySelector(".placeholder-editor").value;
+	editingHeader.defaultValue = editWrapperElement.querySelector(".default-value-editor").value;
 	editingHeader.required = editWrapperElement.querySelector(".required-editor").checked;
 	return editingHeader;
 }
@@ -174,6 +174,15 @@ function attachEditListener(previewRender, editControls, wrapper) {
 			editControls.classList.remove("dimensionless");
 		}
 	});
+
+	for(const input of editControls.querySelectorAll("input")) {
+		input.addEventListener("input", () => {
+			updatePreview(wrapper);
+		});
+		input.addEventListener("change", () => {
+			updatePreview(wrapper);
+		});
+	}
 
 	return previewRender;
 }
