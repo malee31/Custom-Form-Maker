@@ -1,25 +1,26 @@
 <template id="render-wrapper-template">
     <div class="render-wrapper">
-        <div class="render-replace">Replace this div with rendered input elements</div>
+        <div class="render-preview"><!-- Render data as an element here --></div>
         <div class="edit-controls-wrapper pseudo-label dimensionless">
             <div class="edit-controls">
 							<button class="close-editor-button" type="button" tabindex="-1">✖</button>
 							<label>
 								<span>Label</span>
-								<input type="text" class="label-editor">
+								<input type="text" class="label-editor" tabindex="-1">
 							</label>
 							<label>
 								<span>Default Value</span>
-								<input type="text" class="default-value-editor">
+								<input type="text" class="default-value-editor" tabindex="-1">
 							</label>
 							<label>
 								<span>Placeholder</span>
-								<input type="text" class="placeholder-editor">
+								<input type="text" class="placeholder-editor" tabindex="-1">
 							</label>
 							<label>
 								<span>Required</span>
-								<input type="checkbox" class="required-editor">
+								<input type="checkbox" class="required-editor" tabindex="-1">
 							</label>
+							<div class="additional-edit-controls"></div>
             </div>
         </div>
     </div>

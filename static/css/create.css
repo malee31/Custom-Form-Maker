@@ -123,8 +123,8 @@ main {
 	opacity: 1;
 }
 
-.edit-mode .edit-controls-wrapper, .edit-controls {
-	height: 40vmin;
+.edit-mode .edit-controls-wrapper {
+	height: 35vmin;
 }
 
 .edit-mode .edit-controls-wrapper > * {
@@ -160,6 +160,14 @@ main {
 	text-align: right;
 	white-space: nowrap;
 	margin-right: .5rem;
+}
+
+.additional-edit-controls {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	width: 90%;
 }
 
 .dimensionless {

@@ -54,13 +54,108 @@ function createToolOverride(e) {
 		addEditElementReferences(elementMap);
 		attachEditListeners(rendered, elementMap);
 
-		elementMap.replace.replaceWith(rendered);
+		elementMap.renderPreview.append(rendered);
 		formAppend(elementMap.renderWrapper);
 		elementMap.data = data;
 		dataMap[uuid] = elementMap;
 		GeneratedData.headers.push(uuid);
 		console.log("New Input Added");
 	});
+}
+
+function fetchCreateToolValues(targetObj = makeData()) {
+	targetObj.displayName = creationInputs.labelValue.value;
+	targetObj.type = creationInputs.template.value;
+	typeFilter(targetObj);
+	targetObj.placeholderText = creationInputs.placeholder.value;
+	targetObj.defaultValue = creationInputs.defaultValue.value;
+	targetObj.required = creationInputs.requiredInput.checked;
+	return targetObj;
+}
+
+function fetchEditorValues(elementMap) {
+	// For lookup by uuid
+	elementMap = typeof elementMap === "string" ? dataMap[elementMap] : elementMap;
+	const editorElements = elementMap.editorElements;
+	const editingHeader = elementMap.data;
+	editingHeader.displayName = editorElements.labelValue.value;
+	editingHeader.placeholderText = editorElements.placeholderValue.value;
+	editingHeader.defaultValue = editorElements.defaultValue.value;
+	editingHeader.required = editorElements.requiredValue.checked;
+	return editingHeader;
+}
+
+function updatePreview(elementMap) {
+	const updatedData = fetchEditorValues(elementMap);
+	requestTemplate(updatedData.type).then(template => {
+		const rendered = parseHTMLString(ejs.render(template, {inputOptions: cleanData(updatedData, elementMap.renderWrapper.dataset.uuid)}))[0];
+		while(elementMap.renderPreview.firstChild) elementMap.renderPreview.firstChild.remove();
+		elementMap.renderPreview.append(rendered);
+		attachEditOpenerListeners(rendered, elementMap);
+	});
+}
+
+function requestTemplate(templateType) {
+	return new Promise((resolve, reject) => {
+		if(loadedTemplates[templateType]) resolve(loadedTemplates[templateType]);
+
+		const request = new XMLHttpRequest();
+		request.addEventListener("load", res => {
+			loadedTemplates[templateType] = res.target.response;
+			resolve(loadedTemplates[templateType]);
+		});
+		request.addEventListener("error", reject);
+		request.open("GET", `${window.location.origin}/templates?type=${encodeURIComponent(templateType)}`);
+		request.send();
+	});
+}
+
+function createRenderWrapper() {
+	const renderWrapperClone = renderWrapperTemplate.content.cloneNode(true);
+	const renderElements = {
+		renderWrapper: renderWrapperClone.querySelector(".render-wrapper"),
+		renderPreview: renderWrapperClone.querySelector(".render-preview"),
+		editorWrapper: renderWrapperClone.querySelector(".edit-controls-wrapper"),
+		closeEditor: renderWrapperClone.querySelector(".close-editor-button"),
+		additionalControls: renderWrapperClone.querySelector(".additional-edit-controls")
+	}
+
+	renderElements.closeEditor.addEventListener("click", () => {
+		renderElements.renderWrapper.classList.remove("edit-mode");
+		renderElements.editorWrapper.classList.add("dimensionless");
+	});
+
+	return renderElements;
+}
+
+function attachEditListeners(previewRender, elementMap) {
+	attachEditOpenerListeners(previewRender, elementMap);
+
+	const updatePreviewForWrapper = () => {
+		updatePreview(elementMap)
+	};
+	elementMap.editorElements.labelValue.addEventListener("input", updatePreviewForWrapper);
+	elementMap.editorElements.defaultValue.addEventListener("input", updatePreviewForWrapper);
+	elementMap.editorElements.placeholderValue.addEventListener("input", updatePreviewForWrapper);
+	elementMap.editorElements.requiredValue.addEventListener("change", updatePreviewForWrapper);
+}
+
+function attachEditOpenerListeners(previewRender, elementMap) {
+	previewRender.addEventListener("click", () => {
+		if(!elementMap.renderWrapper.classList.contains("edit-mode")) {
+			elementMap.renderWrapper.classList.add("edit-mode");
+			elementMap.editorWrapper.classList.remove("dimensionless");
+		}
+	});
+}
+
+function addEditElementReferences(renderMap) {
+	renderMap.editorElements = {
+		labelValue: renderMap.editorWrapper.querySelector(".label-editor"),
+		defaultValue: renderMap.editorWrapper.querySelector(".default-value-editor"),
+		placeholderValue: renderMap.editorWrapper.querySelector(".placeholder-editor"),
+		requiredValue: renderMap.editorWrapper.querySelector(".required-editor")
+	};
 }
 
 function editableListeners(editableElem) {
@@ -109,97 +204,6 @@ function editableContentFilter(targetElem, filteredText, restore = true) {
 	if(restore) restoreSelection(targetElem, savedRange);
 }
 
-function fetchCreateToolValues(targetObj = makeData()) {
-	targetObj.displayName = creationInputs.labelValue.value;
-	targetObj.type = creationInputs.template.value;
-	typeFilter(targetObj);
-	targetObj.placeholderText = creationInputs.placeholder.value;
-	targetObj.defaultValue = creationInputs.defaultValue.value;
-	targetObj.required = creationInputs.requiredInput.checked;
-	return targetObj;
-}
-
-function fetchEditorValues(elementMap) {
-	// For lookup by uuid
-	elementMap = typeof elementMap === "string" ? dataMap[elementMap] : elementMap;
-	const editorElements = elementMap.editorElements;
-	const editingHeader = elementMap.data;
-	editingHeader.displayName = editorElements.labelValue.value;
-	editingHeader.placeholderText = editorElements.placeholderValue.value;
-	editingHeader.defaultValue = editorElements.defaultValue.value;
-	editingHeader.required = editorElements.requiredValue.checked;
-	return editingHeader;
-}
-
-function updatePreview(elementMap) {
-	const updatedData = fetchEditorValues(elementMap);
-	requestTemplate(updatedData.type).then(template => {
-		const rendered = parseHTMLString(ejs.render(template, {inputOptions: cleanData(updatedData, elementMap.renderWrapper.dataset.uuid)}))[0];
-		elementMap.renderWrapper.querySelector(".pseudo-label").replaceWith(rendered);
-		attachEditOpenerListeners(rendered, elementMap);
-	});
-}
-
-function requestTemplate(templateType) {
-	return new Promise((resolve, reject) => {
-		if(loadedTemplates[templateType]) resolve(loadedTemplates[templateType]);
-
-		const request = new XMLHttpRequest();
-		request.addEventListener("load", res => {
-			loadedTemplates[templateType] = res.target.response;
-			resolve(loadedTemplates[templateType]);
-		});
-		request.addEventListener("error", reject);
-		request.open("GET", `${window.location.origin}/templates?type=${encodeURIComponent(templateType)}`);
-		request.send();
-	});
-}
-
-function createRenderWrapper() {
-	const renderWrapperClone = renderWrapperTemplate.content.cloneNode(true);
-	const renderElements = {
-		renderWrapper: renderWrapperClone.querySelector(".render-wrapper"),
-		editorWrapper: renderWrapperClone.querySelector(".edit-controls-wrapper"),
-		closeEditor: renderWrapperClone.querySelector(".close-editor-button"),
-		replace: renderWrapperClone.querySelector(".render-replace")
-	}
-
-	renderElements.closeEditor.addEventListener("click", () => {
-		renderElements.renderWrapper.classList.remove("edit-mode");
-		renderElements.editorWrapper.classList.add("dimensionless");
-	});
-
-	return renderElements;
-}
-
-function attachEditOpenerListeners(previewRender, elementMap) {
-	previewRender.addEventListener("click", () => {
-		if(!elementMap.renderWrapper.classList.contains("edit-mode")) {
-			elementMap.renderWrapper.classList.add("edit-mode");
-			elementMap.editorWrapper.classList.remove("dimensionless");
-		}
-	});
-}
-
-function attachEditListeners(previewRender, elementMap) {
-	attachEditOpenerListeners(previewRender, elementMap);
-
-	const updatePreviewForWrapper = () => {updatePreview(elementMap)};
-	elementMap.editorElements.labelValue.addEventListener("input", updatePreviewForWrapper);
-	elementMap.editorElements.defaultValue.addEventListener("input", updatePreviewForWrapper);
-	elementMap.editorElements.placeholderValue.addEventListener("input", updatePreviewForWrapper);
-	elementMap.editorElements.requiredValue.addEventListener("change", updatePreviewForWrapper);
-}
-
-function addEditElementReferences(renderMap) {
-	renderMap.editorElements = {
-		labelValue: renderMap.editorWrapper.querySelector(".label-editor"),
-		defaultValue: renderMap.editorWrapper.querySelector(".default-value-editor"),
-		placeholderValue: renderMap.editorWrapper.querySelector(".placeholder-editor"),
-		requiredValue: renderMap.editorWrapper.querySelector(".required-editor"),
-	};
-}
-
 function makeData() {
 	return {
 		name: "",
@@ -225,7 +229,7 @@ function formAppend(newNode) {
 }
 
 function generateUUID() {
-	return `Pseudo-UUID-${uuidCounter}`;
+	return `Pseudo-UUID-${uuidCounter++}`;
 }
 
 function finalizeGeneratedData() {
