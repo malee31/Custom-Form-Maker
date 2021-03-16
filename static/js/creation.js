@@ -74,8 +74,6 @@ function fetchCreateToolValues(targetObj = makeData()) {
 }
 
 function fetchEditorValues(elementMap) {
-	// For lookup by uuid
-	elementMap = typeof elementMap === "string" ? dataMap[elementMap] : elementMap;
 	const editorElements = elementMap.editorElements;
 	const editingHeader = elementMap.data;
 	editingHeader.displayName = editorElements.labelValue.value;
@@ -91,8 +89,15 @@ function updatePreview(elementMap) {
 		const rendered = parseHTMLString(ejs.render(template, {inputOptions: cleanData(updatedData, elementMap.renderWrapper.dataset.uuid)}))[0];
 		while(elementMap.renderPreview.firstChild) elementMap.renderPreview.firstChild.remove();
 		elementMap.renderPreview.append(rendered);
+		setAllTabIndex(rendered, -1);
 		attachEditOpenerListeners(rendered, elementMap);
 	});
+}
+
+function setAllTabIndex(elem, val = 0) {
+	for(const input of elem.querySelectorAll("input, button")) {
+		input.tabIndex = val;
+	}
 }
 
 function requestTemplate(templateType) {
@@ -123,6 +128,7 @@ function createRenderWrapper() {
 	renderElements.closeEditor.addEventListener("click", () => {
 		renderElements.renderWrapper.classList.remove("edit-mode");
 		renderElements.editorWrapper.classList.add("dimensionless");
+		setAllTabIndex(renderElements.editorWrapper, -1);
 	});
 
 	return renderElements;
@@ -130,6 +136,7 @@ function createRenderWrapper() {
 
 function attachEditListeners(previewRender, elementMap) {
 	attachEditOpenerListeners(previewRender, elementMap);
+	setAllTabIndex(previewRender, -1);
 
 	const updatePreviewForWrapper = () => {
 		updatePreview(elementMap)
@@ -145,6 +152,7 @@ function attachEditOpenerListeners(previewRender, elementMap) {
 		if(!elementMap.renderWrapper.classList.contains("edit-mode")) {
 			elementMap.renderWrapper.classList.add("edit-mode");
 			elementMap.editorWrapper.classList.remove("dimensionless");
+			setAllTabIndex(elementMap.editorWrapper, 0);
 		}
 	});
 }
@@ -160,14 +168,14 @@ function addEditElementReferences(renderMap) {
 
 function editableListeners(editableElem) {
 	editableElem.addEventListener("keydown", e => {
-		editableContentFilter(e.target, e.target.innerText.replace(/\s/g, " "));
+		editableContentFilter(e.target, e.target.innerText.replace(/\s^$/g, " "));
 	});
 	editableElem.addEventListener("blur", e => {
 		editableContentFilter(e.target, e.target.innerText.replace(/\s/g, " "), false);
 	});
 	editableElem.addEventListener("paste", e => {
 		const savedSelection = cutSelection();
-		const clippedText = e.clipboardData.getData("text/plain").replace(/\s/g, " ");
+		const clippedText = e.clipboardData.getData("text/plain").replace(/\s^$/g, " ");
 		e.target.innerText = `${e.target.innerText.substring(0, savedSelection.start)}${clippedText}${e.target.innerText.substring(savedSelection.end)}`;
 		savedSelection.start += clippedText.length;
 		savedSelection.end += clippedText.length;
