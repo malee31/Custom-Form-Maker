@@ -167,19 +167,17 @@ function addEditElementReferences(renderMap) {
 }
 
 function editableListeners(editableElem) {
-	editableElem.addEventListener("keydown", e => {
-		editableContentFilter(e.target, e.target.innerText.replace(/\s^$/g, " "));
+	editableElem.addEventListener("input", e => {
+		editableContentFilter(e.target, e.target.innerText.replace(/\s(?!$)\s*/g, " ").replace(/ $/, String.fromCharCode(160)), true, /\s{2}/.test(e.target.innerText) ? -1 : 0);
 	});
 	editableElem.addEventListener("blur", e => {
-		editableContentFilter(e.target, e.target.innerText.replace(/\s/g, " "), false);
+		editableContentFilter(e.target, e.target.innerText.replace(/\s+/g, " ").trim(), false);
 	});
 	editableElem.addEventListener("paste", e => {
 		const savedSelection = cutSelection();
-		const clippedText = e.clipboardData.getData("text/plain").replace(/\s^$/g, " ");
+		const clippedText = e.clipboardData.getData("text/plain").replace(/\s+/g, " ");
 		e.target.innerText = `${e.target.innerText.substring(0, savedSelection.start)}${clippedText}${e.target.innerText.substring(savedSelection.end)}`;
-		savedSelection.start += clippedText.length;
-		savedSelection.end += clippedText.length;
-		restoreSelection(e.target, savedSelection);
+		restoreSelection(e.target, savedSelection, clippedText.length);
 		e.preventDefault();
 	});
 }
@@ -195,21 +193,21 @@ function cutSelection() {
 	return savedRange;
 }
 
-function restoreSelection(targetElem, restorePosition, collapse = false) {
+function restoreSelection(targetElem, restorePosition, offset = 0, collapse = false) {
 	const selection = window.getSelection();
 	const newRange = document.createRange();
 	if(!targetElem.firstChild) targetElem.appendChild(document.createTextNode(""));
 	const targetChild = targetElem.firstChild;
 	while(targetElem.childNodes.length > 1) targetElem.removeChild(targetElem.lastChild);
-	newRange.setStart(targetChild, Math.min(restorePosition.start, targetChild.length));
-	newRange.setEnd(targetChild, Math.min(collapse ? restorePosition.start : restorePosition.end, targetChild.length));
+	newRange.setStart(targetChild, Math.min(restorePosition.start + offset, targetChild.length));
+	newRange.setEnd(targetChild, Math.min((collapse ? restorePosition.start : restorePosition.end) + offset, targetChild.length));
 	selection.addRange(newRange);
 }
 
-function editableContentFilter(targetElem, filteredText, restore = true) {
+function editableContentFilter(targetElem, filteredText, restore = true, offset = 0) {
 	const savedRange = cutSelection();
 	targetElem.innerText = filteredText;
-	if(restore) restoreSelection(targetElem, savedRange);
+	if(restore) restoreSelection(targetElem, savedRange, offset);
 }
 
 function makeData() {

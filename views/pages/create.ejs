@@ -1,62 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <%- include("/partials/head", {title: "Form Builder"}); %>
-        <link href="/static/css/form.css" rel="stylesheet" type="text/css">
-        <link href="/static/css/create.css" rel="stylesheet" type="text/css">
-    </head>
-    <body>
-        <%- include("/partials/loader") %>
-        <%- include("/partials/renderWrapper") %>
-        <section class="floatBox" id="errorBox" style="display: none; opacity: 0;">
-            <h1 id="errorName">Error</h1>
-            <p id="errorDesc">Something has gone wrong! Try again in a moment.</p>
-            <button onclick="toggleErrorBox(false)">Ok</button>
-        </section>
-        <main class="control-pad">
-            <form name="mainForm">
-                <div class="pseudo-label">
-                    <h1 id="fileTitle" contenteditable="true" spellcheck="false" >Form Creation Tool</h1>
-                </div>
-            </form>
-						<div id="hide-creation-overlay-button"><span></span></div>
-            <section id="creation-overlay-container">
-                <form id="creation-overlay">
-                    <div id="creation-overlay-controls">
-                        <select id="template-type" required>
-                            <option value="text">Question Type (Default: Text)</option>
-                            <option value="password">Password Input</option>
-                            <option value="email">Email</option>
-                            <option value="number">Number</option>
-                            <option value="choice">Multiple Choice</option>
-                            <option value="check">Checkboxes</option>
-                            <option value="color">Color Picker</option>
-                            <option value="datetime">Date and Time</option>
-                            <option value="date">Date</option>
-                            <option value="month">Month</option>
-                            <option value="week">Week</option>
-                            <option value="time">Time</option>
-                            <option value="phone">Phone number</option>
-                            <option value="url">Website Link</option>
-                            <option value="range">Slider</option>
-                            <option value="file">File Upload</option>
-                        </select>
-												<label id="required-checkbox-label">
-													<span>Required Input</span>
-													<input id="required-checkbox" type="checkbox">
-												</label>
-                        <input type="submit" value="Add">
-                    </div>
-                    <input type="text" placeholder="Label" id="label-value">
-                    <input type="text" placeholder="Default Value" id="default-value">
-                    <input type="text" placeholder="Placeholder" id="placeholder-text">
-                </form>
-            </section>
-        </main>
-        <script src="/static/js/ejs.min.js"></script>
-        <script src="/static/js/errorBox.js"></script>
-        <script src="/static/js/inputEvents.js"></script>
-        <script src="/shared/sharedDataProcessor.js"></script>
-        <script src="/static/js/creation.js"></script>
-    </body>
+	<head>
+		<%- include("/partials/head", {title: "Form Builder"}); %>
+		<link href="/static/css/form.css" rel="stylesheet" type="text/css">
+		<link href="/static/css/create.css" rel="stylesheet" type="text/css">
+	</head>
+	<body>
+		<%- include("/partials/loader") %>
+		<%- include("/partials/createTool/renderWrapper") %>
+		<%- include("/partials/createTool/choiceEditor") %>
+		<section class="floatBox" id="errorBox" style="display: none; opacity: 0;">
+			<h1 id="errorName">Error</h1>
+			<p id="errorDesc">Something has gone wrong! Try again in a moment.</p>
+			<button onclick="toggleErrorBox(false)">Ok</button>
+		</section>
+		<main class="control-pad">
+			<form name="mainForm">
+				<div class="pseudo-label">
+					<h1 id="fileTitle" contenteditable="true" spellcheck="false">Form Creation Tool</h1>
+				</div>
+			</form>
+			<div id="hide-creation-overlay-button"><span></span></div>
+			<section id="creation-overlay-container">
+				<form id="creation-overlay">
+					<div id="creation-overlay-controls">
+						<select id="template-type" required>
+							<option value="text">Question Type (Default: Text)</option>
+							<option value="password">Password Input</option>
+							<option value="email">Email</option>
+							<option value="number">Number</option>
+							<option value="choice">Multiple Choice</option>
+							<option value="check">Checkboxes</option>
+							<option value="color">Color Picker</option>
+							<option value="datetime">Date and Time</option>
+							<option value="date">Date</option>
+							<option value="month">Month</option>
+							<option value="week">Week</option>
+							<option value="time">Time</option>
+							<option value="phone">Phone number</option>
+							<option value="url">Website Link</option>
+							<option value="range">Slider</option>
+							<option value="file">File Upload</option>
+						</select>
+						<label id="required-checkbox-label">
+							<span>Required Input</span>
+							<input id="required-checkbox" type="checkbox">
+						</label>
+						<input type="submit" value="Add">
+					</div>
+					<input type="text" placeholder="Label" id="label-value">
+					<input type="text" placeholder="Default Value" id="default-value">
+					<input type="text" placeholder="Placeholder" id="placeholder-text">
+				</form>
+			</section>
+		</main>
+		<script src="/static/js/ejs.min.js"></script>
+		<script src="/static/js/errorBox.js"></script>
+		<script src="/static/js/inputEvents.js"></script>
+		<script src="/shared/sharedDataProcessor.js"></script>
+		<script src="/static/js/creation.js"></script>
+	</body>
 </html>
