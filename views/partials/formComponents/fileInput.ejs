@@ -2,12 +2,10 @@
     <span class="sub-label">
         <%= inputOptions.displayName %>
     </span>
-    <label class="file-label">
-        <span class="sub-label file-sub-label">Upload</span>
-        <!-- TODO: Create a function to handle validation on file inputs instead of "required" since it throws an error -->
-        <input data-bindfrom="<%= inputOptions.uuid %>" data-columnname="<%= inputOptions.name %>" type="file" <%- inputOptions.attributes.value %> <%- inputOptions.attributes.multiple %> <%- inputOptions.attributes.required %>>
-    </label>
-    <div class="file-preview file-preview-hide" data-bindto="<%= inputOptions.uuid %>">
-
-    </div>
+	<label class="file-label">
+		<span class="sub-label file-sub-label">Upload</span>
+		<!-- TODO: Create a function to handle validation on file inputs instead of "required" since it throws an error -->
+		<input data-bindfrom="<%= inputOptions.uuid %>" data-columnname="<%= inputOptions.name %>" type="file" <%- inputOptions.attributes.value %> <%- inputOptions.attributes.multiple %> <%- inputOptions.attributes.required %>>
+	</label>
+	<div class="file-preview file-preview-hide" data-bindto="<%= inputOptions.uuid %>"></div>
 </div>

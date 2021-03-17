@@ -2,12 +2,12 @@
     <span class="sub-label">
         <%= inputOptions.displayName %>
     </span>
-    <% inputOptions.choices.forEach( choice => { %>
-        <label class="inline-label">
-            <span class="sub-label">
-                <%= choice.value %>
-            </span>
-            <input name="<%= inputOptions.name %>" data-columnname="<%= inputOptions.name %>" type="checkbox" value="<%= choice.value %>" <%= (choice.checked ? "checked" : "") %>>
-        </label>
-    <% }) %>
+	<% inputOptions.choices.forEach( choice => { %>
+		<label class="inline-label">
+			<span class="sub-label">
+					<%= choice.value %>
+			</span>
+			<input data-columnname="<%= inputOptions.name %>" name="<%= inputOptions.name %>" type="checkbox" value="<%= choice.value %>" <%= (choice.checked ? "checked" : "") %>>
+		</label>
+	<% }) %>
 </div>

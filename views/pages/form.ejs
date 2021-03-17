@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <%- include("/partials/head", {title: formData.name}); %>
-        <link href="/static/css/form.css" rel="stylesheet" type="text/css">
-    </head>
-    <body>
-        <%- include("/partials/loader") %>
-        <section class="floatBox" id="errorBox" style="display: none; opacity: 0;">
-            <h1 id="errorName">Error</h1>
-            <p id="errorDesc">Something has gone wrong! Try again in a moment.</p>
-            <button onclick="toggleErrorBox(false)">Ok</button>
-        </section>
-        <main>
-            <%- include("/partials/formBody", {formData}); %>
-        </main>
-        <script src="/static/js/errorBox.js"></script>
-        <script src="/static/js/submit.js"></script>
-        <script src="/static/js/inputEvents.js"></script>
-        <script src="/static/js/mobileResize.js"></script>
-        <!-- Used specifically to pad for mobile browser URL bars -->
-        <div id="pad"></div>
-        <div id="control"></div>
-    </body>
+	<head>
+		<%- include("/partials/head", {title: formData.name}); %>
+		<link href="/static/css/form.css" rel="stylesheet" type="text/css">
+	</head>
+	<body>
+		<%- include("/partials/loader") %>
+		<section class="floatBox" id="errorBox" style="display: none; opacity: 0;">
+			<h1 id="errorName">Error</h1>
+			<p id="errorDesc">Something has gone wrong! Try again in a moment.</p>
+			<button onclick="toggleErrorBox(false)">Ok</button>
+		</section>
+		<main>
+			<%- include("/partials/formBody", {formData}); %>
+		</main>
+		<script src="/static/js/errorBox.js"></script>
+		<script src="/static/js/submit.js"></script>
+		<script src="/static/js/inputEvents.js"></script>
+		<script src="/static/js/mobileResize.js"></script>
+		<!-- Used specifically to pad for mobile browser URL bars -->
+		<div id="pad"></div>
+		<div id="control"></div>
+	</body>
 </html>
