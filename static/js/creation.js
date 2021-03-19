@@ -160,6 +160,7 @@ function createRenderWrapper() {
 function createOptionEditor() {
 	const choiceEditor = choiceEditorTemplate.content.cloneNode(true);
 	// TODO: Add listeners to add more option inputs
+
 	return choiceEditor;
 }
 
