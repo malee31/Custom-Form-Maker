@@ -2,6 +2,7 @@ console.log("Creation script attached");
 
 const form = document.forms["mainForm"];
 const renderWrapperTemplate = document.getElementById("render-wrapper-template");
+const choiceEditorTemplate = document.getElementById("choice-editor-template");
 const creationOverlay = document.getElementById("creation-overlay");
 const creationInputs = {
 	template: creationOverlay.querySelector("#template-type"),
@@ -13,21 +14,27 @@ const creationInputs = {
 
 let uuidCounter = 0;
 const loadedTemplates = {};
+const dataMap = {};
 const GeneratedData = {
 	name: "Custom Form",
 	headers: []
 };
-const dataMap = {};
 
 window.addEventListener("load", () => {
-	creationOverlay.addEventListener("submit", createToolOverride);
 	form.addEventListener("submit", e => e.preventDefault());
-	const fileTitle = document.getElementById("fileTitle");
-	fileTitle.addEventListener("input", e => {
+	creationOverlay.addEventListener("submit", createToolOverride);
+	formTitleListeners(document.getElementById("fileTitle"));
+	createToolHideToggleListener();
+});
+
+function formTitleListeners(formTitleElem) {
+	formTitleElem.addEventListener("input", e => {
 		GeneratedData.name = e.target.innerText.replace(/\s/g, " ");
 	});
-	editableListeners(fileTitle);
+	editableListeners(formTitleElem);
+}
 
+function createToolHideToggleListener() {
 	document.getElementById("hide-creation-overlay-button").addEventListener("click", e => {
 		const overlayContainer = document.getElementById("creation-overlay-container");
 		if(e.target.classList.contains("hide-creation-overlay")) {
@@ -40,7 +47,7 @@ window.addEventListener("load", () => {
 			document.querySelector("main").classList.remove("control-pad");
 		}
 	});
-});
+}
 
 function createToolOverride(e) {
 	if(e) e.preventDefault();
@@ -51,6 +58,12 @@ function createToolOverride(e) {
 		const rendered = parseHTMLString(ejs.render(template, {inputOptions: cleanData(data, uuid)}))[0];
 		const elementMap = createRenderWrapper();
 		elementMap.renderWrapper.dataset.uuid = uuid;
+		switch(data.type) {
+			case "radio":
+			case "checkbox":
+				const choiceEditor = createOptionEditor();
+				elementMap.additionalControls.append(choiceEditor);
+		}
 		addEditElementReferences(elementMap);
 		attachEditListeners(rendered, elementMap);
 
@@ -80,6 +93,16 @@ function fetchEditorValues(elementMap) {
 	editingHeader.placeholderText = editorElements.placeholderValue.value;
 	editingHeader.defaultValue = editorElements.defaultValue.value;
 	editingHeader.required = editorElements.requiredValue.checked;
+	delete editingHeader.choices;
+	if(elementMap.editorElements.choiceEditor) {
+		editingHeader.choices = [];
+		for(const choice of elementMap.editorElements.choiceEditor.querySelectorAll(".choice-editor")) {
+			editingHeader.choices.push({
+				"value": choice.value,
+				"default": false
+			});
+		}
+	}
 	return editingHeader;
 }
 
@@ -132,6 +155,12 @@ function createRenderWrapper() {
 	});
 
 	return renderElements;
+}
+
+function createOptionEditor() {
+	const choiceEditor = choiceEditorTemplate.content.cloneNode(true);
+	// TODO: Add listeners to add more option inputs
+	return choiceEditor;
 }
 
 function attachEditListeners(previewRender, elementMap) {

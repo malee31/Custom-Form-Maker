@@ -72,6 +72,7 @@ function typeFilter(inputData, assignTo) {
 			assignTo.type = "radio";
 			assignTo.path = "/partials/formComponents/radioInput";
 			break;
+		case "check":
 		case "checkbox":
 			assignTo.type = "checkbox";
 			assignTo.path = "/partials/formComponents/checkboxInput";
@@ -185,8 +186,9 @@ function cleanData(inputData, uuid = "") {
 	cleanData.displayName = inputData.displayName || inputData.name || "";
 	cleanData.uuid = uuid;
 	cleanData.required = Boolean(inputData.required);
-	if(inputData.choices) cleanData.choices = inputData.choices;
+	if(cleanData.type === "radio" || cleanData.type === "checkbox") cleanData.choices = inputData.choices || [];
 	cleanData.attributes = attributeAssembly(inputData);
+	console.log(inputData.choices)
 	return cleanData;
 }
 
