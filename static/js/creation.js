@@ -2,7 +2,10 @@ console.log("Creation script attached");
 
 const form = document.forms["mainForm"];
 const renderWrapperTemplate = document.getElementById("render-wrapper-template");
-const choiceEditorTemplate = document.getElementById("choice-editor-template");
+const choiceEditorTemplate = {
+	main: document.getElementById("choice-editor-template"),
+	choice: document.getElementById("choice-option-template")
+};
 const creationOverlay = document.getElementById("creation-overlay");
 const creationInputs = {
 	template: creationOverlay.querySelector("#template-type"),
@@ -63,6 +66,7 @@ function createToolOverride(e) {
 			case "checkbox":
 				const choiceEditor = createOptionEditor();
 				elementMap.additionalControls.append(choiceEditor);
+				attachOptionListeners(elementMap, choiceEditor);
 		}
 		addEditElementReferences(elementMap);
 		attachEditListeners(rendered, elementMap);
@@ -158,10 +162,15 @@ function createRenderWrapper() {
 }
 
 function createOptionEditor() {
-	const choiceEditor = choiceEditorTemplate.content.cloneNode(true);
-	// TODO: Add listeners to add more option inputs
+	return choiceEditorTemplate.main.content.cloneNode(true);
+}
 
-	return choiceEditor;
+function attachOptionListeners(elementMap, choiceEditor) {
+	// TODO: Add listeners to add more option inputs
+	elementMap.additionalControls.querySelector(".add-option-button").addEventListener("click", () => {
+		const newOptionEditor = choiceEditorTemplate.choice.content.cloneNode(true);
+		elementMap.additionalControls.querySelector(".choice-container").append(newOptionEditor);
+	});
 }
 
 function attachEditListeners(previewRender, elementMap) {
