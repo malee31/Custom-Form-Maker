@@ -64,9 +64,8 @@ function createToolOverride(e) {
 		switch(data.type) {
 			case "radio":
 			case "checkbox":
-				const choiceEditor = createOptionEditor();
-				elementMap.additionalControls.append(choiceEditor);
-				attachOptionListeners(elementMap, choiceEditor);
+				elementMap.additionalControls.append(createOptionEditor());
+				attachOptionListeners(elementMap);
 		}
 		addEditElementReferences(elementMap);
 		attachEditListeners(rendered, elementMap);
@@ -98,9 +97,9 @@ function fetchEditorValues(elementMap) {
 	editingHeader.defaultValue = editorElements.defaultValue.value;
 	editingHeader.required = editorElements.requiredValue.checked;
 	delete editingHeader.choices;
-	if(elementMap.editorElements.choiceEditor) {
+	if(elementMap.additionalControls.querySelector(".choice-container")) {
 		editingHeader.choices = [];
-		for(const choice of elementMap.editorElements.choiceEditor.querySelectorAll(".choice-editor")) {
+		for(const choice of elementMap.additionalControls.querySelectorAll(".choice-editor")) {
 			editingHeader.choices.push({
 				"value": choice.value,
 				"default": false
@@ -118,6 +117,7 @@ function updatePreview(elementMap) {
 		elementMap.renderPreview.append(rendered);
 		setAllTabIndex(rendered, -1);
 		attachEditOpenerListeners(rendered, elementMap);
+		updateListeners();
 	});
 }
 
@@ -165,11 +165,15 @@ function createOptionEditor() {
 	return choiceEditorTemplate.main.content.cloneNode(true);
 }
 
-function attachOptionListeners(elementMap, choiceEditor) {
-	// TODO: Add listeners to add more option inputs
+function attachOptionListeners(elementMap) {
 	elementMap.additionalControls.querySelector(".add-option-button").addEventListener("click", () => {
 		const newOptionEditor = choiceEditorTemplate.choice.content.cloneNode(true);
+		const newChoiceEditor = newOptionEditor.querySelector(".choice-editor");
+		newChoiceEditor.addEventListener("input", () => {
+			updatePreview(elementMap);
+		});
 		elementMap.additionalControls.querySelector(".choice-container").append(newOptionEditor);
+		newChoiceEditor.focus();
 	});
 }
 

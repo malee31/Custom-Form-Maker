@@ -181,6 +181,10 @@ main {
 	margin: .25rem;
 }
 
+.choice-container {
+	width: 100%;
+}
+
 .add-option-button {
 	width: 90%;
 	height: 2rem;
