@@ -16,7 +16,9 @@ const creationInputs = {
 };
 
 let uuidCounter = 0;
+// Contains templates already fetched from the server. Caches them so they don't need to be refetched
 const loadedTemplates = {};
+// Contains the element maps in uuid: elementMap pairs
 const dataMap = {};
 const GeneratedData = {
 	name: "Custom Form",
@@ -35,21 +37,6 @@ function formTitleListeners(formTitleElem) {
 		GeneratedData.name = e.target.innerText.replace(/\s/g, " ");
 	});
 	editableListeners(formTitleElem);
-}
-
-function createToolHideToggleListener() {
-	document.getElementById("hide-creation-overlay-button").addEventListener("click", e => {
-		const overlayContainer = document.getElementById("creation-overlay-container");
-		if(e.target.classList.contains("hide-creation-overlay")) {
-			e.target.classList.remove("hide-creation-overlay");
-			overlayContainer.classList.remove("hide-creation-overlay");
-			document.querySelector("main").classList.add("control-pad");
-		} else {
-			e.target.classList.add("hide-creation-overlay");
-			overlayContainer.classList.add("hide-creation-overlay");
-			document.querySelector("main").classList.remove("control-pad");
-		}
-	});
 }
 
 function createToolOverride(e) {
@@ -76,6 +63,21 @@ function createToolOverride(e) {
 		dataMap[uuid] = elementMap;
 		GeneratedData.headers.push(uuid);
 		console.log("New Input Added");
+	});
+}
+
+function createToolHideToggleListener() {
+	document.getElementById("hide-creation-overlay-button").addEventListener("click", e => {
+		const overlayContainer = document.getElementById("creation-overlay-container");
+		if(e.target.classList.contains("hide-creation-overlay")) {
+			e.target.classList.remove("hide-creation-overlay");
+			overlayContainer.classList.remove("hide-creation-overlay");
+			document.querySelector("main").classList.add("control-pad");
+		} else {
+			e.target.classList.add("hide-creation-overlay");
+			overlayContainer.classList.add("hide-creation-overlay");
+			document.querySelector("main").classList.remove("control-pad");
+		}
 	});
 }
 
