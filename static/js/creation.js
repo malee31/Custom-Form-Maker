@@ -32,6 +32,10 @@ window.addEventListener("load", () => {
 	createToolHideToggleListener();
 });
 
+/**
+ * Attaches the listener to the content-editable form title and updates the name property on input.
+ * @param {HTMLElement} formTitleElem The content-editable element to listen to
+ */
 function formTitleListeners(formTitleElem) {
 	formTitleElem.addEventListener("input", e => {
 		GeneratedData.name = e.target.innerText.replace(/\s/g, " ");
@@ -39,6 +43,10 @@ function formTitleListeners(formTitleElem) {
 	editableListeners(formTitleElem);
 }
 
+/**
+ * Overrides the form that handles creating new elements and processing templates
+ * @param {Event} [e] Optional event from the submit button to preventDefault()
+ */
 function createToolOverride(e) {
 	if(e) e.preventDefault();
 	console.log("Creating New Input");
@@ -66,6 +74,9 @@ function createToolOverride(e) {
 	});
 }
 
+/**
+ * Loops through and adds the listeners needed to hide and show the editors for all the rendered elements
+ */
 function createToolHideToggleListener() {
 	document.getElementById("hide-creation-overlay-button").addEventListener("click", e => {
 		const overlayContainer = document.getElementById("creation-overlay-container");
@@ -81,6 +92,11 @@ function createToolHideToggleListener() {
 	});
 }
 
+/**
+ * Fetches the info needed for a RawInputData object
+ * @param {RawInputData} [targetObj = makeData()] Object to assign the strings to. Creates an empty RawInputData object by default
+ * @returns {RawInputData} The fetched data stored in an object
+ */
 function fetchCreateToolValues(targetObj = makeData()) {
 	targetObj.displayName = creationInputs.labelValue.value;
 	targetObj.type = creationInputs.template.value;
@@ -91,6 +107,11 @@ function fetchCreateToolValues(targetObj = makeData()) {
 	return targetObj;
 }
 
+/**
+ * Fetches the data needed for a RawInputData object from the editors of each preview
+ * @param {Object} elementMap The map of the elements for the object
+ * @returns {InputData} Completely assembled input object used to rerender. Saves it in the global object before returning
+ */
 function fetchEditorValues(elementMap) {
 	const editorElements = elementMap.editorElements;
 	const editingHeader = elementMap.data;
@@ -111,6 +132,10 @@ function fetchEditorValues(elementMap) {
 	return editingHeader;
 }
 
+/**
+ * Rerenders a preview from a map of elements.
+ * @param {Object} elementMap The map of the elements for rerender
+ */
 function updatePreview(elementMap) {
 	const updatedData = fetchEditorValues(elementMap);
 	requestTemplate(updatedData.type).then(template => {
