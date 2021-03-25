@@ -154,6 +154,11 @@ function setAllTabIndex(elem, val = 0) {
 	}
 }
 
+/**
+ * Fetches the EJS template for a type of element from the server. Caches templates each time a unique one is requested
+ * @param {string} templateType Type of template to fetch. Defaults to text if an invalid string is provided and returns an error if nothing is provided
+ * @returns {Promise<string>} A promise that resolves to the EJS template string
+ */
 function requestTemplate(templateType) {
 	return new Promise((resolve, reject) => {
 		if(loadedTemplates[templateType]) resolve(loadedTemplates[templateType]);
@@ -169,6 +174,10 @@ function requestTemplate(templateType) {
 	});
 }
 
+/**
+ * Creates a wrapper around rendered inputs and their respective editors
+ * @returns {Object} Object containing a map of element nodes in the wrapper
+ */
 function createRenderWrapper() {
 	const renderWrapperClone = renderWrapperTemplate.content.cloneNode(true);
 	const renderElements = {
@@ -188,10 +197,18 @@ function createRenderWrapper() {
 	return renderElements;
 }
 
+/**
+ * Clones the editor for multiple choice and checkbox options
+ * @returns {Node} The cloned node
+ */
 function createOptionEditor() {
 	return choiceEditorTemplate.main.content.cloneNode(true);
 }
 
+/**
+ * Attaches the listeners the the multiple choice or checkbox option editor. Specifically for the add new option button
+ * @param {Object} elementMap The map of elements for the renderWrapper
+ */
 function attachOptionListeners(elementMap) {
 	elementMap.additionalControls.querySelector(".add-option-button").addEventListener("click", () => {
 		const newOptionEditor = choiceEditorTemplate.choice.content.cloneNode(true);
@@ -204,6 +221,11 @@ function attachOptionListeners(elementMap) {
 	});
 }
 
+/**
+ * Adds listeners to update tab-index and previews when the editor inputs are changed.
+ * @param {HTMLElement} previewRender The render preview to attach edit listeners to
+ * @param {Object} elementMap The element map to link to the preview
+ */
 function attachEditListeners(previewRender, elementMap) {
 	attachEditOpenerListeners(previewRender, elementMap);
 	setAllTabIndex(previewRender, -1);
@@ -217,6 +239,11 @@ function attachEditListeners(previewRender, elementMap) {
 	elementMap.editorElements.requiredValue.addEventListener("change", updatePreviewForWrapper);
 }
 
+/**
+ * Adds the listener to the rendered preview that opens up the editor on click
+ * @param {HTMLElement} previewRender The rendered preview
+ * @param {Object} elementMap The element map containing the editor to reveal
+ */
 function attachEditOpenerListeners(previewRender, elementMap) {
 	previewRender.addEventListener("click", () => {
 		if(!elementMap.renderWrapper.classList.contains("edit-mode")) {
@@ -227,6 +254,10 @@ function attachEditOpenerListeners(previewRender, elementMap) {
 	});
 }
 
+/**
+ * Adds additional HTMLElement references to the renderMap
+ * @param {Object} renderMap The map of render elements to add to
+ */
 function addEditElementReferences(renderMap) {
 	renderMap.editorElements = {
 		labelValue: renderMap.editorWrapper.querySelector(".label-editor"),
@@ -236,6 +267,10 @@ function addEditElementReferences(renderMap) {
 	};
 }
 
+/**
+ * Adds a filter and multiple listeners for content-editable elements
+ * @param {HTMLElement} editableElem Content-editable element to add listeners to
+ */
 function editableListeners(editableElem) {
 	editableElem.addEventListener("input", e => {
 		editableContentFilter(e.target, e.target.innerText.replace(/\s(?!$)\s*/g, " ").replace(/ $/, String.fromCharCode(160)), true, /\s{2}/.test(e.target.innerText) ? -1 : 0);
@@ -252,6 +287,10 @@ function editableListeners(editableElem) {
 	});
 }
 
+/**
+ * Removes all selections on the page and saves the first one for restoring later if needed
+ * @returns {Object} The position of the selection as a start and end integer property
+ */
 function cutSelection() {
 	const selection = window.getSelection();
 	const currentRange = selection.rangeCount ? selection.getRangeAt(0) : {};
@@ -263,6 +302,13 @@ function cutSelection() {
 	return savedRange;
 }
 
+/**
+ * Restores the position of the cursor on an element
+ * @param {HTMLElement} targetElem Content-editable element to restore selection position on
+ * @param {Object} restorePosition Object containing the integer start and end properties to set the cursor to
+ * @param {number} [offset = 0] Amount to offset the restorePosition object
+ * @param {boolean} [collapse = false] Whether or not to collapse the size of the selection from a highlighted portion of text to a single cursor
+ */
 function restoreSelection(targetElem, restorePosition, offset = 0, collapse = false) {
 	const selection = window.getSelection();
 	const newRange = document.createRange();
@@ -274,12 +320,23 @@ function restoreSelection(targetElem, restorePosition, offset = 0, collapse = fa
 	selection.addRange(newRange);
 }
 
+/**
+ * Resets the text of a content-editable element to a filtered version and restores the cursor position
+ * @param {HTMLElement} targetElem Element to apply filtered text
+ * @param {string} filteredText The filtered string to set as the innerText
+ * @param {boolean} [restore = true] Whether or not to restore the cursor position after filtering (Set to false for blur events)
+ * @param {number} [offset = 0] Number to offset the cursor by
+ */
 function editableContentFilter(targetElem, filteredText, restore = true, offset = 0) {
 	const savedRange = cutSelection();
 	targetElem.innerText = filteredText;
 	if(restore) restoreSelection(targetElem, savedRange, offset);
 }
 
+/**
+ * Constructs a new object for new input elements
+ * @returns {Object} Basic template for the InputData object
+ */
 function makeData() {
 	return {
 		name: "",
@@ -293,21 +350,38 @@ function makeData() {
 	};
 }
 
+/**
+ * Converts HTML from a string to actual nodes
+ * @param {string} HTMLString HTML string to convert into nodes
+ * @returns {NodeListOf<ChildNode>} Converted HTML string as a list of nodes
+ */
 function parseHTMLString(HTMLString = "") {
 	const mockDOM = document.createElement("body");
 	mockDOM.innerHTML = HTMLString;
 	return mockDOM.childNodes;
 }
 
+/**
+ * Appends a new node to the form and updates listeners on the form
+ * @param {HTMLElement} newNode New element to add to the form
+ */
 function formAppend(newNode) {
 	form.append(newNode);
 	updateListeners();
 }
 
+/**
+ * Creates a temporary UUID. This UUID is not actually universally unique, it's just unique for the current page and follows a simple pattern of Pseudo-UUID-#
+ * @returns {string} Temporary UUID stand-in
+ */
 function generateUUID() {
 	return `Pseudo-UUID-${uuidCounter++}`;
 }
 
+/**
+ * Finalizes the data used to generate the form and processes it.
+ * @returns {Object} The finalized JSON object
+ */
 function finalizeGeneratedData() {
 	for(let uuidNum = 0; uuidNum < GeneratedData.headers.length; uuidNum++) {
 		const uuid = GeneratedData.headers[uuidNum];
