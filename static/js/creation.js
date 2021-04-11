@@ -16,7 +16,7 @@ const creationInputs = {
 };
 
 let uuidCounter = 0;
-// Contains templates already fetched from the server. Caches them so they don't need to be refetched
+// Contains templates already fetched from the server. Caches them so they don't need to be fetched again
 const loadedTemplates = {};
 // Contains the element maps in uuid: elementMap pairs
 const dataMap = {};
@@ -133,7 +133,7 @@ function fetchEditorValues(elementMap) {
 }
 
 /**
- * Rerenders a preview from a map of elements.
+ * Renders a preview from a map of elements and replaces the old one.
  * @param {Object} elementMap The map of the elements for rerender
  */
 function updatePreview(elementMap) {
@@ -223,7 +223,7 @@ function attachOptionListeners(elementMap) {
 
 /**
  * Adds listeners to update tab-index and previews when the editor inputs are changed.
- * @param {HTMLElement} previewRender The render preview to attach edit listeners to
+ * @param {Node} previewRender The render preview to attach edit listeners to
  * @param {Object} elementMap The element map to link to the preview
  */
 function attachEditListeners(previewRender, elementMap) {
@@ -241,7 +241,7 @@ function attachEditListeners(previewRender, elementMap) {
 
 /**
  * Adds the listener to the rendered preview that opens up the editor on click
- * @param {HTMLElement} previewRender The rendered preview
+ * @param {Node} previewRender The rendered preview
  * @param {Object} elementMap The element map containing the editor to reveal
  */
 function attachEditOpenerListeners(previewRender, elementMap) {
@@ -353,7 +353,7 @@ function makeData() {
 /**
  * Converts HTML from a string to actual nodes
  * @param {string} HTMLString HTML string to convert into nodes
- * @returns {NodeListOf<ChildNode>} Converted HTML string as a list of nodes
+ * @returns {NodeListOf<Node>} Converted HTML string as a list of nodes
  */
 function parseHTMLString(HTMLString = "") {
 	const mockDOM = document.createElement("body");
@@ -383,14 +383,19 @@ function generateUUID() {
  * @returns {Object} The finalized JSON object
  */
 function finalizeGeneratedData() {
+	const finalized = {
+		name: GeneratedData.name,
+		headers: []
+	};
 	for(let uuidNum = 0; uuidNum < GeneratedData.headers.length; uuidNum++) {
 		const uuid = GeneratedData.headers[uuidNum];
-		if(typeof uuid === "object") {
-			console.log("Already finalized.");
-			console.log(uuid);
-			continue;
-		}
-		GeneratedData.headers[uuidNum] = dataMap[uuid].data;
+		// if(typeof uuid === "object") {
+		// 	console.log("Already finalized.");
+		// 	console.log(uuid);
+		// 	continue;
+		// }
+		// Note: Does not complete a deep copy of data objects. Referenced.
+		finalized.headers[uuidNum] = dataMap[uuid].data;
 	}
-	return GeneratedData;
+	return finalized;
 }
