@@ -45,11 +45,11 @@ async function getWorksheets(formId) {
  * Retrieves the labels/headers at the top row of the main sheet
  * @async
  * @param {string} id String that is the id of the spreadsheet on Google Spreadsheets
- * @returns {Object[]} Returns Array of JSON objects containing the header names and whether they are required inputs along with their default values
+ * @returns {Promise<Object[]>} Returns Array of JSON objects containing the header names and whether they are required inputs along with their default values
  */
 async function getSheetHeaders(id) {
 	const doc = await getWorksheets(id);
-	return (await getRequirements(doc));
+	return getRequirements(doc);
 }
 
 /**
@@ -81,7 +81,7 @@ function getConfig(doc) {
  * @async
  * @param {GoogleSpreadsheet} doc Google Spreadsheet to get requirements from
  * @param {boolean} [keepExcluded = false] Determines whether or not the returned object will include excluded headers.
- * @returns {Object} Returns object containing metadata and an array of objects with the column name, default values, and whether or not they are required
+ * @returns {Promise<Object>} Returns object containing metadata and an array of objects with the column name, default values, and whether or not they are required
  */
 async function getRequirements(doc, keepExcluded = false) {
 	const config = getConfig(doc) || getMain(doc);

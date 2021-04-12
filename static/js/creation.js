@@ -404,7 +404,8 @@ function sendJSON() {
 	const data = finalizeGeneratedData();
 	const req = new XMLHttpRequest();
 	req.addEventListener("load", res => {
-		console.log("Success!")
+		console.log("Success!");
+		console.log(res.target.responseText);
 	});
 	req.addEventListener("error", console.error);
 	req.open("POST", `${window.location.origin}/create/submit`);

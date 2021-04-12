@@ -23,7 +23,7 @@ const sheetError = require("./sheetError.js");
 const {cleanData, typeFilter} = require("./serverDataProcessor.js");
 
 // Place to save created form JSON files
-const writeFile = require("fs").promises.writeFile;
+const {writeFile, readFile} = require("fs").promises;
 const createdJSONPath = path.resolve(__dirname, "createdJSON");
 const {v4: uuidv4} = require("uuid");
 const processor = require("./shared/sharedDataProcessor.js");

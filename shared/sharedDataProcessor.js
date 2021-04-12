@@ -170,6 +170,7 @@ const copyProps = ["name", "required", "defaultValue", "placeholderText"];
  * Cleans up raw input data and sets defaults for their properties
  * @param {RawInputData} inputData Data to be cleaned up and assigned an id and other information
  * @param {string} [uuid = ""] Unique ID to assign to data
+ * @param {boolean} [keepDerived = true] Whether to include data that can be regenerated at runtime. Set to false to optimize data size
  * @returns {InputData} The resulting data
  */
 function cleanData(inputData, uuid = "", keepDerived = true) {
