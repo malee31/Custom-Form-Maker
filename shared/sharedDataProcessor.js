@@ -172,7 +172,7 @@ const copyProps = ["name", "required", "defaultValue", "placeholderText", "choic
  * @param {string} [uuid = ""] Unique ID to assign to data
  * @returns {InputData} The resulting data
  */
-function cleanData(inputData, uuid = "") {
+function cleanData(inputData, uuid = "", keepDerived = true) {
 	if(typeof inputData !== "object") {
 		console.warn(inputData);
 		throw "Input data is not an object";
@@ -183,18 +183,18 @@ function cleanData(inputData, uuid = "") {
 		cleanData[prop] = inputData[prop] || "";
 	}
 	typeFilter(inputData, cleanData);
+	if(!keepDerived) delete cleanData.path;
 	cleanData.displayName = inputData.displayName || inputData.name || "";
 	cleanData.uuid = uuid;
 	cleanData.required = Boolean(inputData.required);
 	if(cleanData.type === "radio" || cleanData.type === "checkbox") cleanData.choices = inputData.choices || [];
-	cleanData.attributes = attributeAssembly(inputData);
-	console.log(inputData.choices)
+	if(keepDerived) cleanData.attributes = attributeAssembly(inputData);
 	return cleanData;
 }
 
 /**
  * Cleans up raw input data and sets defaults for their properties
- * @param {InputData} inputData Data to be cleaned up and assigned an id and other information
+ * @param {InputData|RawInputData} inputData Data to be cleaned up and assigned an id and other information
  * @returns {Attributes} All the pre-escaped assembled attributes ready to be inserted into HTML
  */
 function attributeAssembly(inputData) {

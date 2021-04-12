@@ -22,6 +22,11 @@ const sheetError = require("./sheetError.js");
 // For cleaning up input data for rendering
 const {cleanData, typeFilter} = require("./serverDataProcessor.js");
 
+// Place to save created form JSON files
+const writeFile = require("fs").promises.writeFile;
+const createdJSONPath = path.resolve(__dirname, "createdJSON");
+const {v4: uuidv4} = require("uuid");
+
 // Allows parsing of data in requests
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
@@ -122,6 +127,16 @@ app.get("/templates", (req, res) => {
 	} catch(err) {
 		return res.status(500).send("Unable to read template. Check to see if the requested template type exists and try again later");
 	}
+});
+
+app.post("/create/submit", (req, res) => {
+	const assignedID = uuidv4();
+	const data = req.body;
+	writeFile(path.resolve(createdJSONPath, `${assignedID}.json`), JSON.stringify(data)).then(() => {
+		return res.status(200).send(`Your form can now be found at ID: ${uuidv4()}`);
+	}).catch(err => {
+		return res.status(500).send(`Unable to save. Please try again\n${err.toString()}`);
+	});
 });
 
 // Error 404

@@ -399,3 +399,15 @@ function finalizeGeneratedData() {
 	}
 	return finalized;
 }
+
+function sendJSON() {
+	const data = finalizeGeneratedData();
+	const req = new XMLHttpRequest();
+	req.addEventListener("load", res => {
+		console.log("Success!")
+	});
+	req.addEventListener("error", console.error);
+	req.open("POST", `${window.location.origin}/create/submit`);
+	req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	req.send(JSON.stringify(data));
+}

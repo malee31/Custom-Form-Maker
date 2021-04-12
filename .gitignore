@@ -12,6 +12,7 @@ docs/
 
 #uploaded files
 uploads/*
+createdJSON/*.json
 
 #dev files
 output.txt
