@@ -164,7 +164,7 @@ function quoteEscape(text = "", isDouble = false) {
 	return text.replace(/'/g, "&#39;");
 }
 
-const copyProps = ["name", "required", "defaultValue", "placeholderText", "choices"];
+const copyProps = ["name", "required", "defaultValue", "placeholderText"];
 
 /**
  * Cleans up raw input data and sets defaults for their properties
@@ -183,12 +183,15 @@ function cleanData(inputData, uuid = "", keepDerived = true) {
 		cleanData[prop] = inputData[prop] || "";
 	}
 	typeFilter(inputData, cleanData);
-	if(!keepDerived) delete cleanData.path;
 	cleanData.displayName = inputData.displayName || inputData.name || "";
-	cleanData.uuid = uuid;
 	cleanData.required = Boolean(inputData.required);
 	if(cleanData.type === "radio" || cleanData.type === "checkbox") cleanData.choices = inputData.choices || [];
-	if(keepDerived) cleanData.attributes = attributeAssembly(inputData);
+	if(keepDerived) {
+		cleanData.uuid = uuid;
+		cleanData.attributes = attributeAssembly(inputData);
+	} else {
+		delete cleanData.path;
+	}
 	return cleanData;
 }
 
@@ -204,7 +207,6 @@ function attributeAssembly(inputData) {
 	attributes.required = inputData.required ? "required" : "";
 	// TODO: Add formal way of adding component specific config. This is a stop-gap for allowing multiple files for fileInputs
 	attributes.multiple = inputData.allowMultiple === true ? "multiple" : "";
-	console.log(attributes);
 	return attributes;
 }
 

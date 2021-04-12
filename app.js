@@ -26,6 +26,7 @@ const {cleanData, typeFilter} = require("./serverDataProcessor.js");
 const writeFile = require("fs").promises.writeFile;
 const createdJSONPath = path.resolve(__dirname, "createdJSON");
 const {v4: uuidv4} = require("uuid");
+const processor = require("./shared/sharedDataProcessor.js");
 
 // Allows parsing of data in requests
 app.use(express.urlencoded({extended: true}));
@@ -132,6 +133,11 @@ app.get("/templates", (req, res) => {
 app.post("/create/submit", (req, res) => {
 	const assignedID = uuidv4();
 	const data = req.body;
+	const dataHeaders = data.headers;
+	data.headers = [];
+	for(const header of dataHeaders) {
+		data.headers.push(processor.cleanData(header, "", false));
+	}
 	writeFile(path.resolve(createdJSONPath, `${assignedID}.json`), JSON.stringify(data)).then(() => {
 		return res.status(200).send(`Your form can now be found at ID: ${uuidv4()}`);
 	}).catch(err => {
