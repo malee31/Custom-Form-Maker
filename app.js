@@ -116,6 +116,21 @@ app.get("/form/:sheetId", async(req, res) => {
 	res.render(path.resolve(__dirname, "views/pages/form"), {formId: req.params.sheetId, formData: headers});
 });
 
+app.get("/created/:createId", (req, res) => {
+	const requestedCreated = path.resolve(createdJSONPath, `${req.params.createId}.json`);
+	console.log(`Requesting ${requestedCreated}`);
+	readFile(requestedCreated).then(data => {
+		const jsonify = JSON.parse(data.toString());
+		res.render(path.resolve(__dirname, "views/pages/form"), {
+			formId: `createId/${req.params.createId}`,
+			formData: {
+				name: jsonify.name,
+				headers: jsonify.headers.map(header => cleanData(header))
+			}
+		});
+	})
+});
+
 app.get("/create", (req, res) => {
 	res.render(path.resolve(__dirname, "views/pages/create"));
 });
@@ -139,7 +154,7 @@ app.post("/create/submit", (req, res) => {
 		data.headers.push(processor.cleanData(header, "", false));
 	}
 	writeFile(path.resolve(createdJSONPath, `${assignedID}.json`), JSON.stringify(data)).then(() => {
-		return res.status(200).send(`Your form can now be found at ID: ${uuidv4()}`);
+		return res.status(200).send(`Your form can now be found at ID: ${assignedID}`);
 	}).catch(err => {
 		return res.status(500).send(`Unable to save. Please try again\n${err.toString()}`);
 	});
