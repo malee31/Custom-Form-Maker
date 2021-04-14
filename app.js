@@ -151,7 +151,7 @@ app.post("/create/submit", (req, res) => {
 	const dataHeaders = data.headers;
 	data.headers = [];
 	for(const header of dataHeaders) {
-		data.headers.push(processor.cleanData(header, "", false));
+		data.headers.push(processor.cleanDataBare(header));
 	}
 	writeFile(path.resolve(createdJSONPath, `${assignedID}.json`), JSON.stringify(data)).then(() => {
 		return res.status(200).send(`Your form can now be found at ID: ${assignedID}`);

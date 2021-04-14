@@ -1,5 +1,6 @@
 if(typeof module !== "undefined") module.exports = {
 	cleanData,
+	cleanDataBare,
 	typeFilter
 };
 
@@ -53,97 +54,100 @@ if(typeof module !== "undefined") module.exports = {
  * Affects InputData.type and InputData.path
  * @param {RawInputData|InputData|{type: string}} [inputData] Object to filter types and component path of
  * @param {RawInputData|InputData} [assignTo = inputData] Object to assign the selected types and paths to. Defaults to inputData
+ * @param {boolean} [assignPath = true] Whether to set the path property to the EJS template path
  * @returns {RawInputData|InputData|{type: string, path: string}} Returns assignTo parameter value after mutating
  */
-function typeFilter(inputData, assignTo) {
+function typeFilter(inputData, assignTo, assignPath = true) {
 	if(typeof assignTo !== "object") assignTo = inputData;
+	let EJSPath = "";
 	switch(inputData.type?.toLowerCase().replace(/[\W]|_/g, "")) {
 		case "password":
 			assignTo.type = "password";
-			assignTo.path = "/partials/formComponents/passwordInput";
+			EJSPath = "/partials/formComponents/passwordInput";
 			break;
 		case "color":
 			assignTo.type = "color";
-			assignTo.path = "/partials/formComponents/colorInput";
+			EJSPath = "/partials/formComponents/colorInput";
 			break;
 		case "radio":
 		case "choice":
 		case "multiplechoice":
 			assignTo.type = "radio";
-			assignTo.path = "/partials/formComponents/radioInput";
+			EJSPath = "/partials/formComponents/radioInput";
 			break;
 		case "check":
 		case "checkbox":
 			assignTo.type = "checkbox";
-			assignTo.path = "/partials/formComponents/checkboxInput";
+			EJSPath = "/partials/formComponents/checkboxInput";
 			break;
 		case "datetime":
 		case "datetimelocal":
 			assignTo.type = "datetime-local";
-			assignTo.path = "/partials/formComponents/dateTimeInput";
+			EJSPath = "/partials/formComponents/dateTimeInput";
 			break;
 		case "date":
 		case "calendar":
 			assignTo.type = "date";
-			assignTo.path = "/partials/formComponents/dateInput";
+			EJSPath = "/partials/formComponents/dateInput";
 			break;
 		case "month":
 			assignTo.type = "month";
-			assignTo.path = "/partials/formComponents/monthInput";
+			EJSPath = "/partials/formComponents/monthInput";
 			break;
 		case "week":
 			assignTo.type = "week";
-			assignTo.path = "/partials/formComponents/weekInput";
+			EJSPath = "/partials/formComponents/weekInput";
 			break;
 		case "email":
 			assignTo.type = "email";
-			assignTo.path = "/partials/formComponents/emailInput";
+			EJSPath = "/partials/formComponents/emailInput";
 			break;
 		case "telephone":
 		case "phone":
 		case "tel":
 			assignTo.type = "tel";
-			assignTo.path = "/partials/formComponents/telInput";
+			EJSPath = "/partials/formComponents/telInput";
 			break;
 		case "website":
 		case "site":
 		case "link":
 		case "url":
 			assignTo.type = "url";
-			assignTo.path = "/partials/formComponents/urlInput";
+			EJSPath = "/partials/formComponents/urlInput";
 			break;
 		case "time":
 			assignTo.type = "time";
-			assignTo.path = "/partials/formComponents/timeInput";
+			EJSPath = "/partials/formComponents/timeInput";
 			break;
 		case "num":
 		case "number":
 		case "int":
 		case "integer":
 			assignTo.type = "number";
-			assignTo.path = "/partials/formComponents/numberInput";
+			EJSPath = "/partials/formComponents/numberInput";
 			break;
 		case "range":
 		case "slider":
 			assignTo.type = "range";
-			assignTo.path = "/partials/formComponents/rangeInput";
+			EJSPath = "/partials/formComponents/rangeInput";
 			break;
 		case "file":
 		case "upload":
 			assignTo.type = "file";
-			assignTo.path = "/partials/formComponents/fileInput";
+			EJSPath = "/partials/formComponents/fileInput";
 			break;
 		case "text":
 		default:
 			assignTo.type = "text";
-			assignTo.path = "/partials/formComponents/textInput";
+			EJSPath = "/partials/formComponents/textInput";
 	}
+	if(assignPath) assignTo.path = EJSPath;
 	return assignTo;
 }
 
 /**
  * Escapes text for use in HTML. Does not escape quotes.
- * @param {string} [text=""] Text to escape
+ * @param {string} [text = ""] Text to escape
  * @returns {string} Escaped text
  */
 function HTMLEscape(text = "") {
@@ -155,7 +159,7 @@ function HTMLEscape(text = "") {
 
 /**
  * HTML escapes quotes
- * @param {string} [text=""] Text to escape
+ * @param {string} [text = ""] Text to escape
  * @param {boolean} [isDouble = false] If true, escapes double quote. Else, escapes single quotes
  * @returns {string} Escaped text
  */
@@ -179,20 +183,33 @@ function cleanData(inputData, uuid = "", keepDerived = true) {
 		throw "Input data is not an object";
 	}
 
+	const cleanData = cleanDataBare(inputData);
+	typeFilter(cleanData);
+	cleanData.uuid = uuid;
+	cleanData.attributes = attributeAssembly(inputData);
+	return cleanData;
+}
+
+/**
+ * Cleans up raw input data and sets defaults for their properties
+ * @param {RawInputData} inputData Data to be cleaned up and assigned an id and other information
+ * @returns {RawInputData} The resulting data (cleaned)
+ */
+function cleanDataBare(inputData) {
+	if(typeof inputData !== "object") {
+		console.warn(inputData);
+		throw "Input data is not an object";
+	}
+
+	/** @type RawInputData */
 	const cleanData = {};
 	for(const prop of copyProps) {
 		cleanData[prop] = inputData[prop] || "";
 	}
-	typeFilter(inputData, cleanData);
+	typeFilter(inputData, cleanData, false);
 	cleanData.displayName = inputData.displayName || inputData.name || "";
 	cleanData.required = Boolean(inputData.required);
-	if(cleanData.type === "radio" || cleanData.type === "checkbox") cleanData.choices = inputData.choices || [];
-	if(keepDerived) {
-		cleanData.uuid = uuid;
-		cleanData.attributes = attributeAssembly(inputData);
-	} else {
-		delete cleanData.path;
-	}
+	if(cleanData.type === "radio" || cleanData.type === "checkbox") cleanData.choices = Array.isArray(inputData.choices) ? inputData.choices : [];
 	return cleanData;
 }
 
