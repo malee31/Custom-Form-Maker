@@ -1,15 +1,3 @@
-if(typeof module !== "undefined") module.exports = {
-	cleanData,
-	cleanDataBare,
-	typeFilter
-};
-
-/**
- * @typedef InputComponent
- * @property {string} path Form input component path relative to the EJS root folder (views/)
- * @property {InputData} data Data to pass onto
- */
-
 /**
  * @typedef RawInputData
  * @property {string} [displayName] Text for input field label. Defaults to name property value
@@ -49,100 +37,215 @@ if(typeof module !== "undefined") module.exports = {
  * @property {string} multiple Assembled from InputData.allowMultiple. Used for file inputs
  */
 
+class InputDataManager {
+	/**
+	 * @constructor InputDataManager
+	 * @param {RawInputData|InputData|Object} [baseObject = {}] If provided, an instance will be constructed from the pre-existing properties of baseObject
+	 */
+	constructor(baseObject = {}) {
+		this.data = {};
+		this.displayName = baseObject.displayName || "";
+		this.data.name = baseObject.name || "";
+		this.data.type = baseObject.type || "text";
+		this.updateSubtype();
+		this.data.required = baseObject.required || false;
+		this.data.defaultValue = baseObject.defaultValue || "";
+		this.data.placeholderText = baseObject.placeholderText || "";
+		this.data.choices = baseObject.choices || [];
+		this.data.allowMultiple = baseObject.allowMultiple || false;
+	}
+
+	set displayName(newVal) { this.data.displayName = newVal; }
+	set name(newVal) { this.data.name = newVal.toString(); }
+	set type(newVal) {
+		const oldType = this.data.subtype;
+		this.data.type = rawTypeFilter(newVal.toString());
+		this.updateSubtype();
+		if(this.subtype !== oldType) console.warn("Changing between incompatible types may cause problems");
+	}
+	set required(newVal) { this.data.required = Boolean(newVal); }
+	set defaultValue(newVal) { this.data.defaultValue = newVal.toString(); }
+	set placeholderText(newVal) { this.data.placeholderText = newVal.toString(); }
+	set choices(newVal) {
+		if(!Array.isArray(newVal)) throw "Not an Array. Property 'choices' requires an array of InputDataChoice objects";
+		// TODO: Double check contents of array and clean up their properties
+		this.data.choices = newVal;
+	}
+	set allowMultiple(newVal) { this.data.allowMultiple = Boolean(newVal); }
+
+	get displayName() { return this.data.displayName; }
+	get name() { return this.data.name; }
+	get type() { return this.data.type; }
+	get required() { return this.data.required; }
+	get defaultValue() { return this.data.defaultValue; }
+	get placeholderText() { return this.data.placeholderText; }
+	get choices() { return this.data.choices; }
+	get allowMultiple() {return this.data.allowMultiple;}
+
+	updateSubtype() {
+		switch(this.type) {
+			case "radio":
+			case "checkbox":
+				this.subtype = "select";
+				break;
+			case "file":
+				this.subtype = "file";
+				break;
+			default:
+				this.subtype = "text";
+		}
+	}
+
+	/**
+	 * Converts all the saved properties in the instance into a clean RawInputData object ready to be saved or processed further
+	 * @returns {RawInputData} An input data object created using this instance's internal properties
+	 */
+	toCleanObject() {
+		/** @type RawInputData */
+		const cleanObject = {
+			name: this.name,
+			displayName: this.displayName,
+			type: this.type,
+			required: this.required
+		};
+		switch(this.type) {
+			case "radio":
+			case "checkbox":
+				// TODO: Convert each choice back into objects once the class for it is written
+				cleanObject.choices = this.choices;
+				break;
+			case "file":
+				cleanObject.allowMultiple = this.allowMultiple;
+				break;
+			default:
+				cleanObject.defaultValue = this.defaultValue;
+				cleanObject.placeholderText = this.placeholderText;
+		}
+		return cleanObject;
+	}
+
+	/**
+	 * Converts all the saved properties in the instance into a clean InputData object ready to be rendered
+	 * @param {string} [uuid = ""] Unique ID to assign to the input data when rendering
+	 * @return {InputData} An input data object created using this instance's internal properties with additional properties for rendering purposes
+	 */
+	toProcessedObject(uuid = "") {
+		const processed = this.toCleanObject();
+		typeFilter(processed);
+		processed.uuid = uuid;
+		processed.attributes = {};
+		processed.attributes.required = this.required ? "required" : "";
+		switch(this.subtype) {
+			case "select":
+				break;
+			case "file":
+				processed.attributes.multiple = this.allowMultiple ? "multiple" : "";
+				break;
+			case "text":
+			default:
+				processed.attributes.value = attributePair("value", processed.defaultValue);
+				processed.attributes.placeholder = attributePair("placeholder", processed.placeholderText);
+		}
+		return processed;
+	}
+}
+
+if(typeof module !== "undefined") module.exports = {
+	cleanData,
+	cleanDataBare,
+	typeFilter,
+	InputDataManager
+};
+
+const typePathMap = {
+	"text": "/partials/formComponents/textInput",
+	"password": "/partials/formComponents/passwordInput",
+	"color": "/partials/formComponents/colorInput",
+	"radio": "/partials/formComponents/radioInput",
+	"checkbox": "/partials/formComponents/checkboxInput",
+	"datetime-local": "/partials/formComponents/dateTimeInput",
+	"date": "/partials/formComponents/dateInput",
+	"month": "/partials/formComponents/monthInput",
+	"week": "/partials/formComponents/weekInput",
+	"email": "/partials/formComponents/emailInput",
+	"tel": "/partials/formComponents/telInput",
+	"url": "/partials/formComponents/urlInput",
+	"time": "/partials/formComponents/timeInput",
+	"number": "/partials/formComponents/numberInput",
+	"range": "/partials/formComponents/rangeInput",
+	"file": "/partials/formComponents/fileInput"
+};
+
 /**
  * Coerces input type strings into the set of available types and sets the path of partial as well.
  * Affects InputData.type and InputData.path
  * @param {RawInputData|InputData|{type: string}} [inputData] Object to filter types and component path of
  * @param {RawInputData|InputData} [assignTo = inputData] Object to assign the selected types and paths to. Defaults to inputData
- * @param {boolean} [assignPath = true] Whether to set the path property to the EJS template path
  * @returns {RawInputData|InputData|{type: string, path: string}} Returns assignTo parameter value after mutating
  */
-function typeFilter(inputData, assignTo, assignPath = true) {
-	if(typeof assignTo !== "object") assignTo = inputData;
-	let EJSPath = "";
-	switch(inputData.type?.toLowerCase().replace(/[\W]|_/g, "")) {
+function typeFilter(inputData, assignTo = inputData) {
+	assignTo.type = rawTypeFilter(inputData.type);
+	assignTo.path = typePathMap[assignTo.type];
+	return assignTo;
+}
+
+/**
+ * Coerces input data type strings into the set of available types. Honestly overkill
+ * @param {string|*} [typeString=  ""] Type string to coerce into a defined type. If a nonstring is passed as an argument, its toString() method will be called
+ * @returns {string} A valid input type to render
+ */
+function rawTypeFilter(typeString = "") {
+	typeString = typeString.toString().toLowerCase().replace(/[^a-z]/g, "");
+	switch(typeString) {
 		case "password":
-			assignTo.type = "password";
-			EJSPath = "/partials/formComponents/passwordInput";
-			break;
+			return "password";
 		case "color":
-			assignTo.type = "color";
-			EJSPath = "/partials/formComponents/colorInput";
-			break;
+			return "color";
 		case "radio":
 		case "choice":
 		case "multiplechoice":
-			assignTo.type = "radio";
-			EJSPath = "/partials/formComponents/radioInput";
-			break;
+			return "radio";
 		case "check":
 		case "checkbox":
-			assignTo.type = "checkbox";
-			EJSPath = "/partials/formComponents/checkboxInput";
-			break;
+			return "checkbox";
 		case "datetime":
 		case "datetimelocal":
-			assignTo.type = "datetime-local";
-			EJSPath = "/partials/formComponents/dateTimeInput";
-			break;
+			return "datetime-local";
 		case "date":
 		case "calendar":
-			assignTo.type = "date";
-			EJSPath = "/partials/formComponents/dateInput";
-			break;
+			return "date";
 		case "month":
-			assignTo.type = "month";
-			EJSPath = "/partials/formComponents/monthInput";
-			break;
+			return "month";
 		case "week":
-			assignTo.type = "week";
-			EJSPath = "/partials/formComponents/weekInput";
-			break;
+			return "week";
 		case "email":
-			assignTo.type = "email";
-			EJSPath = "/partials/formComponents/emailInput";
-			break;
+			return "email";
 		case "telephone":
 		case "phone":
 		case "tel":
-			assignTo.type = "tel";
-			EJSPath = "/partials/formComponents/telInput";
-			break;
+			return "tel";
 		case "website":
 		case "site":
 		case "link":
 		case "url":
-			assignTo.type = "url";
-			EJSPath = "/partials/formComponents/urlInput";
-			break;
+			return "url";
 		case "time":
-			assignTo.type = "time";
-			EJSPath = "/partials/formComponents/timeInput";
-			break;
+			return "time";
 		case "num":
 		case "number":
 		case "int":
 		case "integer":
-			assignTo.type = "number";
-			EJSPath = "/partials/formComponents/numberInput";
-			break;
+			return "number";
 		case "range":
 		case "slider":
-			assignTo.type = "range";
-			EJSPath = "/partials/formComponents/rangeInput";
-			break;
+			return "range";
 		case "file":
 		case "upload":
-			assignTo.type = "file";
-			EJSPath = "/partials/formComponents/fileInput";
-			break;
+			return "file";
 		case "text":
 		default:
-			assignTo.type = "text";
-			EJSPath = "/partials/formComponents/textInput";
+			return "text";
 	}
-	if(assignPath) assignTo.path = EJSPath;
-	return assignTo;
 }
 
 /**
@@ -168,8 +271,6 @@ function quoteEscape(text = "", isDouble = false) {
 	return text.replace(/'/g, "&#39;");
 }
 
-const copyProps = ["name", "required", "defaultValue", "placeholderText"];
-
 /**
  * Cleans up raw input data and sets defaults for their properties
  * @param {RawInputData} inputData Data to be cleaned up and assigned an id and other information
@@ -182,12 +283,7 @@ function cleanData(inputData, uuid = "", keepDerived = true) {
 		console.warn(inputData);
 		throw "Input data is not an object";
 	}
-
-	const cleanData = cleanDataBare(inputData);
-	typeFilter(cleanData);
-	cleanData.uuid = uuid;
-	cleanData.attributes = attributeAssembly(inputData);
-	return cleanData;
+	return new InputDataManager(inputData).toProcessedObject(uuid);
 }
 
 /**
@@ -200,32 +296,7 @@ function cleanDataBare(inputData) {
 		console.warn(inputData);
 		throw "Input data is not an object";
 	}
-
-	/** @type RawInputData */
-	const cleanData = {};
-	for(const prop of copyProps) {
-		cleanData[prop] = inputData[prop] || "";
-	}
-	typeFilter(inputData, cleanData, false);
-	cleanData.displayName = inputData.displayName || inputData.name || "";
-	cleanData.required = Boolean(inputData.required);
-	if(cleanData.type === "radio" || cleanData.type === "checkbox") cleanData.choices = Array.isArray(inputData.choices) ? inputData.choices : [];
-	return cleanData;
-}
-
-/**
- * Cleans up raw input data and sets defaults for their properties
- * @param {InputData|RawInputData} inputData Data to be cleaned up and assigned an id and other information
- * @returns {Attributes} All the pre-escaped assembled attributes ready to be inserted into HTML
- */
-function attributeAssembly(inputData) {
-	const attributes = {};
-	attributes.value = attributePair("value", inputData.defaultValue);
-	attributes.placeholder = attributePair("placeholder", inputData.placeholderText);
-	attributes.required = inputData.required ? "required" : "";
-	// TODO: Add formal way of adding component specific config. This is a stop-gap for allowing multiple files for fileInputs
-	attributes.multiple = inputData.allowMultiple === true ? "multiple" : "";
-	return attributes;
+	return new InputDataManager(inputData).toCleanObject();
 }
 
 /**
