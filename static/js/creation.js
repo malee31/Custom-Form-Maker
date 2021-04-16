@@ -53,14 +53,12 @@ function createToolOverride(e) {
 	const data = fetchCreateToolValues();
 	requestTemplate(creationInputs.template.value).then(template => {
 		const uuid = generateUUID();
-		const rendered = parseHTMLString(ejs.render(template, {inputOptions: cleanData(data, uuid)}))[0];
+		const rendered = parseHTMLString(ejs.render(template, {inputOptions: data.toProcessedObject(uuid)}))[0];
 		const elementMap = createRenderWrapper();
 		elementMap.renderWrapper.dataset.uuid = uuid;
-		switch(data.type) {
-			case "radio":
-			case "checkbox":
-				elementMap.additionalControls.append(createOptionEditor());
-				attachOptionListeners(elementMap);
+		if(data.subtype === "select") {
+			elementMap.additionalControls.append(createOptionEditor());
+			attachOptionListeners(elementMap);
 		}
 		addEditElementReferences(elementMap);
 		attachEditListeners(rendered, elementMap);
@@ -94,8 +92,8 @@ function createToolHideToggleListener() {
 
 /**
  * Fetches the info needed for a RawInputData object
- * @param {RawInputData} [targetObj = makeData()] Object to assign the strings to. Creates an empty RawInputData object by default
- * @returns {RawInputData} The fetched data stored in an object
+ * @param {InputDataManager|RawInputData} [targetObj = makeData()] Object to assign the strings to. Creates an empty RawInputData object by default
+ * @returns {InputDataManager} The fetched data stored in an object
  */
 function fetchCreateToolValues(targetObj = makeData()) {
 	targetObj.displayName = creationInputs.labelValue.value;
@@ -110,7 +108,7 @@ function fetchCreateToolValues(targetObj = makeData()) {
 /**
  * Fetches the data needed for a RawInputData object from the editors of each preview
  * @param {Object} elementMap The map of the elements for the object
- * @returns {InputData} Completely assembled input object used to rerender. Saves it in the global object before returning
+ * @returns {InputDataManager|InputData} Completely assembled input object used to rerender. Saves it in the global object before returning
  */
 function fetchEditorValues(elementMap) {
 	const editorElements = elementMap.editorElements;
@@ -119,9 +117,8 @@ function fetchEditorValues(elementMap) {
 	editingHeader.placeholderText = editorElements.placeholderValue.value;
 	editingHeader.defaultValue = editorElements.defaultValue.value;
 	editingHeader.required = editorElements.requiredValue.checked;
-	delete editingHeader.choices;
+	editingHeader.choices = [];
 	if(elementMap.additionalControls.querySelector(".choice-container")) {
-		editingHeader.choices = [];
 		for(const choice of elementMap.additionalControls.querySelectorAll(".choice-editor")) {
 			editingHeader.choices.push({
 				"value": choice.value,
@@ -335,19 +332,10 @@ function editableContentFilter(targetElem, filteredText, restore = true, offset 
 
 /**
  * Constructs a new object for new input elements
- * @returns {Object} Basic template for the InputData object
+ * @returns {InputDataManager} An empty data manager to contain and manipulate input data objects
  */
 function makeData() {
-	return {
-		name: "",
-		displayName: "",
-		defaultValue: "",
-		placeholderText: "",
-		type: "text",
-		subtype: null,
-		required: false,
-		attributes: {}
-	};
+	return new InputDataManager();
 }
 
 /**
@@ -380,7 +368,7 @@ function generateUUID() {
 
 /**
  * Finalizes the data used to generate the form and processes it.
- * @returns {Object} The finalized JSON object
+ * @returns {InputData|RawInputData} The finalized JSON object
  */
 function finalizeGeneratedData() {
 	const finalized = {
@@ -395,7 +383,7 @@ function finalizeGeneratedData() {
 		// 	continue;
 		// }
 		// Note: Does not complete a deep copy of data objects. Referenced.
-		finalized.headers[uuidNum] = dataMap[uuid].data;
+		finalized.headers[uuidNum] = dataMap[uuid].data.toCleanObject();
 	}
 	return finalized;
 }

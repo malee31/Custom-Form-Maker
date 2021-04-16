@@ -61,7 +61,7 @@ class InputDataManager {
 		const oldType = this.data.subtype;
 		this.data.type = rawTypeFilter(newVal.toString());
 		this.updateSubtype();
-		if(this.subtype !== oldType) console.warn("Changing between incompatible types may cause problems");
+		if(this.subtype !== oldType) console.warn(`Changing between incompatible types may cause problems\nChange detected from subtypes ${oldType} to ${this.subtype}`);
 	}
 	set required(newVal) { this.data.required = Boolean(newVal); }
 	set defaultValue(newVal) { this.data.defaultValue = newVal.toString(); }
