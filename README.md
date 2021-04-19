@@ -8,7 +8,6 @@ Once it is created, it will appear at the end of the list on the `Service Accoun
 There, open up the `Actions` menu for it and `Manage Keys`.</br>
 Press `Add a key > Create new key > JSON`. This will automatically start a download of a JSON file. These are the credentials for the service account.</br>
 If you lose the key, you can go back to the same page to generate a new one the same way.</br>
-`Note: The service account email must have permission to read and write to the spreadsheets being used when running the project later.`</br>
 See below for the two ways to add the credentials to the repository: The original JSON file or Environment variables
 
 # Adding Credentials - JSON File Method
@@ -22,3 +21,8 @@ First, set the environment variable `process.env.VARIABLE_MODE` to `TRUE`.</br>
 Go to the page where you can set the `Environment Variables` in the selected service and open up the downloaded credentials JSON file from earlier.</br>
 The name of each remaining environmental variable to add will be the keys from the JSON file like `type`, `private_key`, `auth_provider_x509_cert_url`, and more.</br>
 Add the value of those keys to their respective variables to complete the credential set-up process.
+
+# Running the project
+Before running the project for the first time, run the command `npm install` to install the necessary dependencies.</br>
+The first step can be skipped every time after that. To run the project, simply run `node .` or `node app.js`.
+`Note: The service account email must have permission to read and write to the spreadsheets being used when running the project later.`</br>

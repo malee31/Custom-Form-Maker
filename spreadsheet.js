@@ -4,7 +4,7 @@ const sheetError = require('./sheetError.js');
 
 const credentials = !Boolean(process.env.VARIABLE_MODE)
 	?
-	require("./private/SpreadsheetPlaygroundCredentials.json")
+	require("./private/credentials.json")
 	:
 	{
 		"type": process.env.type,
