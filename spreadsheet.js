@@ -1,20 +1,23 @@
-const {GoogleSpreadsheet} = require('google-spreadsheet');
-const {RequirementCollection} = require("./requirement.js");
+const { GoogleSpreadsheet } = require('google-spreadsheet');
+const { RequirementCollection } = require("./requirement.js");
 const sheetError = require('./sheetError.js');
 
-const credentials = require("./private/SpreadsheetPlaygroundCredentials.json");
-// const credentials = {
-// 	"type": process.env.type,
-// 	"project_id": process.env.project_id,
-// 	"private_key_id": process.env.private_key_id,
-// 	"private_key": process.env.private_key,
-// 	"client_email": process.env.client_email,
-// 	"client_id": process.env.client_id,
-// 	"auth_uri": process.env.auth_uri,
-// 	"token_uri": process.env.token_uri,
-// 	"auth_provider_x509_cert_url": process.env.auth_provider_x509_cert_url,
-// 	"client_x509_cert_url": process.env.client_x509_cert_url
-// }
+const credentials = !Boolean(process.env.VARIABLE_MODE)
+	?
+	require("./private/SpreadsheetPlaygroundCredentials.json")
+	:
+	{
+		"type": process.env.type,
+		"project_id": process.env.project_id,
+		"private_key_id": process.env.private_key_id,
+		"private_key": process.env.private_key,
+		"client_email": process.env.client_email,
+		"client_id": process.env.client_id,
+		"auth_uri": process.env.auth_uri,
+		"token_uri": process.env.token_uri,
+		"auth_provider_x509_cert_url": process.env.auth_provider_x509_cert_url,
+		"client_x509_cert_url": process.env.client_x509_cert_url
+	};
 
 const CONFIG_SHEET_NAME = ".config";
 

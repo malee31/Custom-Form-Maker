@@ -53,7 +53,7 @@ function createToolOverride(e) {
 	const data = fetchCreateToolValues();
 	requestTemplate(creationInputs.template.value).then(template => {
 		const uuid = generateUUID();
-		const rendered = parseHTMLString(ejs.render(template, {inputOptions: data.toProcessedObject(uuid)}))[0];
+		const rendered = parseHTMLString(ejs.render(template, { inputOptions: data.toProcessedObject(uuid) }))[0];
 		const elementMap = createRenderWrapper();
 		elementMap.renderWrapper.dataset.uuid = uuid;
 		if(data.subtype === "select") {
@@ -136,7 +136,7 @@ function fetchEditorValues(elementMap) {
 function updatePreview(elementMap) {
 	const updatedData = fetchEditorValues(elementMap);
 	requestTemplate(updatedData.type).then(template => {
-		const rendered = parseHTMLString(ejs.render(template, {inputOptions: cleanData(updatedData, elementMap.renderWrapper.dataset.uuid)}))[0];
+		const rendered = parseHTMLString(ejs.render(template, { inputOptions: cleanData(updatedData, elementMap.renderWrapper.dataset.uuid) }))[0];
 		while(elementMap.renderPreview.firstChild) elementMap.renderPreview.firstChild.remove();
 		elementMap.renderPreview.append(rendered);
 		setAllTabIndex(rendered, -1);
