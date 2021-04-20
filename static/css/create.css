@@ -101,22 +101,32 @@ main {
 .render-wrapper {
 	width: 100%;
 	position: relative;
+	background-color: #EEE;
+	border-radius: .25rem;
+	margin: .25rem 0;
 }
 
 .render-replace {
 	display: none;
 }
 
+.pseudo-label {
+	margin: 0;
+}
+
 .edit-controls-wrapper {
 	display: block;
 	width: 100%;
+	background: none;
 	padding: 0;
+	border: none;
 	position: relative;
 	overflow: hidden;
 }
 
 .edit-mode .edit-controls-wrapper, .edit-controls {
-	height: 35vmin;
+	height: 25vh;
+	max-height: 25vh;
 }
 
 .edit-mode .edit-controls-wrapper > * {
@@ -152,20 +162,40 @@ main {
 }
 
 .edit-control-label {
-	width: 90%;
+	width: 100%;
+	margin-bottom: .1rem;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+	position: relative;
+}
+
+.edit-control-label > span {
+	background-color: #FAFAFA;
+	margin-right: .5rem;
+	position: absolute;
+	top: -.5rem;
+	left: .25rem;
+	white-space: nowrap;
+}
+
+.edit-control-label-inline {
+	width: 100%;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	justify-content: flex-start;
 }
 
-.edit-control-label > span {
-	width: 7rem;
-	min-width: 7rem;
-	max-width: 7rem;
-	text-align: right;
-	white-space: nowrap;
-	margin-right: .5rem;
+.edit-control-label-inline > span {
+	padding-left: .5rem;
+	font-size: 1.25rem;
+}
+
+.edit-control-label-inline > input[type="checkbox"] {
+	width: 1.5rem;
+	height: 1.5rem;
 }
 
 .additional-edit-controls {
