@@ -163,7 +163,7 @@ main {
 
 .edit-control-label {
 	width: 100%;
-	margin-bottom: .1rem;
+	margin: .5rem 0 .2rem;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -172,12 +172,21 @@ main {
 }
 
 .edit-control-label > span {
-	background-color: #FAFAFA;
+	padding: 0 .25rem;
 	margin-right: .5rem;
 	position: absolute;
-	top: -.5rem;
+	top: .75rem;
 	left: .25rem;
 	white-space: nowrap;
+	color: #777;
+	pointer-events: none;
+	cursor: none;
+}
+
+.edit-control-label > input:focus + span, .lock-label-span-top {
+	top: -.5rem;
+	color: #000;
+	background-color: #FAFAFA;
 }
 
 .edit-control-label-inline {
