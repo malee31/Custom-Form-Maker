@@ -191,6 +191,13 @@ function createRenderWrapper() {
 		setAllTabIndex(renderElements.editorWrapper, -1);
 	});
 
+	for(const animatedInput of renderElements.editorWrapper.querySelectorAll(".edit-control-label")) {
+		const targetSpan = animatedInput.querySelector("input + span");
+		animatedInput.querySelector("input").addEventListener("change", () => {
+			if(!targetSpan.classList.contains("lock-label-span-top")) targetSpan.classList.add("lock-label-span-top");
+		});
+	}
+
 	return renderElements;
 }
 
