@@ -399,10 +399,11 @@ function sendJSON() {
 	const data = finalizeGeneratedData();
 	const req = new XMLHttpRequest();
 	req.addEventListener("load", res => {
-		console.log("Success!");
-		console.log(res.target.responseText);
+		toggleErrorBox(true, "Success!", res.target.responseText.replace(" ID: ", `\n${window.location.origin}/created/`));
 	});
-	req.addEventListener("error", console.error);
+	req.addEventListener("error", err => {
+		toggleErrorBox(true, "Failed to Save Form", err || "Please try again later")
+	});
 	req.open("POST", `${window.location.origin}/create/submit`);
 	req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	req.send(JSON.stringify(data));
