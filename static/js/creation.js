@@ -30,6 +30,7 @@ window.addEventListener("load", () => {
 	creationOverlay.addEventListener("submit", createToolOverride);
 	formTitleListeners(document.getElementById("fileTitle"));
 	createToolHideToggleListener();
+	document.getElementById("save-overlay-button").addEventListener("click", sendJSON);
 });
 
 /**
@@ -81,10 +82,12 @@ function createToolHideToggleListener() {
 		if(e.target.classList.contains("hide-creation-overlay")) {
 			e.target.classList.remove("hide-creation-overlay");
 			overlayContainer.classList.remove("hide-creation-overlay");
+			document.getElementById("save-overlay-button").classList.remove("hide-creation-overlay");
 			document.querySelector("main").classList.add("control-pad");
 		} else {
 			e.target.classList.add("hide-creation-overlay");
 			overlayContainer.classList.add("hide-creation-overlay");
+			document.getElementById("save-overlay-button").classList.add("hide-creation-overlay");
 			document.querySelector("main").classList.remove("control-pad");
 		}
 	});

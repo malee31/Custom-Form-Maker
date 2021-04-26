@@ -20,7 +20,7 @@ main {
 	background-color: #EEEEEEAA;
 }
 
-#hide-creation-overlay-button {
+#hide-creation-overlay-button, #save-overlay-button {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -42,6 +42,14 @@ main {
 
 #hide-creation-overlay-button.hide-creation-overlay:after {
 	content: "▲";
+}
+
+#save-overlay-button {
+	right: 2.1rem;
+}
+
+#save-overlay-button:after {
+	content: "💾";
 }
 
 .hide-creation-overlay {
