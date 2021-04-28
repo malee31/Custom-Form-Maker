@@ -402,7 +402,7 @@ function sendJSON() {
 	const data = finalizeGeneratedData();
 	const req = new XMLHttpRequest();
 	req.addEventListener("load", res => {
-		toggleErrorBox(true, "Success!", res.target.responseText.replace(" ID: ", `\n${window.location.origin}/created/`));
+		toggleErrorBox(true, "Success!", `Your form will be found at <a href="${window.location.origin}${res.target.responseText}">${window.location.origin}${res.target.responseText}</a>`, true);
 	});
 	req.addEventListener("error", err => {
 		toggleErrorBox(true, "Failed to Save Form", err || "Please try again later")

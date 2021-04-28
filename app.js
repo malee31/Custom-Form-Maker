@@ -154,7 +154,7 @@ app.post("/create/submit", (req, res) => {
 		data.headers.push(processor.cleanDataBare(header));
 	}
 	writeFile(path.resolve(createdJSONPath, `${assignedID}.json`), JSON.stringify(data)).then(() => {
-		return res.status(200).send(`Your form can now be found at ID: ${assignedID}`);
+		return res.status(200).send(`/created/${assignedID}`);
 	}).catch(err => {
 		return res.status(500).send(`Unable to save. Please try again\n${err.toString()}`);
 	});
