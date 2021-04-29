@@ -22,7 +22,8 @@ const loadedTemplates = {};
 const dataMap = {};
 const GeneratedData = {
 	name: "Custom Form",
-	headers: []
+	headers: [],
+	sheetId: "N/A"
 };
 
 window.addEventListener("load", () => {
@@ -30,7 +31,11 @@ window.addEventListener("load", () => {
 	creationOverlay.addEventListener("submit", createToolOverride);
 	formTitleListeners(document.getElementById("fileTitle"));
 	createToolHideToggleListener();
-	document.getElementById("save-overlay-button").addEventListener("click", sendJSON);
+	document.getElementById("save-overlay-button").addEventListener("click", e => {
+		GeneratedData.sheetId = document.querySelector("#save-overlay-button > input").value;
+		if(e.target.id === "save-overlay-button") sendJSON();
+		// else console.log(e.target)
+	});
 });
 
 /**
@@ -383,7 +388,8 @@ function generateUUID() {
 function finalizeGeneratedData() {
 	const finalized = {
 		name: GeneratedData.name,
-		headers: []
+		headers: [],
+		sheetId: GeneratedData.sheetId
 	};
 	for(let uuidNum = 0; uuidNum < GeneratedData.headers.length; uuidNum++) {
 		const uuid = GeneratedData.headers[uuidNum];

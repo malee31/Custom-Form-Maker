@@ -46,6 +46,12 @@ main {
 
 #save-overlay-button {
 	right: 2.1rem;
+	width: auto;
+	padding: 0 .1rem;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
 }
 
 #save-overlay-button:after {
