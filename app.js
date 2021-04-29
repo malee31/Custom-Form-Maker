@@ -122,7 +122,7 @@ app.get("/created/:createId", (req, res) => {
 	readFile(requestedCreated).then(data => {
 		const jsonify = JSON.parse(data.toString());
 		res.render(path.resolve(__dirname, "views/pages/form"), {
-			formId: `createId/${req.params.createId}`,
+			formId: jsonify.sheetId,
 			formData: {
 				name: jsonify.name,
 				headers: jsonify.headers.map(header => cleanData(header))
