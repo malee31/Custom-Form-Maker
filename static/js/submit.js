@@ -13,13 +13,13 @@ function collectFormData(formData, form) {
 		switch(input.type) {
 			case "checkbox":
 				// targetObject[input.dataset.columnname] = [];
-				form.querySelectorAll(`input[type="checkbox"][name=${input.name}]`)
+				form.querySelectorAll(`input[type="checkbox"][name="${input.name}"]`)
 					.forEach(item => {
 						if(item.checked) formData.append(input.dataset.columnname, item.value);
 					});
 				break;
 			case "radio":
-				form.querySelectorAll(`input[type="radio"][name=${input.name}]`)
+				form.querySelectorAll(`input[type="radio"][name="${input.name}"]`)
 					.forEach(item => {
 						if(item.checked) formData.set(input.dataset.columnname, item.value);
 					});

@@ -87,7 +87,7 @@ app.post("/submit", upload.any(), async(req, res) => {
 		sheetError.specificErr(err, "Adding Rows")
 		res.sendStatus(422);
 	}
-})
+});
 
 app.post("/redirect", (req, res) => {
 	console.log(req.body);
