@@ -46,13 +46,13 @@ class InputDataManager {
 		this.data = {};
 		this.displayName = baseObject.displayName || "";
 		this.data.name = baseObject.name || "";
-		this.data.type = baseObject.type || "text";
+		this.data.type = rawTypeFilter(baseObject.type);
 		this.updateSubtype();
-		this.data.required = baseObject.required || false;
+		this.data.required = Boolean(baseObject.required);
 		this.data.defaultValue = baseObject.defaultValue || "";
 		this.data.placeholderText = baseObject.placeholderText || "";
 		this.data.choices = baseObject.choices || [];
-		this.data.allowMultiple = baseObject.allowMultiple || false;
+		this.data.allowMultiple = Boolean(baseObject.allowMultiple);
 	}
 
 	set displayName(newVal) { this.data.displayName = newVal; }
@@ -103,8 +103,8 @@ class InputDataManager {
 	toCleanObject() {
 		/** @type RawInputData */
 		const cleanObject = {
-			name: this.name,
-			displayName: this.displayName,
+			name: this.name || this.displayName,
+			displayName: this.displayName || this.name,
 			type: this.type,
 			required: this.required
 		};
