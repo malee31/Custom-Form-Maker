@@ -3,4 +3,7 @@
         <%= inputOptions.displayName %>
     </span>
 	<input data-columnname="<%= inputOptions.name %>" pattern="\d{4}-\d{2}-\d{2}" placeholder="yyyy-mm-dd" type="date" <%- inputOptions.attributes.value %> <%- inputOptions.attributes.required %>>
+	<% if(typeof editMode !== "undefined" && editMode) { %>
+		<div data-purpose="input-editor-text"></div>
+	<% } %>
 </label>

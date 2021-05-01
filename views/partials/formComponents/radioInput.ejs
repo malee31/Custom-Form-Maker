@@ -4,10 +4,11 @@
     </span>
 	<% inputOptions.choices.forEach( choice => { %>
 	<label class="inline-label">
-            <span class="sub-label">
-                <%= choice.value %>
-            </span>
+		<span class="sub-label">
+				<%= choice.value %>
+		</span>
 		<input data-columnname="<%= inputOptions.name %>" name="<%= inputOptions.uuid %>" type="radio" value="<%= choice.value %>" <%= (choice.default ? "checked" : "") %>>
+		<!-- TODO: Custom Editor and Purpose for Select Subtypes -->
 	</label>
 	<% }) %>
 </div>

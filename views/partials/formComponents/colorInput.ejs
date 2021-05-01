@@ -3,7 +3,8 @@
         <%= inputOptions.displayName %>
     </span>
 	<span class="color-wrapper">
-        <input data-bindto="<%= inputOptions.uuid %>" type="text" <%- inputOptions.attributes.value %> <%- inputOptions.attributes.placeholder %>>
-        <input data-bindfrom="<%= inputOptions.uuid %>" data-columnname="<%= inputOptions.name %>" type="color" <%- inputOptions.attributes.value %> <%- inputOptions.attributes.required %>>
-    </span>
+		<input data-bindto="<%= inputOptions.uuid %>" type="text" <%- inputOptions.attributes.value %> <%- inputOptions.attributes.placeholder %>>
+		<input data-bindfrom="<%= inputOptions.uuid %>" data-columnname="<%= inputOptions.name %>" type="color" <%- inputOptions.attributes.value %> <%- inputOptions.attributes.required %>>
+		<!-- TODO: Add custom editor for color inputs -->
+	</span>
 </label>

@@ -3,4 +3,7 @@
         <%= inputOptions.displayName %>
     </span>
 	<input data-columnname="<%= inputOptions.name %>" type="month" <%- inputOptions.attributes.value %> <%- inputOptions.attributes.placeholder %> <%- inputOptions.attributes.required %>>
+	<% if(typeof editMode !== "undefined" && editMode) { %>
+		<div data-purpose="input-editor-text"></div>
+	<% } %>
 </label>

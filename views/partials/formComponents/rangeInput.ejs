@@ -4,4 +4,7 @@
     </span>
 	<!-- TODO: Customizable ranges and step increments -->
 	<input data-columnname="<%= inputOptions.name %>" type="range" <%- inputOptions.attributes.value %> <%- inputOptions.attributes.placeholder %> <%- inputOptions.attributes.required %>>
+	<% if(typeof editMode !== "undefined" && editMode) { %>
+		<div data-purpose="input-editor-text"></div>
+	<% } %>
 </label>

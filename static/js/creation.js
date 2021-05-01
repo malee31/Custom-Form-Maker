@@ -59,7 +59,7 @@ function createToolOverride(e) {
 	const data = fetchCreateToolValues();
 	requestTemplate(creationInputs.template.value).then(template => {
 		const uuid = generateUUID();
-		const rendered = parseHTMLString(ejs.render(template, { inputOptions: data.toProcessedObject(uuid) }))[0];
+		const rendered = parseHTMLString(ejs.render(template, { inputOptions: data.toProcessedObject(uuid), editMode: true }))[0];
 		const elementMap = createRenderWrapper();
 		elementMap.renderWrapper.dataset.uuid = uuid;
 		if(data.subtype === "select") {
