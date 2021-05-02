@@ -34,7 +34,7 @@ window.addEventListener("load", () => {
 	document.getElementById("save-overlay-button").addEventListener("click", e => {
 		GeneratedData.sheetId = document.querySelector("#save-overlay-button > input").value;
 		if(e.target.id === "save-overlay-button") sendJSON();
-		// else console.log(e.target)
+		// else console.log(e.target);
 	});
 });
 
@@ -57,25 +57,22 @@ function createToolOverride(e) {
 	if(e) e.preventDefault();
 	console.log("Creating New Input");
 	const data = fetchCreateToolValues();
-	requestTemplate(creationInputs.template.value).then(template => {
-		const uuid = generateUUID();
-		const rendered = parseHTMLString(ejs.render(template, { inputOptions: data.toProcessedObject(uuid), editMode: true }))[0];
-		const elementMap = createRenderWrapper();
-		elementMap.renderWrapper.dataset.uuid = uuid;
-		if(data.subtype === "select") {
-			elementMap.additionalControls.append(createOptionEditor());
-			attachOptionListeners(elementMap);
-		}
-		addEditElementReferences(elementMap);
-		attachEditListeners(rendered, elementMap);
+	const uuid = generateUUID();
+	const elementMap = createRenderWrapper();
+	elementMap.data = data;
+	elementMap.renderWrapper.dataset.uuid = uuid;
+	if(data.subtype === "select") {
+		elementMap.additionalControls.append(createOptionEditor());
+		attachOptionListeners(elementMap);
+	}
+	addEditElementReferences(elementMap);
+	attachEditListeners(elementMap);
+	updatePreview(elementMap, true);
 
-		elementMap.renderPreview.append(rendered);
-		formAppend(elementMap.renderWrapper);
-		elementMap.data = data;
-		dataMap[uuid] = elementMap;
-		GeneratedData.headers.push(uuid);
-		console.log("New Input Added");
-	});
+	formAppend(elementMap.renderWrapper);
+	dataMap[uuid] = elementMap;
+	GeneratedData.headers.push(uuid);
+	console.log("New Input Added");
 }
 
 /**
@@ -104,7 +101,7 @@ function createToolHideToggleListener() {
  * @returns {InputDataManager} The fetched data stored in an object
  */
 function fetchCreateToolValues(targetObj = makeData()) {
-	targetObj.displayName = creationInputs.labelValue.value;
+	targetObj.displayName = creationInputs.labelValue.value.trim() || "<Label>";
 	targetObj.type = creationInputs.template.value;
 	typeFilter(targetObj);
 	targetObj.placeholderText = creationInputs.placeholder.value;
@@ -121,7 +118,6 @@ function fetchCreateToolValues(targetObj = makeData()) {
 function fetchEditorValues(elementMap) {
 	const editorElements = elementMap.editorElements;
 	const editingHeader = elementMap.data;
-	editingHeader.displayName = editorElements.labelValue.value;
 	editingHeader.placeholderText = editorElements.placeholderValue.value;
 	editingHeader.defaultValue = editorElements.defaultValue.value;
 	editingHeader.required = editorElements.requiredValue.checked;
@@ -140,15 +136,16 @@ function fetchEditorValues(elementMap) {
 /**
  * Renders a preview from a map of elements and replaces the old one.
  * @param {Object} elementMap The map of the elements for rerender
+ * @param {boolean} [skipFetch = false] If set to true, the object will be re-rendered from pre-existing data
  */
-function updatePreview(elementMap) {
-	const updatedData = fetchEditorValues(elementMap);
+function updatePreview(elementMap, skipFetch = false) {
+	const updatedData = skipFetch ? elementMap.data : fetchEditorValues(elementMap);
 	requestTemplate(updatedData.type).then(template => {
-		const rendered = parseHTMLString(ejs.render(template, { inputOptions: cleanData(updatedData, elementMap.renderWrapper.dataset.uuid) }))[0];
+		const rendered = parseHTMLString(ejs.render(template, { inputOptions: cleanData(updatedData, elementMap.renderWrapper.dataset.uuid), editMode: true }))[0];
 		while(elementMap.renderPreview.firstChild) elementMap.renderPreview.firstChild.remove();
 		elementMap.renderPreview.append(rendered);
-		setAllTabIndex(rendered, -1);
 		attachEditOpenerListeners(rendered, elementMap);
+		setAllTabIndex(rendered, -1);
 		updateListeners();
 	});
 }
@@ -235,17 +232,12 @@ function attachOptionListeners(elementMap) {
 
 /**
  * Adds listeners to update tab-index and previews when the editor inputs are changed.
- * @param {Node} previewRender The render preview to attach edit listeners to
  * @param {Object} elementMap The element map to link to the preview
  */
-function attachEditListeners(previewRender, elementMap) {
-	attachEditOpenerListeners(previewRender, elementMap);
-	setAllTabIndex(previewRender, -1);
-
+function attachEditListeners(elementMap) {
 	const updatePreviewForWrapper = () => {
-		updatePreview(elementMap)
+		updatePreview(elementMap);
 	};
-	elementMap.editorElements.labelValue.addEventListener("input", updatePreviewForWrapper);
 	elementMap.editorElements.defaultValue.addEventListener("input", updatePreviewForWrapper);
 	elementMap.editorElements.placeholderValue.addEventListener("input", updatePreviewForWrapper);
 	elementMap.editorElements.requiredValue.addEventListener("change", updatePreviewForWrapper);
@@ -253,12 +245,21 @@ function attachEditListeners(previewRender, elementMap) {
 
 /**
  * Adds the listener to the rendered preview that opens up the editor on click
- * @param {Node} previewRender The rendered preview
+ * @param {Element|Node} previewRender The rendered preview
  * @param {Object} elementMap The element map containing the editor to reveal
  */
 function attachEditOpenerListeners(previewRender, elementMap) {
-	previewRender.addEventListener("click", () => {
-		if(!elementMap.renderWrapper.classList.contains("edit-mode")) {
+	const labelEditor = previewRender.querySelector("[data-purpose='label']");
+	labelEditor.setAttribute("contenteditable", "true");
+	editableListeners(labelEditor);
+	labelEditor.addEventListener("click", e => {
+		e.preventDefault();
+	});
+	labelEditor.addEventListener("input", e => {
+		elementMap.data.displayName = e.target.innerText.replace(/\s/g, " ");
+	});
+	previewRender.addEventListener("click", e => {
+		if(e.target === previewRender && !elementMap.renderWrapper.classList.contains("edit-mode")) {
 			elementMap.renderWrapper.classList.add("edit-mode");
 			elementMap.editorWrapper.classList.remove("dimensionless");
 			setAllTabIndex(elementMap.editorWrapper, 0);
@@ -272,7 +273,6 @@ function attachEditOpenerListeners(previewRender, elementMap) {
  */
 function addEditElementReferences(renderMap) {
 	renderMap.editorElements = {
-		labelValue: renderMap.editorWrapper.querySelector(".label-editor"),
 		defaultValue: renderMap.editorWrapper.querySelector(".default-value-editor"),
 		placeholderValue: renderMap.editorWrapper.querySelector(".placeholder-editor"),
 		requiredValue: renderMap.editorWrapper.querySelector(".required-editor")
@@ -334,7 +334,7 @@ function restoreSelection(targetElem, restorePosition, offset = 0, collapse = fa
 
 /**
  * Resets the text of a content-editable element to a filtered version and restores the cursor position
- * @param {HTMLElement} targetElem Element to apply filtered text
+ * @param {Element} targetElem Element to apply filtered text
  * @param {string} filteredText The filtered string to set as the innerText
  * @param {boolean} [restore = true] Whether or not to restore the cursor position after filtering (Set to false for blur events)
  * @param {number} [offset = 0] Number to offset the cursor by
@@ -383,7 +383,7 @@ function generateUUID() {
 
 /**
  * Finalizes the data used to generate the form and processes it.
- * @returns {InputData|RawInputData} The finalized JSON object
+ * @returns {RawInputData} The finalized JSON object
  */
 function finalizeGeneratedData() {
 	const finalized = {
@@ -411,7 +411,7 @@ function sendJSON() {
 		toggleErrorBox(true, "Success!", `Your form will be found at <a href="${window.location.origin}${res.target.responseText}">${window.location.origin}${res.target.responseText}</a>`, true);
 	});
 	req.addEventListener("error", err => {
-		toggleErrorBox(true, "Failed to Save Form", err || "Please try again later")
+		toggleErrorBox(true, "Failed to Save Form", err || "Please try again later");
 	});
 	req.open("POST", `${window.location.origin}/create/submit`);
 	req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
