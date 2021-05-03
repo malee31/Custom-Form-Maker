@@ -259,7 +259,7 @@ function attachEditOpenerListeners(previewRender, elementMap) {
 		elementMap.data.displayName = e.target.innerText.replace(/\s/g, " ");
 	});
 	previewRender.addEventListener("click", e => {
-		if(e.target === previewRender && !elementMap.renderWrapper.classList.contains("edit-mode")) {
+		if(e.target.dataset.purpose !== "label" && !elementMap.renderWrapper.classList.contains("edit-mode")) {
 			elementMap.renderWrapper.classList.add("edit-mode");
 			elementMap.editorWrapper.classList.remove("dimensionless");
 			setAllTabIndex(elementMap.editorWrapper, 0);

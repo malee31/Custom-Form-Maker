@@ -153,21 +153,21 @@ main {
 	justify-content: flex-start;
 	align-items: center;
 	overflow-y: auto;
-	padding: 3rem .5rem 1rem;
+	padding: 0 0 1rem;
 	margin: 0;
 	opacity: 1;
 }
 
 .close-editor-button {
-	position: absolute;
-	top: .5rem;
-	right: 1rem;
-	min-width: 2rem;
+	/*position: absolute;*/
+	/*top: .5rem;*/
+	/*right: 1rem;*/
+	width: 100%;
 	min-height: 2rem;
 	align-self: flex-end;
 	border-radius: .2rem;
 	border: 1px solid #CCC;
-	margin-bottom: .5rem;
+	margin: 0 0 .5rem;
 }
 
 .close-editor-button:hover {
@@ -176,8 +176,8 @@ main {
 }
 
 .edit-control-label {
-	width: 100%;
-	margin: .5rem 0 .2rem;
+	width: calc(100% - 1rem);
+	margin: .5rem .2rem;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -204,11 +204,12 @@ main {
 }
 
 .edit-control-label-inline {
-	width: 100%;
+	width: calc(100% - 1rem);
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	justify-content: flex-start;
+	margin: 0 .5rem;
 }
 
 .edit-control-label-inline > span {
@@ -226,7 +227,7 @@ main {
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: center;
-	width: 90%;
+	width: calc(100% - 1rem);
 }
 
 .choice-editor-heading {
