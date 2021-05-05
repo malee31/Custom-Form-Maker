@@ -7,4 +7,5 @@
 		<input data-bindfrom="<%= inputOptions.uuid %>" data-columnname="<%= inputOptions.name %>" type="color" <%- inputOptions.attributes.value %> <%- inputOptions.attributes.required %>>
 		<!-- TODO: Add custom editor for color inputs -->
 	</span>
+	<span data-purpose="required-span" class="required-span <%- inputOptions.required ? "required-span-enabled" : "" %>"></span>
 </label>
