@@ -128,6 +128,23 @@ main {
 	margin: 0;
 }
 
+.required-span, .required-span-enabled:hover {
+	color: gray;
+	font-size: .75rem;
+	text-decoration: line-through;
+	cursor: pointer;
+}
+
+.required-span-enabled, .required-span:hover {
+	color: red;
+	text-decoration: none;
+}
+
+.required-span-enabled:hover {
+	color: gray;
+	text-decoration: line-through;
+}
+
 .edit-controls-wrapper {
 	display: block;
 	width: 100%;

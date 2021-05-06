@@ -7,7 +7,7 @@
 		<!-- TODO: Create a function to handle validation on file inputs instead of "required" since it throws an error -->
 		<input data-bindfrom="<%= inputOptions.uuid %>" data-columnname="<%= inputOptions.name %>" type="file" <%- inputOptions.attributes.multiple %> <%- inputOptions.attributes.required %>>
 	</label>
-	<span data-purpose="required-span" class="required-span <%- inputOptions.required ? "required-span-enabled" : "" %>"></span>
+	<span data-purpose="required-span" class="required-span <%- inputOptions.required ? "required-span-enabled" : "" %>">✻ Required</span>
 	<div class="file-preview file-preview-hide" data-bindto="<%= inputOptions.uuid %>"></div>
 	<% if(typeof editMode !== "undefined" && editMode) { %>
 	<div data-purpose="input-editor-text"></div>

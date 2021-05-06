@@ -3,7 +3,7 @@
         <%= inputOptions.displayName %>
     </span>
 	<input data-columnname="<%= inputOptions.name %>" type="tel" <%- inputOptions.attributes.value %> <%- inputOptions.attributes.placeholder %> <%- inputOptions.attributes.required %>>
-	<span data-purpose="required-span" class="required-span <%- inputOptions.required ? "required-span-enabled" : "" %>"></span>
+	<span data-purpose="required-span" class="required-span <%- inputOptions.required ? "required-span-enabled" : "" %>">✻ Required</span>
 	<% if(typeof editMode !== "undefined" && editMode) { %>
 		<div data-purpose="input-editor-text"></div>
 	<% } %>

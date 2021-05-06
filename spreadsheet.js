@@ -132,7 +132,7 @@ async function fillRow(userInput) {
 		return sheetError.throwErr("REQUIRED INPUT NONEXISTENT", `Required Inputs Missing: \nUser Input: ${JSON.stringify(userInput)} \nRequired Inputs: ${JSON.stringify(requirements)}`);
 
 	try {
-		console.log(userInput);
+		console.log(`Pushing onto sheet: ${JSON.stringify(userInput)}`);
 		await (await getMain(sheets)).addRow(userInput);
 	} catch(err) {
 		console.error(err);

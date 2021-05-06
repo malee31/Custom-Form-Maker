@@ -122,21 +122,17 @@ form {
 }
 
 .required-span {
+	width: fit-content;
+	align-self: flex-end;
+	padding: 0 0 0 .25rem;
+	color: transparent;
+	text-align: right;
 	font-size: .5rem;
 }
 
-.required-span:after {
-	content: "\200b";
-}
-
 .required-span-enabled {
-	text-align: right;
-	font-size: .75rem;
 	color: red;
-}
-
-.required-span-enabled:after {
-	content: "✻ Required";
+	font-size: .75rem;
 }
 
 /* Used together with JS to pad the bottom of the page for the URL bar.
