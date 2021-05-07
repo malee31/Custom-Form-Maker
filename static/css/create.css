@@ -128,20 +128,24 @@ main {
 	margin: 0;
 }
 
-.required-span, .required-span-enabled:hover {
+.required-span {
 	color: gray;
 	font-size: .75rem;
-	text-decoration: line-through;
+	text-decoration: none;
 	cursor: pointer;
 }
 
-.required-span-enabled, .required-span:hover {
+.required-span-enabled {
 	color: red;
 	text-decoration: none;
 }
 
+.required-span:hover {
+	text-decoration: underline;
+}
+
 .required-span-enabled:hover {
-	color: gray;
+	color: red;
 	text-decoration: line-through;
 }
 
@@ -231,6 +235,7 @@ main {
 	background-color: #FAFAFA;
 }
 
+/* No longer used (Required-Editor Checkbox Removed) */
 .edit-control-label-inline {
 	width: 100%;
 	display: flex;

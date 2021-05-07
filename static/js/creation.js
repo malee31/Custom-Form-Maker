@@ -120,7 +120,6 @@ function fetchEditorValues(elementMap) {
 	const editingHeader = elementMap.data;
 	editingHeader.placeholderText = editorElements.placeholderValue.value;
 	editingHeader.defaultValue = editorElements.defaultValue.value;
-	editingHeader.required = editorElements.requiredValue.checked;
 	editingHeader.choices = [];
 	if(elementMap.additionalControls.querySelector(".choice-container")) {
 		for(const choice of elementMap.additionalControls.querySelectorAll(".choice-editor")) {
@@ -240,7 +239,6 @@ function attachEditListeners(elementMap) {
 	};
 	elementMap.editorElements.defaultValue.addEventListener("input", updatePreviewForWrapper);
 	elementMap.editorElements.placeholderValue.addEventListener("input", updatePreviewForWrapper);
-	elementMap.editorElements.requiredValue.addEventListener("change", updatePreviewForWrapper);
 }
 
 /**
@@ -258,8 +256,14 @@ function attachEditOpenerListeners(previewRender, elementMap) {
 	labelEditor.addEventListener("input", e => {
 		elementMap.data.displayName = e.target.innerText.replace(/\s/g, " ");
 	});
+	const requiredEditor = previewRender.querySelector("[data-purpose='required-span']");
+	requiredEditor.addEventListener("click", e => {
+		if(elementMap.data.required) e.target.classList.remove("required-span-enabled");
+		else e.target.classList.add("required-span-enabled");
+		elementMap.data.required = !elementMap.data.required;
+	});
 	previewRender.addEventListener("click", e => {
-		if(e.target.dataset.purpose !== "label" && !elementMap.renderWrapper.classList.contains("edit-mode")) {
+		if(e.target.dataset.purpose !== "label" && e.target.dataset.purpose !== "required-span" && !elementMap.renderWrapper.classList.contains("edit-mode")) {
 			elementMap.renderWrapper.classList.add("edit-mode");
 			elementMap.editorWrapper.classList.remove("dimensionless");
 			setAllTabIndex(elementMap.editorWrapper, 0);
@@ -274,8 +278,7 @@ function attachEditOpenerListeners(previewRender, elementMap) {
 function addEditElementReferences(renderMap) {
 	renderMap.editorElements = {
 		defaultValue: renderMap.editorWrapper.querySelector(".default-value-editor"),
-		placeholderValue: renderMap.editorWrapper.querySelector(".placeholder-editor"),
-		requiredValue: renderMap.editorWrapper.querySelector(".required-editor")
+		placeholderValue: renderMap.editorWrapper.querySelector(".placeholder-editor")
 	};
 }
 
