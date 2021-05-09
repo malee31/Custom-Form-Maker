@@ -145,14 +145,19 @@ app.get("/templates", (req, res) => {
 	}
 });
 
-app.post("/create/submit", (req, res) => {
+app.post("/create/submit", async (req, res) => {
 	const assignedID = uuidv4();
 	const data = req.body;
 	const dataHeaders = data.headers;
 	data.headers = [];
+	const headerValues = [];
 	for(const header of dataHeaders) {
-		data.headers.push(processor.cleanDataBare(header));
+		const cleaned = processor.cleanDataBare(header);
+		data.headers.push(cleaned);
+		headerValues.push(cleaned.name);
 	}
+	const createState = await sheet.createResultSheet(data.sheetId, headerValues);
+	if(!createState.success) return res.status(400).send(`Sheet ID may be invalid or uneditable by server\n Error: ${createState.statusText}`);
 	writeFile(path.resolve(createdJSONPath, `${assignedID}.json`), JSON.stringify(data)).then(() => {
 		return res.status(200).send(`/created/${assignedID}`);
 	}).catch(err => {

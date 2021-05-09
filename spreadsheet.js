@@ -20,6 +20,7 @@ const credentials = !Boolean(process.env.VARIABLE_MODE)
 	};
 
 const CONFIG_SHEET_NAME = ".config";
+const RESULT_SHEET_TITLE = "Form Results";
 
 /**
  * Handles wrangling with Google Spreadsheet API functions
@@ -28,13 +29,14 @@ const CONFIG_SHEET_NAME = ".config";
 module.exports = {
 	newRow: fillRow,
 	getHeaders: getSheetHeaders,
+	createResultSheet: makeResultSheet
 }
 
 /**
  * Initializes a GoogleSpreadsheet object from a specified id and loads their worksheets.
  * @async
  * @param {string} formId Id of the target Google Spreadsheet meant for inputted data.
- * @returns {GoogleSpreadsheet} Google Spreadsheet object with all worksheets loaded in
+ * @returns {Promise<GoogleSpreadsheet>} Google Spreadsheet object with all worksheets loaded in
  */
 async function getWorksheets(formId) {
 	const doc = new GoogleSpreadsheet(formId);
@@ -104,36 +106,71 @@ async function getRequirements(doc, keepExcluded = false) {
 }
 
 /**
+ * Creates a sheet to add results onto
+ * @param {string} sheetId Sheet ID of the spreadsheet to add a results sheet onto
+ * @param {string[]} headers Headers for the sheet. Array of the column titles
+ * @return {Promise<{success: boolean, statusText: string}>} Promise that returns whether the sheet was successfully created and a note if not
+ */
+async function makeResultSheet(sheetId, headers) {
+	try {
+		const doc = await getWorksheets(sheetId);
+		if(doc.sheetsByTitle[RESULT_SHEET_TITLE]) await doc.deleteSheet(doc.sheetsByTitle[RESULT_SHEET_TITLE].sheetId);
+		await doc.addSheet({
+			title: RESULT_SHEET_TITLE,
+			headerValues: headers,
+			tabColor: {
+				red: 0.016,
+				green: 0.549,
+				blue: 0.988,
+				alpha: 1
+			}
+		});
+		return {success: true, statusText: "Successfully created result sheet"};
+	} catch (e) {
+		return {success: false, statusText: `Code ${e.code}: ${e.message}`};
+	}
+}
+
+/**
  * Fills a new row in the main sheet with form input after validating input. Rejects on fail.
  * @async
  * @param {Object} userInput JSON object containing user form input in key value pairs of sanitized header
  * 	names and inputted data.
+ * @param {boolean} [legacyMode = false] Whether to run checks based on the old method of doing things through config sheets
  */
-async function fillRow(userInput) {
+async function fillRow(userInput, legacyMode = false) {
 	const sheets = await getWorksheets(userInput["formId"]);
+	let resultSheet;
+
+	// Pre-processing
 	delete userInput["formId"];
-
-	const requirements = (await getRequirements(sheets)).headers;
-
 	for(const dataProp in userInput) {
-		if(!requirements.find(req => req.name === dataProp)) {
-			console.log(`Deleted ${dataProp}: ${userInput[dataProp]}`);
-			delete userInput[dataProp];
-			continue;
-		}
-
 		// Concatenates arrays from checkboxes and HTML escapes commas in values
 		if(Array.isArray(userInput[dataProp]))
 			userInput[dataProp] = userInput[dataProp].map(val => val.replace(/,/g, "&comma;")).join(",");
 	}
 
-	// Checks to make sure that all required inputs have values
-	if(!requirements.every(req => !req.required || userInput[req.name]))
-		return sheetError.throwErr("REQUIRED INPUT NONEXISTENT", `Required Inputs Missing: \nUser Input: ${JSON.stringify(userInput)} \nRequired Inputs: ${JSON.stringify(requirements)}`);
+	if(legacyMode) {
+		resultSheet = await getMain(sheets);
+		const requirements = (await getRequirements(sheets)).headers;
+		for(const dataProp in userInput) {
+			if(!requirements.find(req => req.name === dataProp)) {
+				console.log(`Deleted ${dataProp}: ${userInput[dataProp]}`);
+				delete userInput[dataProp];
+			}
+		}
+
+		// Checks to make sure that all required inputs have values
+		if(!requirements.every(req => !req.required || userInput[req.name]))
+			return sheetError.throwErr("REQUIRED INPUT NONEXISTENT", `Required Inputs Missing: \nUser Input: ${JSON.stringify(userInput)} \nRequired Inputs: ${JSON.stringify(requirements)}`);
+	} else {
+		resultSheet = sheets.sheetsByTitle[RESULT_SHEET_TITLE];
+		if(!resultSheet) sheetError.throwErr("Results Sheet Missing", `The sheet titled ${RESULT_SHEET_TITLE} does not exist`);
+	}
 
 	try {
 		console.log(`Pushing onto sheet: ${JSON.stringify(userInput)}`);
-		await (await getMain(sheets)).addRow(userInput);
+		await resultSheet.addRow(userInput);
 	} catch(err) {
 		console.error(err);
 	}
