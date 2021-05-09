@@ -105,15 +105,15 @@ app.get("/test/:testMode?", (req, res) => {
 });
 
 app.get("/form/:sheetId", async(req, res) => {
-	const headers = await sheet.getHeaders(req.params.sheetId);
-	headers.headers = headers.headers.map(header => cleanData(header));
+	const headerData = await sheet.getHeaders(req.params.sheetId);
 	(req.query.default || "").split(/(?=\s*(?<=[^\\])),/).forEach((val, index) => {
 		val = val.replace(/\\,/g, ",").trim();
-		if(val && index + 1 < headers.length) headers[index + 1].defaultValue = val;
+		if(val && index < headerData.headers.length) headerData.headers[index].defaultValue = val;
 	});
 
-	console.log(headers);
-	res.render(path.resolve(__dirname, "views/pages/form"), {formId: req.params.sheetId, formData: headers});
+	headerData.headers = headerData.headers.map(header => cleanData(header));
+	console.log(headerData);
+	res.render(path.resolve(__dirname, "views/pages/form"), {formId: req.params.sheetId, formData: headerData});
 });
 
 app.get("/created/:createId", (req, res) => {

@@ -2,6 +2,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { RequirementCollection } = require("./requirement.js");
 const sheetError = require('./sheetError.js');
 
+const RESULT_SHEET_TITLE = "Form Results";
 const credentials = !Boolean(process.env.VARIABLE_MODE)
 	?
 	require("./private/credentials.json")
@@ -19,8 +20,6 @@ const credentials = !Boolean(process.env.VARIABLE_MODE)
 		"client_x509_cert_url": process.env.client_x509_cert_url
 	};
 
-const CONFIG_SHEET_NAME = ".config";
-const RESULT_SHEET_TITLE = "Form Results";
 
 /**
  * Handles wrangling with Google Spreadsheet API functions
@@ -58,27 +57,23 @@ async function getSheetHeaders(id) {
 }
 
 /**
- * Returns the sheet labeled as the main sheet from an array of worksheets based on the config sheet.
+ * Retrieves the labels/headers at the top row of the main sheet along with their requirement status.
  * @async
- * @param {GoogleSpreadsheet} doc Google Spreadsheet to get Main worksheet from
- * @param {boolean} [defaultToFirst = true] Whether to default to the first sheet if a main sheet is not found
- * @returns {GoogleSpreadsheetWorksheet} The main worksheet
+ * @param {GoogleSpreadsheetWorksheet} sheet Google Spreadsheet to load cells from
+ * @param {number} [minRow = 0] Zero-indexed row number minimum
+ * @param {number} [minCol = 0] Zero-indexed column number minimum
+ * @param {number} [maxRow = doc.rowCount] Zero-indexed row number maximum
+ * @param {number} [maxCol = doc.columnCount] Zero-indexed column number maximum
  */
-async function getMain(doc, defaultToFirst = true) {
-	// console.log("Searching for main");
-	const config = getConfig(doc);
-	const main = await offsetParse(config, "DATA", 1, 0, "Main");
-	// console.log("Main sheet is called: " + main);
-	return doc.sheetsByTitle[main] || (defaultToFirst ? doc.sheetsByIndex[0] : undefined);
-}
-
-/**
- * Returns the sheet labeled as the config from an array of worksheets.
- * @param {GoogleSpreadsheet} doc Google Spreadsheet to get Config worksheet from
- * @returns {GoogleSpreadsheetWorksheet} The config worksheet
- */
-function getConfig(doc) {
-	return doc.sheetsByTitle[CONFIG_SHEET_NAME];
+async function loadCells(sheet, minRow = 0, minCol = 0, maxRow, maxCol) {
+	maxRow = maxRow || sheet.rowCount;
+	maxCol = maxCol || sheet.columnCount;
+	return await sheet.loadCells({
+		"startRowIndex": Math.min(minRow, sheet.rowCount - 1),
+		"startColumnIndex": Math.min(minCol, sheet.columnCount - 1),
+		"endRowIndex": Math.min(maxRow, sheet.rowCount),
+		"endColumnIndex": Math.min(maxCol, sheet.columnCount)
+	});
 }
 
 /**
@@ -89,14 +84,13 @@ function getConfig(doc) {
  * @returns {Promise<Object>} Returns object containing metadata and an array of objects with the column name, default values, and whether or not they are required
  */
 async function getRequirements(doc, keepExcluded = false) {
-	const config = getConfig(doc) || getMain(doc);
-	await loadCells(config, 0, 0, 3, config.columnCount);
-
+	const sheet = doc.sheetsByIndex[0];
 	const topCells = new RequirementCollection();
-	for(let columnNum = 1; columnNum < config.columnCount; columnNum++) {
-		const cellValue = config.getCell(0, columnNum).value;
+	await loadCells(sheet, 0, 0, 2);
+	for(let columnNum = 0; columnNum < sheet.columnCount; columnNum++) {
+		const cellValue = sheet.getCell(0, columnNum).value;
 		if(cellValue === null) break;
-		topCells.createRequirement(cellValue, config.getCell(1, columnNum).value, config.getCell(2, columnNum).value, config.getCell(1, columnNum).value);
+		topCells.createRequirement(cellValue);
 	}
 
 	return {
@@ -140,7 +134,7 @@ async function makeResultSheet(sheetId, headers) {
  */
 async function fillRow(userInput, legacyMode = false) {
 	const sheets = await getWorksheets(userInput["formId"]);
-	let resultSheet;
+	const resultSheet = sheets.sheetsByTitle[RESULT_SHEET_TITLE];
 
 	// Pre-processing
 	delete userInput["formId"];
@@ -149,129 +143,12 @@ async function fillRow(userInput, legacyMode = false) {
 		if(Array.isArray(userInput[dataProp]))
 			userInput[dataProp] = userInput[dataProp].map(val => val.replace(/,/g, "&comma;")).join(",");
 	}
-
-	if(legacyMode) {
-		resultSheet = await getMain(sheets);
-		const requirements = (await getRequirements(sheets)).headers;
-		for(const dataProp in userInput) {
-			if(!requirements.find(req => req.name === dataProp)) {
-				console.log(`Deleted ${dataProp}: ${userInput[dataProp]}`);
-				delete userInput[dataProp];
-			}
-		}
-
-		// Checks to make sure that all required inputs have values
-		if(!requirements.every(req => !req.required || userInput[req.name]))
-			return sheetError.throwErr("REQUIRED INPUT NONEXISTENT", `Required Inputs Missing: \nUser Input: ${JSON.stringify(userInput)} \nRequired Inputs: ${JSON.stringify(requirements)}`);
-	} else {
-		resultSheet = sheets.sheetsByTitle[RESULT_SHEET_TITLE];
-		if(!resultSheet) sheetError.throwErr("Results Sheet Missing", `The sheet titled ${RESULT_SHEET_TITLE} does not exist`);
-	}
+	if(!resultSheet) sheetError.throwErr("Results Sheet Missing", `The sheet titled ${RESULT_SHEET_TITLE} does not exist`);
 
 	try {
 		console.log(`Pushing onto sheet: ${JSON.stringify(userInput)}`);
 		await resultSheet.addRow(userInput);
 	} catch(err) {
 		console.error(err);
-	}
-}
-
-/**
- * Retrieves the labels/headers at the top row of the main sheet along with their requirement status.
- * @async
- * @param {GoogleSpreadsheetWorksheet} doc Google Spreadsheet to load cells from
- * @param {number} [minRow = 0] Zero-indexed row number minimum
- * @param {number} [minCol = 0] Zero-indexed column number minimum
- * @param {number} [maxRow = doc.rowCount] Zero-indexed row number maximum
- * @param {number} [maxCol = doc.columnCount] Zero-indexed column number maximum
- */
-async function loadCells(doc, minRow = 0, minCol = 0, maxRow, maxCol) {
-	maxRow = maxRow || doc.rowCount;
-	maxCol = maxCol || doc.columnCount;
-	return await doc.loadCells({
-		"startRowIndex": Math.min(minRow, doc.rowCount - 1),
-		"startColumnIndex": Math.min(minCol, doc.columnCount - 1),
-		"endRowIndex": Math.min(maxRow, doc.rowCount),
-		"endColumnIndex": Math.min(maxCol, doc.columnCount)
-	});
-}
-
-/**
- * Returns the position of cells in a given sheet that match a given value.
- * @async
- * @param {GoogleSpreadsheetWorksheet} sheet A singular worksheet from any Google Sheet
- * @param {string} value The value to look for the positions of.
- * @returns {number[][]} Position of first match in [row, column] format (Zero-indexed) in an array.
- */
-async function valueLookup(sheet, value) {
-	await loadCells(sheet);
-
-	const result = [];
-	for(let rowNum = 0; rowNum < sheet.rowCount; rowNum++) {
-		for(let colNum = 0; colNum < sheet.columnCount; colNum++) {
-			const cell = sheet.getCell(rowNum, colNum);
-			if(cell.value === value) {
-				result.push([rowNum, colNum]);
-			}
-		}
-	}
-	return result;
-}
-
-/**
- * Returns the position of cells in a given sheet that match a given value, offset by given offsets. Not zero indexed.
- * @async
- * @param {GoogleSpreadsheetWorksheet} sheet A singular worksheet from any Google Sheet
- * @param {string} value The value to look for the position of.
- * @param {number} offsetCol Value to offset returned position columns by.
- * @param {number} offsetRow Value to offset returned position rows by.
- * @returns {number[][]} Array of offset matches in [row, column] format (Zero-indexed).
- */
-async function offsetLookup(sheet, value, offsetCol, offsetRow) {
-	const matches = await valueLookup(sheet, value);
-	for(const matchPair of matches) {
-		matchPair[0] += offsetCol;
-		matchPair[1] += offsetRow;
-		if(matchPair[0] < 1 || matchPair[1] < 1) {
-			sheetError.nonErr("Potential Error: This Offset Pair is invalid - " + matchPair);
-		}
-	}
-	return matches;
-}
-
-/**
- * Returns the value of a cell position in a given sheet.
- * @async
- * @param {GoogleSpreadsheetWorksheet} sheet A singular worksheet from any Google Sheet
- * @param {number} col Column position of the cell to retrieve the value from.
- * @param {number} row Row position of the cell to retrieve the value from.
- * @returns {string} Value of the given cell.
- */
-async function parseValue(sheet, col, row) {
-	try {
-		await loadCells(sheet, row, col, row + 1, col + 1);
-		return sheet.getCell(row, col);
-	} catch(err) {
-		sheetError.specificErr(err, "Cell parseValue error");
-	}
-}
-
-/**
- * Returns the value of a cell position in a given sheet.
- * @async
- * @param {GoogleSpreadsheetWorksheet} sheet A singular worksheet from any Google Sheet
- * @param {string} searchKey The value to look for the position of before offsetting.
- * @param {number} colOffset Value to offset returned position columns by.
- * @param {number} rowOffset Value to offset returned position rows by.
- * @param {string} [defaultVal = ""] Value to return in case the search key is not found.
- * @returns {string} Value of the given cell.
- */
-async function offsetParse(sheet, searchKey, colOffset, rowOffset, defaultVal = "") {
-	try {
-		const res = (await offsetLookup(sheet, searchKey, colOffset, rowOffset))[0];
-		return await parseValue(sheet, res[0], res[1]);
-	} catch(err) {
-		sheetError.handledErr("Failed to offset and parse. Returning empty String or default value.");
-		return defaultVal;
 	}
 }
