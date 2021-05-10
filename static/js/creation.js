@@ -410,12 +410,14 @@ function finalizeGeneratedData() {
 function sendJSON() {
 	const data = finalizeGeneratedData();
 	const req = new XMLHttpRequest();
-	req.addEventListener("load", res => {
-		toggleErrorBox(true, "Success!", `Your form will be found at <a href="${window.location.origin}${res.target.responseText}">${window.location.origin}${res.target.responseText}</a>`, true);
-	});
-	req.addEventListener("error", err => {
+	const onerror = err => {
 		toggleErrorBox(true, "Failed to Save Form", err || "Please try again later");
+	}
+	req.addEventListener("load", res => {
+		if(res.target.status === 200) toggleErrorBox(true, "Success!", `Your form will be found at <a href="${window.location.origin}${res.target.responseText}">${window.location.origin}${res.target.responseText}</a>`, true);
+		else onerror(res.target.responseText);
 	});
+	req.addEventListener("error", onerror);
 	req.open("POST", `${window.location.origin}/create/submit`);
 	req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	req.send(JSON.stringify(data));
