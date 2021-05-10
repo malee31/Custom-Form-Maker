@@ -41,7 +41,6 @@ async function getWorksheets(formId) {
 	const doc = new GoogleSpreadsheet(formId);
 	await doc.useServiceAccountAuth(credentials);
 	await doc.loadInfo();
-	if(!doc.sheetCount >= 1) throw "No worksheets";
 	return doc;
 }
 
@@ -86,10 +85,10 @@ async function loadCells(sheet, minRow = 0, minCol = 0, maxRow, maxCol) {
 async function getRequirements(doc, keepExcluded = false) {
 	const sheet = doc.sheetsByIndex[0];
 	const topCells = new RequirementCollection();
-	await loadCells(sheet, 0, 0, 2);
+	await loadCells(sheet, 0, 0, 1);
 	for(let columnNum = 0; columnNum < sheet.columnCount; columnNum++) {
 		const cellValue = sheet.getCell(0, columnNum).value;
-		if(cellValue === null) break;
+		if(cellValue === null) continue;
 		topCells.createRequirement(cellValue);
 	}
 
@@ -108,17 +107,56 @@ async function getRequirements(doc, keepExcluded = false) {
 async function makeResultSheet(sheetId, headers) {
 	try {
 		const doc = await getWorksheets(sheetId);
-		if(doc.sheetsByTitle[RESULT_SHEET_TITLE]) await doc.deleteSheet(doc.sheetsByTitle[RESULT_SHEET_TITLE].sheetId);
-		await doc.addSheet({
-			title: RESULT_SHEET_TITLE,
-			headerValues: headers,
-			tabColor: {
-				red: 0.016,
-				green: 0.549,
-				blue: 0.988,
-				alpha: 1
+		if(doc.sheetsByTitle[RESULT_SHEET_TITLE]) {
+			console.log("Updating existing result sheet to match");
+			const sheet = doc.sheetsByTitle[RESULT_SHEET_TITLE];
+			await loadCells(sheet, 0, 0, 1);
+			const top = [];
+			for(let columnNum = 0; columnNum < sheet.columnCount; columnNum++) {
+				const cellValue = sheet.getCell(0, columnNum).value;
+				if(cellValue !== null) {
+					top.push(cellValue);
+				}
 			}
-		});
+			const newHeaders = headers.filter(val => !top.includes(val));
+			await sheet.updateProperties({
+				title: RESULT_SHEET_TITLE,
+				gridProperties: {
+					columnCount: sheet.columnCount + newHeaders.length,
+					rowCount: sheet.rowCount,
+					frozenRowCount: 1
+				},
+				tabColor: {
+					red: 0.016,
+					green: 0.549,
+					blue: 0.988,
+					alpha: 1
+				}
+			});
+			await loadCells(sheet, 0, 0, 1);
+
+			for(let adding = 1; adding <= newHeaders.length; adding++) {
+				const cell = sheet.getCell(0, sheet.columnCount - adding);
+				cell.value = newHeaders[newHeaders.length - adding];
+			}
+			await sheet.saveUpdatedCells();
+
+			// await doc.deleteSheet(sheet.sheetId);
+		} else {
+			await doc.addSheet({
+				title: RESULT_SHEET_TITLE,
+				headerValues: headers,
+				gridProperties: {
+					frozenRowCount: 1
+				},
+				tabColor: {
+					red: 0.016,
+					green: 0.549,
+					blue: 0.988,
+					alpha: 1
+				}
+			});
+		}
 		return {success: true, statusText: "Successfully created result sheet"};
 	} catch (e) {
 		return {success: false, statusText: `Code ${e.code}: ${e.message}`};
