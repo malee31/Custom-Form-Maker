@@ -99,6 +99,28 @@ async function getRequirements(doc, keepExcluded = false) {
 }
 
 /**
+ *
+ * @param {number} [columnCount = 1] Number of columns for the sheet
+ * @param {number} [rowCount = 2] Number of rows for the sheet
+ * @return {{title: string, tabColor: {red: number, green: number, blue: number}, gridProperties: {frozenRowCount: number, columnCount: number, rowCount: number}}} Some preset properties to give each result sheet
+ */
+function createPropertyUpdate(columnCount = 1, rowCount = 2) {
+	return {
+		title: RESULT_SHEET_TITLE,
+		gridProperties: {
+			columnCount: columnCount,
+			rowCount: rowCount,
+			frozenRowCount: 1
+		},
+		tabColor: {
+			red: 0.016,
+			green: 0.549,
+			blue: 0.988
+		}
+	};
+}
+
+/**
  * Creates a sheet to add results onto
  * @param {string} sheetId Sheet ID of the spreadsheet to add a results sheet onto
  * @param {string[]} headers Headers for the sheet. Array of the column titles
@@ -110,6 +132,7 @@ async function makeResultSheet(sheetId, headers) {
 		if(doc.sheetsByTitle[RESULT_SHEET_TITLE]) {
 			console.log("Updating existing result sheet to match");
 			const sheet = doc.sheetsByTitle[RESULT_SHEET_TITLE];
+
 			await loadCells(sheet, 0, 0, 1);
 			const top = [];
 			for(let columnNum = 0; columnNum < sheet.columnCount; columnNum++) {
@@ -119,20 +142,8 @@ async function makeResultSheet(sheetId, headers) {
 				}
 			}
 			const newHeaders = headers.filter(val => !top.includes(val));
-			await sheet.updateProperties({
-				title: RESULT_SHEET_TITLE,
-				gridProperties: {
-					columnCount: sheet.columnCount + newHeaders.length,
-					rowCount: sheet.rowCount,
-					frozenRowCount: 1
-				},
-				tabColor: {
-					red: 0.016,
-					green: 0.549,
-					blue: 0.988,
-					alpha: 1
-				}
-			});
+
+			await sheet.updateProperties(createPropertyUpdate(sheet.columnCount + newHeaders.length, sheet.rowCount));
 			await loadCells(sheet, 0, 0, 1);
 
 			for(let adding = 1; adding <= newHeaders.length; adding++) {
@@ -140,22 +151,10 @@ async function makeResultSheet(sheetId, headers) {
 				cell.value = newHeaders[newHeaders.length - adding];
 			}
 			await sheet.saveUpdatedCells();
-
-			// await doc.deleteSheet(sheet.sheetId);
 		} else {
-			await doc.addSheet({
-				title: RESULT_SHEET_TITLE,
-				headerValues: headers,
-				gridProperties: {
-					frozenRowCount: 1
-				},
-				tabColor: {
-					red: 0.016,
-					green: 0.549,
-					blue: 0.988,
-					alpha: 1
-				}
-			});
+			const properties = createPropertyUpdate(headers.length);
+			properties.headerValues = headers;
+			await doc.addSheet(properties);
 		}
 		return {success: true, statusText: "Successfully created result sheet"};
 	} catch (e) {
