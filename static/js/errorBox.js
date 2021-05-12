@@ -1,7 +1,7 @@
 const errBox = document.getElementById("errorBox");
 
 /**
- * Toggles the error window by hiding or showing it. Also sets the text if provided.
+ * Toggles the error window by hiding or showing it. Also sets the text if provided. Doubles as a modal
  * @param {boolean} [show] Determines whether to show the loader or hide it. Will default to toggle mode
  * @param {string} [title] The name of the error used as the title.
  * @param {string} [desc] Additional description about the error.

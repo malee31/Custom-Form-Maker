@@ -94,16 +94,6 @@ app.post("/redirect", (req, res) => {
 	res.redirect(`/form/${encodeURIComponent(req.body.sheetId)}/${req.body.defaultVals ? `?default=${encodeURIComponent(req.body.defaultVals)}` : ""}`);
 });
 
-const allTestData = require("./GenerateTest.json");
-app.get("/test/:testMode?", (req, res) => {
-	let testData = allTestData[req.params.testMode] || allTestData.full;
-	testData = {
-		name: testData.name,
-		headers: testData.headers.map(header => cleanData(header))
-	};
-	return res.render(path.resolve(__dirname, "views/pages/form"), {formId: "N/A", formData: testData});
-});
-
 app.get("/form/:sheetId", async(req, res) => {
 	const headerData = await sheet.getHeaders(req.params.sheetId);
 	(req.query.default || "").split(/(?=\s*(?<=[^\\])),/).forEach((val, index) => {

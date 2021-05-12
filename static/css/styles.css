@@ -1,7 +1,7 @@
 * {
-	font-family: arial, times, sans-serif;
 	box-sizing: border-box;
-	transition-duration: 0.5s;
+	font-family: arial, times, sans-serif;
+	transition-duration: .5s;
 }
 
 body {
@@ -42,11 +42,16 @@ body {
 	display: flex;
 	align-items: center;
 	flex-direction: column;
-	justify-content: center;
+	justify-content: space-between;
 	width: 60vw;
 	height: 50vh;
+	min-width: 60vw;
+	max-width: 95vw;
+	min-height: 60vh;
+	max-height: 80vh;
 	transform: translate(-50%, -50%);
 	text-align: center;
+	padding: .5rem;
 	border-radius: .5rem;
 	background-color: #EEE;
 }
@@ -57,9 +62,9 @@ form h1 {
 
 form input, .file-label {
 	height: 2.5rem;
-	border-radius: 0.2rem;
+	border-radius: .2rem;
 	border: 1px solid #CCC;
-	padding: 0.25rem 0.75rem;
+	padding: .25rem .75rem;
 	margin: 0;
 }
 
@@ -88,8 +93,8 @@ form input[data-bindto] {
 }
 
 form input[type="range"] {
-	padding: 0.25rem 0;
-	margin: 0 0.75rem;
+	padding: .25rem 0;
+	margin: 0 .75rem;
 }
 
 form input[type="file"] {
@@ -106,10 +111,6 @@ form input[type="submit"]:hover {
 	background-color: #BBB;
 }
 
-span.required {
-	color: red;
-}
-
 .error-border {
 	border-color: #FF0F0F;
 }
@@ -123,15 +124,18 @@ footer {
 
 .loadWheel {
 	position: fixed;
-	z-index: 99;
 	top: calc(50vh - 30vmin);
 	left: calc(50vw - 30vmin);
 	width: 60vmin;
 	height: 60vmin;
-	animation: load 2s linear infinite;
 	border: 16px solid #F3F3F3;
 	border-top: 16px solid #3498DB;
 	border-radius: 50%;
+	z-index: 99;
+}
+
+.infinite-spin {
+	animation: load 1.5s linear infinite;
 }
 
 @keyframes load {
