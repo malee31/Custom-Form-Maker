@@ -5,7 +5,7 @@
 		<link href="/static/css/index.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
-		<%- include("/partials/loader") %>
+		<div class="loadWheel infinite-spin" <%- (typeof show !== "undefined" && show ? "" : 'style="visibility: hidden;"') %>></div>
 		<form action="/redirect" enctype="application/x-www-form-urlencoded" method="POST">
 			<h3>Start Form</h3>
 			<label for="sheetId">
@@ -21,5 +21,6 @@
 				<input onclick="toggleLoader(true)" type="submit">
 			</div>
 		</form>
+		<script src="/static/js/utilities.js"></script>
 	</body>
 </html>
