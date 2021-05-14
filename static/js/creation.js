@@ -50,6 +50,92 @@ function formTitleListeners(formTitleElem) {
 }
 
 /**
+ * Adds a filter and multiple listeners for content-editable elements
+ * @param {HTMLElement} editableElem Content-editable element to add listeners to
+ */
+function editableListeners(editableElem) {
+	editableElem.addEventListener("input", e => {
+		editableContentFilter(e.target, e.target.innerText.replace(/\s(?!$)\s*/g, " ").replace(/ $/, String.fromCharCode(160)), true, /\s{2}/.test(e.target.innerText) ? -1 : 0);
+	});
+	editableElem.addEventListener("blur", e => {
+		editableContentFilter(e.target, e.target.innerText.replace(/\s+/g, " ").trim(), false);
+	});
+	editableElem.addEventListener("paste", e => {
+		e.preventDefault();
+		const savedSelection = cutSelection();
+		const clippedText = e.clipboardData.getData("text/plain").replace(/\s+/g, " ");
+		e.target.innerText = `${e.target.innerText.substring(0, savedSelection.start)}${clippedText}${e.target.innerText.substring(savedSelection.end)}`;
+		restoreSelection(e.target, savedSelection, clippedText.length);
+	});
+}
+
+/**
+ * Removes all selections on the page and saves the first one for restoring later if needed
+ * @returns {Object} The position of the selection as a start and end integer property
+ */
+function cutSelection() {
+	const selection = window.getSelection();
+	const currentRange = selection.rangeCount ? selection.getRangeAt(0) : {};
+	const savedRange = {
+		start: currentRange.startOffset || 0,
+		end: currentRange.endOffset || 0
+	};
+	selection.removeAllRanges();
+	return savedRange;
+}
+
+/**
+ * Restores the position of the cursor on an element
+ * @param {HTMLElement} targetElem Content-editable element to restore selection position on
+ * @param {Object} restorePosition Object containing the integer start and end properties to set the cursor to
+ * @param {number} [offset = 0] Amount to offset the restorePosition object
+ * @param {boolean} [collapse = false] Whether or not to collapse the size of the selection from a highlighted portion of text to a single cursor
+ */
+function restoreSelection(targetElem, restorePosition, offset = 0, collapse = false) {
+	const selection = window.getSelection();
+	const newRange = document.createRange();
+	if(!targetElem.firstChild) targetElem.appendChild(document.createTextNode(""));
+	const targetChild = targetElem.firstChild;
+	while(targetElem.childNodes.length > 1) targetElem.removeChild(targetElem.lastChild);
+	newRange.setStart(targetChild, Math.min(restorePosition.start + offset, targetChild.length));
+	newRange.setEnd(targetChild, Math.min((collapse ? restorePosition.start : restorePosition.end) + offset, targetChild.length));
+	selection.addRange(newRange);
+}
+
+/**
+ * Resets the text of a content-editable element to a filtered version and restores the cursor position
+ * @param {Element} targetElem Element to apply filtered text
+ * @param {string} filteredText The filtered string to set as the innerText
+ * @param {boolean} [restore = true] Whether or not to restore the cursor position after filtering (Set to false for blur events)
+ * @param {number} [offset = 0] Number to offset the cursor by
+ */
+function editableContentFilter(targetElem, filteredText, restore = true, offset = 0) {
+	const savedRange = cutSelection();
+	targetElem.innerText = filteredText;
+	if(restore) restoreSelection(targetElem, savedRange, offset);
+}
+
+/**
+ * Loops through and adds the listeners needed to hide and show the editors for all the rendered elements
+ */
+function createToolHideToggleListener() {
+	document.getElementById("hide-creation-overlay-button").addEventListener("click", e => {
+		const overlayContainer = document.getElementById("creation-overlay-container");
+		if(e.target.classList.contains("hide-creation-overlay")) {
+			e.target.classList.remove("hide-creation-overlay");
+			overlayContainer.classList.remove("hide-creation-overlay");
+			document.getElementById("save-overlay-button").classList.remove("hide-creation-overlay");
+			document.querySelector("main").classList.add("control-pad");
+		} else {
+			e.target.classList.add("hide-creation-overlay");
+			overlayContainer.classList.add("hide-creation-overlay");
+			document.getElementById("save-overlay-button").classList.add("hide-creation-overlay");
+			document.querySelector("main").classList.remove("control-pad");
+		}
+	});
+}
+
+/**
  * Overrides the form that handles creating new elements and processing templates
  * @param {Event} [e] Optional event from the submit button to preventDefault()
  */
@@ -76,23 +162,43 @@ function createToolOverride(e) {
 }
 
 /**
- * Loops through and adds the listeners needed to hide and show the editors for all the rendered elements
+ * Fetches the EJS template for a type of element from the server. Caches templates each time a unique one is requested
+ * @param {string} templateType Type of template to fetch. Defaults to text if an invalid string is provided and returns an error if nothing is provided
+ * @returns {Promise<string>} A promise that resolves to the EJS template string
  */
-function createToolHideToggleListener() {
-	document.getElementById("hide-creation-overlay-button").addEventListener("click", e => {
-		const overlayContainer = document.getElementById("creation-overlay-container");
-		if(e.target.classList.contains("hide-creation-overlay")) {
-			e.target.classList.remove("hide-creation-overlay");
-			overlayContainer.classList.remove("hide-creation-overlay");
-			document.getElementById("save-overlay-button").classList.remove("hide-creation-overlay");
-			document.querySelector("main").classList.add("control-pad");
-		} else {
-			e.target.classList.add("hide-creation-overlay");
-			overlayContainer.classList.add("hide-creation-overlay");
-			document.getElementById("save-overlay-button").classList.add("hide-creation-overlay");
-			document.querySelector("main").classList.remove("control-pad");
-		}
+function requestTemplate(templateType) {
+	return new Promise((resolve, reject) => {
+		if(loadedTemplates[templateType]) resolve(loadedTemplates[templateType]);
+
+		const request = new XMLHttpRequest();
+		request.addEventListener("load", res => {
+			loadedTemplates[templateType] = res.target.response;
+			resolve(loadedTemplates[templateType]);
+		});
+		request.addEventListener("error", reject);
+		request.open("GET", `${window.location.origin}/templates?type=${encodeURIComponent(templateType)}`);
+		request.send();
 	});
+}
+
+/**
+ * Converts HTML from a string to actual nodes
+ * @param {string} HTMLString HTML string to convert into nodes
+ * @returns {NodeListOf<Node>} Converted HTML string as a list of nodes
+ */
+function parseHTMLString(HTMLString = "") {
+	const mockDOM = document.createElement("body");
+	mockDOM.innerHTML = HTMLString;
+	return mockDOM.childNodes;
+}
+
+/**
+ * Appends a new node to the form and updates listeners on the form
+ * @param {HTMLElement} newNode New element to add to the form
+ */
+function formAppend(newNode) {
+	form.append(newNode);
+	updateListeners();
 }
 
 /**
@@ -108,6 +214,31 @@ function fetchCreateToolValues(targetObj = makeData()) {
 	targetObj.defaultValue = creationInputs.defaultValue.value;
 	targetObj.required = creationInputs.requiredInput.checked;
 	return targetObj;
+}
+
+/**
+ * Creates a temporary UUID. This UUID is not actually universally unique, it's just unique for the current page and follows a simple pattern of Pseudo-UUID-#
+ * @returns {string} Temporary UUID stand-in
+ */
+function generateUUID() {
+	return `Pseudo-UUID-${uuidCounter++}`;
+}
+
+/**
+ * Renders a preview from a map of elements and replaces the old one.
+ * @param {Object} elementMap The map of the elements for rerender
+ * @param {boolean} [skipFetch = false] If set to true, the object will be re-rendered from pre-existing data
+ */
+function updatePreview(elementMap, skipFetch = false) {
+	const updatedData = skipFetch ? elementMap.data : fetchEditorValues(elementMap);
+	requestTemplate(updatedData.type).then(template => {
+		const rendered = parseHTMLString(ejs.render(template, { inputOptions: cleanData(updatedData, elementMap.renderWrapper.dataset.uuid), editMode: true }))[0];
+		while(elementMap.renderPreview.firstChild) elementMap.renderPreview.firstChild.remove();
+		elementMap.renderPreview.append(rendered);
+		attachEditOpenerListeners(rendered, elementMap);
+		setAllTabIndex(rendered, -1);
+		updateListeners();
+	});
 }
 
 /**
@@ -130,49 +261,6 @@ function fetchEditorValues(elementMap) {
 		}
 	}
 	return editingHeader;
-}
-
-/**
- * Renders a preview from a map of elements and replaces the old one.
- * @param {Object} elementMap The map of the elements for rerender
- * @param {boolean} [skipFetch = false] If set to true, the object will be re-rendered from pre-existing data
- */
-function updatePreview(elementMap, skipFetch = false) {
-	const updatedData = skipFetch ? elementMap.data : fetchEditorValues(elementMap);
-	requestTemplate(updatedData.type).then(template => {
-		const rendered = parseHTMLString(ejs.render(template, { inputOptions: cleanData(updatedData, elementMap.renderWrapper.dataset.uuid), editMode: true }))[0];
-		while(elementMap.renderPreview.firstChild) elementMap.renderPreview.firstChild.remove();
-		elementMap.renderPreview.append(rendered);
-		attachEditOpenerListeners(rendered, elementMap);
-		setAllTabIndex(rendered, -1);
-		updateListeners();
-	});
-}
-
-function setAllTabIndex(elem, val = 0) {
-	for(const input of elem.querySelectorAll("input, button")) {
-		input.tabIndex = val;
-	}
-}
-
-/**
- * Fetches the EJS template for a type of element from the server. Caches templates each time a unique one is requested
- * @param {string} templateType Type of template to fetch. Defaults to text if an invalid string is provided and returns an error if nothing is provided
- * @returns {Promise<string>} A promise that resolves to the EJS template string
- */
-function requestTemplate(templateType) {
-	return new Promise((resolve, reject) => {
-		if(loadedTemplates[templateType]) resolve(loadedTemplates[templateType]);
-
-		const request = new XMLHttpRequest();
-		request.addEventListener("load", res => {
-			loadedTemplates[templateType] = res.target.response;
-			resolve(loadedTemplates[templateType]);
-		});
-		request.addEventListener("error", reject);
-		request.open("GET", `${window.location.origin}/templates?type=${encodeURIComponent(templateType)}`);
-		request.send();
-	});
 }
 
 /**
@@ -230,15 +318,22 @@ function attachOptionListeners(elementMap) {
 }
 
 /**
- * Adds listeners to update tab-index and previews when the editor inputs are changed.
- * @param {Object} elementMap The element map to link to the preview
+ * Adds additional HTMLElement references to the renderMap
+ * @param {Object} renderMap The map of render elements to add to
  */
-function attachEditListeners(elementMap) {
-	const updatePreviewForWrapper = () => {
-		updatePreview(elementMap);
+function addEditElementReferences(renderMap) {
+	renderMap.editorElements = {
+		defaultValue: renderMap.editorWrapper.querySelector(".default-value-editor"),
+		placeholderValue: renderMap.editorWrapper.querySelector(".placeholder-editor")
 	};
-	elementMap.editorElements.defaultValue.addEventListener("input", updatePreviewForWrapper);
-	elementMap.editorElements.placeholderValue.addEventListener("input", updatePreviewForWrapper);
+}
+
+/**
+ * Constructs a new object for new input elements
+ * @returns {InputDataManager} An empty data manager to contain and manipulate input data objects
+ */
+function makeData() {
+	return new InputDataManager();
 }
 
 /**
@@ -258,12 +353,13 @@ function attachEditOpenerListeners(previewRender, elementMap) {
 	});
 	const requiredEditor = previewRender.querySelector("[data-purpose='required-span']");
 	requiredEditor.addEventListener("click", e => {
+		e.preventDefault();
 		if(elementMap.data.required) e.target.classList.remove("required-span-enabled");
 		else e.target.classList.add("required-span-enabled");
 		elementMap.data.required = !elementMap.data.required;
 	});
 	previewRender.addEventListener("click", e => {
-		if(e.target.dataset.purpose !== "label" && e.target.dataset.purpose !== "required-span" && !elementMap.renderWrapper.classList.contains("edit-mode")) {
+		if(!elementMap.renderWrapper.classList.contains("edit-mode") && (!e.target.dataset.purpose || e.target.dataset.purpose == "component-wrapper")) {
 			elementMap.renderWrapper.classList.add("edit-mode");
 			elementMap.editorWrapper.classList.remove("dimensionless");
 			setAllTabIndex(elementMap.editorWrapper, 0);
@@ -272,116 +368,26 @@ function attachEditOpenerListeners(previewRender, elementMap) {
 }
 
 /**
- * Adds additional HTMLElement references to the renderMap
- * @param {Object} renderMap The map of render elements to add to
+ * Adds listeners to update tab-index and previews when the editor inputs are changed.
+ * @param {Object} elementMap The element map to link to the preview
  */
-function addEditElementReferences(renderMap) {
-	renderMap.editorElements = {
-		defaultValue: renderMap.editorWrapper.querySelector(".default-value-editor"),
-		placeholderValue: renderMap.editorWrapper.querySelector(".placeholder-editor")
+function attachEditListeners(elementMap) {
+	const updatePreviewForWrapper = () => {
+		updatePreview(elementMap);
 	};
+	elementMap.editorElements.defaultValue.addEventListener("input", updatePreviewForWrapper);
+	elementMap.editorElements.placeholderValue.addEventListener("input", updatePreviewForWrapper);
 }
 
 /**
- * Adds a filter and multiple listeners for content-editable elements
- * @param {HTMLElement} editableElem Content-editable element to add listeners to
+ * Update the tab indices of an element's child inputs and buttons all at once
+ * @param {HTMLElement} elem Element to search through and set the tab indices for inputs and buttons for
+ * @param {number} [val = 0] Number to set tab indices to. Defaults to 0
  */
-function editableListeners(editableElem) {
-	editableElem.addEventListener("input", e => {
-		editableContentFilter(e.target, e.target.innerText.replace(/\s(?!$)\s*/g, " ").replace(/ $/, String.fromCharCode(160)), true, /\s{2}/.test(e.target.innerText) ? -1 : 0);
-	});
-	editableElem.addEventListener("blur", e => {
-		editableContentFilter(e.target, e.target.innerText.replace(/\s+/g, " ").trim(), false);
-	});
-	editableElem.addEventListener("paste", e => {
-		const savedSelection = cutSelection();
-		const clippedText = e.clipboardData.getData("text/plain").replace(/\s+/g, " ");
-		e.target.innerText = `${e.target.innerText.substring(0, savedSelection.start)}${clippedText}${e.target.innerText.substring(savedSelection.end)}`;
-		restoreSelection(e.target, savedSelection, clippedText.length);
-		e.preventDefault();
-	});
-}
-
-/**
- * Removes all selections on the page and saves the first one for restoring later if needed
- * @returns {Object} The position of the selection as a start and end integer property
- */
-function cutSelection() {
-	const selection = window.getSelection();
-	const currentRange = selection.rangeCount ? selection.getRangeAt(0) : {};
-	const savedRange = {
-		start: currentRange.startOffset || 0,
-		end: currentRange.endOffset || 0
-	};
-	selection.removeAllRanges();
-	return savedRange;
-}
-
-/**
- * Restores the position of the cursor on an element
- * @param {HTMLElement} targetElem Content-editable element to restore selection position on
- * @param {Object} restorePosition Object containing the integer start and end properties to set the cursor to
- * @param {number} [offset = 0] Amount to offset the restorePosition object
- * @param {boolean} [collapse = false] Whether or not to collapse the size of the selection from a highlighted portion of text to a single cursor
- */
-function restoreSelection(targetElem, restorePosition, offset = 0, collapse = false) {
-	const selection = window.getSelection();
-	const newRange = document.createRange();
-	if(!targetElem.firstChild) targetElem.appendChild(document.createTextNode(""));
-	const targetChild = targetElem.firstChild;
-	while(targetElem.childNodes.length > 1) targetElem.removeChild(targetElem.lastChild);
-	newRange.setStart(targetChild, Math.min(restorePosition.start + offset, targetChild.length));
-	newRange.setEnd(targetChild, Math.min((collapse ? restorePosition.start : restorePosition.end) + offset, targetChild.length));
-	selection.addRange(newRange);
-}
-
-/**
- * Resets the text of a content-editable element to a filtered version and restores the cursor position
- * @param {Element} targetElem Element to apply filtered text
- * @param {string} filteredText The filtered string to set as the innerText
- * @param {boolean} [restore = true] Whether or not to restore the cursor position after filtering (Set to false for blur events)
- * @param {number} [offset = 0] Number to offset the cursor by
- */
-function editableContentFilter(targetElem, filteredText, restore = true, offset = 0) {
-	const savedRange = cutSelection();
-	targetElem.innerText = filteredText;
-	if(restore) restoreSelection(targetElem, savedRange, offset);
-}
-
-/**
- * Constructs a new object for new input elements
- * @returns {InputDataManager} An empty data manager to contain and manipulate input data objects
- */
-function makeData() {
-	return new InputDataManager();
-}
-
-/**
- * Converts HTML from a string to actual nodes
- * @param {string} HTMLString HTML string to convert into nodes
- * @returns {NodeListOf<Node>} Converted HTML string as a list of nodes
- */
-function parseHTMLString(HTMLString = "") {
-	const mockDOM = document.createElement("body");
-	mockDOM.innerHTML = HTMLString;
-	return mockDOM.childNodes;
-}
-
-/**
- * Appends a new node to the form and updates listeners on the form
- * @param {HTMLElement} newNode New element to add to the form
- */
-function formAppend(newNode) {
-	form.append(newNode);
-	updateListeners();
-}
-
-/**
- * Creates a temporary UUID. This UUID is not actually universally unique, it's just unique for the current page and follows a simple pattern of Pseudo-UUID-#
- * @returns {string} Temporary UUID stand-in
- */
-function generateUUID() {
-	return `Pseudo-UUID-${uuidCounter++}`;
+function setAllTabIndex(elem, val = 0) {
+	for(const input of elem.querySelectorAll("input, button")) {
+		input.tabIndex = val;
+	}
 }
 
 /**
