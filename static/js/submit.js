@@ -38,6 +38,11 @@ function collectFormData(formData, form) {
 	console.log(formData);
 }
 
+/**
+ * Adds the pop-up box that confirms that the client wants to close the form without submitting anything
+ * @param {Event} event Unload event's Event instance
+ * @return {string} A warning message for old browsers that still support custom text in pop-up
+ */
 function unloadHandler(event) {
 	if(disableLeaveWarning) return;
 	// Note: Modern browsers have removed the ability to add a custom message to the pop-up
