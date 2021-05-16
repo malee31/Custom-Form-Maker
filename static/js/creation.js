@@ -413,6 +413,9 @@ function finalizeGeneratedData() {
 	return finalized;
 }
 
+/**
+ * Finalizes and sends the JSON data to the server and creates the resulting form
+ */
 function sendJSON() {
 	const data = finalizeGeneratedData();
 	const req = new XMLHttpRequest();
