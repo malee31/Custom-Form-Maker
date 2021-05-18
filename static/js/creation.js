@@ -54,9 +54,12 @@ window.addEventListener("load", () => {
 				toggleErrorBox(true, "Form Fetched", `Now editing form ${editing}`);
 				const fetched = JSON.parse(res.target.response);
 				GeneratedData.name = fetched.name;
-				GeneratedData.headers = fetched.headers;
+				for(const header of fetched.headers) {
+					createToolOverride(null, new InputDataManager(header));
+				}
 				fileTitle.innerText = fetched.name;
 				sheetIDInput.value = fetched.sheetId;
+				GeneratedData.editing = editing;
 			}
 			else onerror(res.target.responseText);
 		});
@@ -166,11 +169,12 @@ function createToolHideToggleListener() {
 /**
  * Overrides the form that handles creating new elements and processing templates
  * @param {Event} [e] Optional event from the submit button to preventDefault()
+ * @param {InputData|RawInputData} [setData] Prefilled data to use in place of fetching from create tool
  */
-function createToolOverride(e) {
+function createToolOverride(e, setData) {
 	if(e) e.preventDefault();
 	console.log("Creating New Input");
-	const data = fetchCreateToolValues();
+	const data = setData || fetchCreateToolValues();
 	const uuid = generateUUID();
 	const elementMap = createRenderWrapper();
 	elementMap.data = data;
@@ -426,7 +430,8 @@ function finalizeGeneratedData() {
 	const finalized = {
 		name: GeneratedData.name,
 		headers: [],
-		sheetId: GeneratedData.sheetId
+		sheetId: GeneratedData.sheetId,
+		editing: GeneratedData.editing || false
 	};
 	for(let uuidNum = 0; uuidNum < GeneratedData.headers.length; uuidNum++) {
 		const uuid = GeneratedData.headers[uuidNum];

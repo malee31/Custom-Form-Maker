@@ -129,8 +129,10 @@ app.get("/edit/:createId", (req, res) => {
 	const requestedCreated = path.resolve(createdJSONPath, `${req.params.createId}.json`);
 	console.log(`Requesting Edit for ${requestedCreated}`);
 	readFile(requestedCreated).then(data => {
-		const jsonify = JSON.parse(data.toString());
 		res.status(200).send(data.toString());
+	}).catch(e => {
+		if(e.code === "ENOENT") res.status(404).send(`Form not found\nPress OK to continue making a new form`);
+		else res.status(400).send(`Something Went Wrong\n${e.toString()}`);
 	});
 });
 
@@ -145,10 +147,13 @@ app.get("/templates", (req, res) => {
 });
 
 app.post("/create/submit", async (req, res) => {
-	const assignedID = uuidv4();
-	const data = req.body;
-	const dataHeaders = data.headers;
-	data.headers = [];
+	const assignedID = req.body.editing || uuidv4();
+	const data = {
+		name: req.body.name,
+		headers: [],
+		sheetId: req.body.sheetId,
+	};
+	const dataHeaders = req.body.headers;
 	const headerValues = [];
 	for(const header of dataHeaders) {
 		const cleaned = processor.cleanDataBare(header);
