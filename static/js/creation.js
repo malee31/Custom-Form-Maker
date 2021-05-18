@@ -29,13 +29,41 @@ const GeneratedData = {
 window.addEventListener("load", () => {
 	form.addEventListener("submit", e => e.preventDefault());
 	creationOverlay.addEventListener("submit", createToolOverride);
-	formTitleListeners(document.getElementById("fileTitle"));
+	const fileTitle = document.getElementById("fileTitle");
+	formTitleListeners(fileTitle);
 	createToolHideToggleListener();
+	const sheetIDInput = document.querySelector("#save-overlay-button > input");
 	document.getElementById("save-overlay-button").addEventListener("click", e => {
-		GeneratedData.sheetId = document.querySelector("#save-overlay-button > input").value;
+		GeneratedData.sheetId = sheetIDInput.value;
 		if(e.target.id === "save-overlay-button") sendJSON();
 		// else console.log(e.target);
 	});
+
+	const params = new URLSearchParams(window.location.search);
+	if(params.has("edit")) {
+		const editing = params.get("edit");
+		const req = new XMLHttpRequest();
+		toggleLoader(true);
+		const onerror = err => {
+			toggleLoader(false);
+			toggleErrorBox(true, "Failed to Fetch Form", err || "Please try again later");
+		}
+		req.addEventListener("load", res => {
+			toggleLoader(false);
+			if(res.target.status === 200) {
+				toggleErrorBox(true, "Form Fetched", `Now editing form ${editing}`);
+				const fetched = JSON.parse(res.target.response);
+				GeneratedData.name = fetched.name;
+				GeneratedData.headers = fetched.headers;
+				fileTitle.innerText = fetched.name;
+				sheetIDInput.value = fetched.sheetId;
+			}
+			else onerror(res.target.responseText);
+		});
+		req.addEventListener("error", onerror);
+		req.open("GET", `${window.location.origin}/edit/${editing}`);
+		req.send()
+	}
 });
 
 /**

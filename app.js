@@ -118,11 +118,20 @@ app.get("/created/:createId", (req, res) => {
 				headers: jsonify.headers.map(header => cleanData(header))
 			}
 		});
-	})
+	});
 });
 
 app.get("/create", (req, res) => {
 	res.render(path.resolve(__dirname, "views/pages/create"));
+});
+
+app.get("/edit/:createId", (req, res) => {
+	const requestedCreated = path.resolve(createdJSONPath, `${req.params.createId}.json`);
+	console.log(`Requesting Edit for ${requestedCreated}`);
+	readFile(requestedCreated).then(data => {
+		const jsonify = JSON.parse(data.toString());
+		res.status(200).send(data.toString());
+	});
 });
 
 app.get("/templates", (req, res) => {
