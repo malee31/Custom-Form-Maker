@@ -6,21 +6,26 @@
 	</head>
 	<body>
 		<div class="loadWheel infinite-spin" <%- (typeof show !== "undefined" && show ? "" : 'style="visibility: hidden;"') %>></div>
-		<form action="/redirect" enctype="application/x-www-form-urlencoded" method="POST">
-			<h3>Start Form</h3>
+		<section class="floatBox" id="errorBox" style="display: none; opacity: 0;">
+			<h1 id="errorName">Error</h1>
+			<p id="errorDesc">Something has gone wrong! Try again in a moment.</p>
+			<button onclick="toggleErrorBox(false)">Ok</button>
+		</section>
+		<form action="/" enctype="application/x-www-form-urlencoded" method="POST">
 			<label for="sheetId">
-				Google Sheet ID<span style="color: red">*</span>
+				Generate from Google Sheet ID
 			</label>
-			<input id="sheetId" name="sheetId" required type="text">
-			<label for="defaultVals">
-				Default Values (Optional)
+			<input id="sheetId" name="sheetId" type="text">
+			<label for="createId">
+				Jump to Pre-existing Form
 			</label>
-			<input id="defaultVals" name="defaultVals" type="text">
+			<input id="createId" name="createId" type="text">
 			<div id="buttons-div">
-				<a id="create" onclick="toggleLoader(true)" href="/create"><span>Create</span></a>
-				<input onclick="toggleLoader(true)" type="submit">
+				<a id="create" onclick="toggleLoader(true)" href="/create"><span>Create/Edit</span></a>
+				<input id="submit" onclick="toggleLoader(true)" type="submit">
 			</div>
 		</form>
 		<script src="/static/js/utilities.js"></script>
+		<script src="/static/js/index.js"></script>
 	</body>
 </html>

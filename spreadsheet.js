@@ -130,7 +130,7 @@ async function makeResultSheet(sheetId, headers) {
 	try {
 		const doc = await getWorksheets(sheetId);
 		if(doc.sheetsByTitle[RESULT_SHEET_TITLE]) {
-			console.log("Updating existing result sheet to match");
+			console.log(`Updating existing result sheet to match [${sheetId}/${RESULT_SHEET_TITLE}]`);
 			const sheet = doc.sheetsByTitle[RESULT_SHEET_TITLE];
 
 			await loadCells(sheet, 0, 0, 1);
