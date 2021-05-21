@@ -5,8 +5,8 @@
 	</head>
 	<body>
 		<main id="errorBox" class="floatBox">
-				<h1 id="errorName">Error 404: Page not found</h1>
-				<p id="errorDesc">There's nothing here...<br>Make sure the link is correct and try again</p>
+				<h1 id="errorName"><%= (typeof errorName !== "undefined" ? errorName : "Error 404: Page not found") %></h1>
+				<p id="errorDesc"><%= (typeof errorDesc !== "undefined" ? errorDesc : "There's nothing here... Make sure the link is correct and try again") %></p>
 		</main>
 	</body>
 </html>

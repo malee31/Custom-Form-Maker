@@ -90,7 +90,15 @@ app.post("/submit", upload.any(), async(req, res) => {
 });
 
 app.get("/form/:sheetId", async(req, res) => {
-	const headerData = await sheet.getHeaders(req.params.sheetId);
+	let headerData;
+	try {
+		headerData = await sheet.getHeaders(req.params.sheetId);
+	} catch(e) {
+		res.status(404).render(path.resolve(__dirname, "views/pages/404.ejs"), {
+			errorName: "Invalid Spreadsheet ID",
+			errorDesc: e.toString()
+		});
+	}
 	(req.query.default || "").split(/(?=\s*(?<=[^\\])),/).forEach((val, index) => {
 		val = val.replace(/\\,/g, ",").trim();
 		if(val && index < headerData.headers.length) headerData.headers[index].defaultValue = val;
