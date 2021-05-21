@@ -1,12 +1,3 @@
-#errorBox {
-	z-index: 3;
-}
-
-#errorBox button {
-	min-width: 20%;
-	min-height: 2rem;
-}
-
 body {
 	display: flex;
 	flex-direction: column;

@@ -142,3 +142,25 @@ footer {
 	0% {transform: rotate(0deg);}
 	100% {transform: rotate(360deg);}
 }
+
+#errorBox {
+	min-height: 20vh;
+	height: unset;
+	z-index: 3;
+}
+
+#errorText {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 2rem;
+}
+
+#errorName {
+	margin-bottom: 0;
+}
+
+#errorBox button {
+	min-width: 20%;
+	min-height: 2rem;
+}

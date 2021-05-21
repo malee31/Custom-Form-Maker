@@ -10,8 +10,10 @@
 		<%- include("/partials/createTool/choiceEditor") %>
 		<div class="loadWheel infinite-spin" <%- (typeof show !== "undefined" && show ? "" : 'style="visibility: hidden;"') %>></div>
 		<section class="floatBox" id="errorBox" style="display: none; opacity: 0;">
-			<h1 id="errorName">Error</h1>
-			<p id="errorDesc">Something has gone wrong! Try again in a moment.</p>
+			<div id="errorText">
+				<h1 id="errorName">Error</h1>
+				<p id="errorDesc">Something has gone wrong! Try again in a moment.</p>
+			</div>
 			<button onclick="toggleErrorBox(false)">Ok</button>
 		</section>
 		<main class="control-pad">
