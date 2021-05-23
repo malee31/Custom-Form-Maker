@@ -94,9 +94,14 @@ app.get("/form/:sheetId", async(req, res) => {
 	try {
 		headerData = await sheet.getHeaders(req.params.sheetId);
 	} catch(e) {
-		res.status(404).render(path.resolve(__dirname, "views/pages/404.ejs"), {
-			errorName: "Invalid Spreadsheet ID",
-			errorDesc: e.toString()
+		const errorData = e?.response?.data?.error || {
+			code: 400,
+			status: "ERROR",
+			message: "Something went wrong while accessing up the Google Spreadsheet. Double-check the link or contact the form owner to troubleshoot the problem"
+		};
+		return res.status(errorData.code).render(path.resolve(__dirname, "views/pages/404.ejs"), {
+			errorName: `Invalid Spreadsheet ID | Error ${errorData.code}`,
+			errorDesc: `[${errorData.status}] | ${errorData.message}`
 		});
 	}
 	(req.query.default || "").split(/(?=\s*(?<=[^\\])),/).forEach((val, index) => {
