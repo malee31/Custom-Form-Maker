@@ -179,6 +179,7 @@ function createToolOverride(e, setData) {
 	const elementMap = createRenderWrapper();
 	elementMap.data = data;
 	elementMap.renderWrapper.dataset.uuid = uuid;
+
 	if(data.subtype === "select") {
 		elementMap.additionalControls.append(createOptionEditor());
 		attachOptionListeners(elementMap);
@@ -306,6 +307,7 @@ function createRenderWrapper() {
 		renderPreview: renderWrapperClone.querySelector(".render-preview"),
 		editorWrapper: renderWrapperClone.querySelector(".edit-controls-wrapper"),
 		closeEditor: renderWrapperClone.querySelector(".close-editor-button"),
+		destroyEditor: renderWrapperClone.querySelector(".destroy-editor-button"),
 		additionalControls: renderWrapperClone.querySelector(".additional-edit-controls")
 	}
 
@@ -409,6 +411,10 @@ function attachEditListeners(elementMap) {
 	};
 	elementMap.editorElements.defaultValue.addEventListener("input", updatePreviewForWrapper);
 	elementMap.editorElements.placeholderValue.addEventListener("input", updatePreviewForWrapper);
+	elementMap.destroyEditor.addEventListener("click", () => {
+		elementMap.renderWrapper.parentNode.removeChild(elementMap.renderWrapper);
+		GeneratedData.headers = GeneratedData.headers.filter(val => val !== elementMap.renderWrapper.dataset.uuid);
+	});
 }
 
 /**
@@ -435,12 +441,6 @@ function finalizeGeneratedData() {
 	};
 	for(let uuidNum = 0; uuidNum < GeneratedData.headers.length; uuidNum++) {
 		const uuid = GeneratedData.headers[uuidNum];
-		// if(typeof uuid === "object") {
-		// 	console.log("Already finalized.");
-		// 	console.log(uuid);
-		// 	continue;
-		// }
-		// Note: Does not complete a deep copy of data objects. Referenced.
 		finalized.headers[uuidNum] = dataMap[uuid].data.toCleanObject();
 	}
 	return finalized;
