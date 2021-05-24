@@ -1,4 +1,4 @@
-const {v4: uuidv4} = require("uuid");
+const { v4: uuidv4 } = require("uuid");
 const sharedDataProcessor = require("./shared/sharedDataProcessor.js");
 
 module.exports = {

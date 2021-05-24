@@ -156,9 +156,9 @@ async function makeResultSheet(sheetId, headers) {
 			properties.headerValues = headers;
 			await doc.addSheet(properties);
 		}
-		return {success: true, statusText: "Successfully created result sheet"};
-	} catch (e) {
-		return {success: false, statusText: `Code ${e.code}: ${e.message}`};
+		return { success: true, statusText: "Successfully created result sheet" };
+	} catch(e) {
+		return { success: false, statusText: `Code ${e.code}: ${e.message}` };
 	}
 }
 

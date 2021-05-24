@@ -20,21 +20,21 @@ const sheet = require("./spreadsheet.js");
 const sheetError = require("./sheetError.js");
 
 // For cleaning up input data for rendering
-const {cleanData, typeFilter} = require("./serverDataProcessor.js");
+const { cleanData, typeFilter } = require("./serverDataProcessor.js");
 
 // Place to save created form JSON files
-const {writeFile, readFile} = require("fs").promises;
+const { writeFile, readFile } = require("fs").promises;
 const createdJSONPath = path.resolve(__dirname, "createdJSON");
-const {v4: uuidv4} = require("uuid");
+const { v4: uuidv4 } = require("uuid");
 const processor = require("./shared/sharedDataProcessor.js");
 
 // Allows parsing of data in requests
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Use EJS Templating Engine with certain options set
 app.set('view engine', 'ejs');
-app.set('view options', {root: path.resolve(__dirname, "views")});
+app.set('view options', { root: path.resolve(__dirname, "views") });
 
 //Serves static file like local js and css
 app.use("/static", express.static(path.resolve(__dirname, "static")));
@@ -111,7 +111,7 @@ app.get("/form/:sheetId", async(req, res) => {
 
 	headerData.headers = headerData.headers.map(header => cleanData(header));
 	console.log(headerData);
-	res.render(path.resolve(__dirname, "views/pages/form"), {formId: req.params.sheetId, formData: headerData});
+	res.render(path.resolve(__dirname, "views/pages/form"), { formId: req.params.sheetId, formData: headerData });
 });
 
 app.get("/created/:createId", (req, res) => {
@@ -148,7 +148,7 @@ app.get("/edit/:createId", (req, res) => {
 });
 
 app.get("/templates", (req, res) => {
-	const requested = {type: req.query.type};
+	const requested = { type: req.query.type };
 	if(!requested.type) return res.status(422).send("No template type requested");
 	try {
 		return res.set("Content-Type", "text/plain").sendFile(path.resolve(__dirname, "views", `${typeFilter(requested).path.substring(1)}.ejs`));
@@ -157,7 +157,7 @@ app.get("/templates", (req, res) => {
 	}
 });
 
-app.post("/create/submit", async (req, res) => {
+app.post("/create/submit", async(req, res) => {
 	const assignedID = req.body.editing || uuidv4();
 	const data = {
 		name: req.body.name,

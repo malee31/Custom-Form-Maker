@@ -60,8 +60,7 @@ window.addEventListener("load", () => {
 				fileTitle.innerText = fetched.name;
 				sheetIDInput.value = fetched.sheetId;
 				GeneratedData.editing = editing;
-			}
-			else onerror(res.target.responseText);
+			} else onerror(res.target.responseText);
 		});
 		req.addEventListener("error", onerror);
 		req.open("GET", `${window.location.origin}/edit/${editing}`);
@@ -265,7 +264,10 @@ function generateUUID() {
 function updatePreview(elementMap, skipFetch = false) {
 	const updatedData = skipFetch ? elementMap.data : fetchEditorValues(elementMap);
 	requestTemplate(updatedData.type).then(template => {
-		const rendered = parseHTMLString(ejs.render(template, { inputOptions: cleanData(updatedData, elementMap.renderWrapper.dataset.uuid), editMode: true }))[0];
+		const rendered = parseHTMLString(ejs.render(template, {
+			inputOptions: cleanData(updatedData, elementMap.renderWrapper.dataset.uuid),
+			editMode: true
+		}))[0];
 		while(elementMap.renderPreview.firstChild) elementMap.renderPreview.firstChild.remove();
 		elementMap.renderPreview.append(rendered);
 		attachEditOpenerListeners(rendered, elementMap);
